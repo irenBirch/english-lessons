@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Trial Lesson A2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: clean lesson workbook. Hero with a to-scale 60-minute plan strip; sticky tab bar switches Lesson / Grammar. */
+:root{
+  --paper:#EEF2F0; --card:#FFFFFF; --ink:#172437; --muted:#5A6878; --rule:rgba(23,36,55,.14);
+  --navy:#1D3557; --navy-fg:#F1F5F9; --green:#1E8C6E; --red:#D2453A; --gold:#EDB23A; --tint:#E3ECE8;
+  --ok:#1E8C6E; --bad:#D2453A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F1722; --card:#182433; --ink:#E8EEF3; --muted:#98A6B5; --rule:rgba(232,238,243,.14);
+  --navy:#22406A; --navy-fg:#F1F5F9; --green:#3CC59C; --red:#FF6B5E; --gold:#F4C25A; --tint:#1F2E40;
+  --ok:#3CC59C; --bad:#FF6B5E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F1722; --card:#182433; --ink:#E8EEF3; --muted:#98A6B5; --rule:rgba(232,238,243,.14);
+  --navy:#22406A; --navy-fg:#F1F5F9; --green:#3CC59C; --red:#FF6B5E; --gold:#F4C25A; --tint:#1F2E40;
+  --ok:#3CC59C; --bad:#FF6B5E; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--navy)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.1;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- HERO ---------- */
+.hero{padding-block:44px 34px}
+.hero .eyebrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--card);border:1px solid var(--rule)}
+.chip.g{background:var(--gold);border-color:var(--gold);color:#172437}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem)}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero .lede{max-width:62ch;color:var(--muted);margin-top:14px;font-size:1.05rem}
+.plan{margin-top:28px;display:flex;flex-direction:column;gap:8px}
+.plan-bar{display:flex;gap:4px;height:58px}
+.plan-bar a{flex:var(--m) 1 0;min-width:0;border-radius:10px;padding:8px 10px;text-decoration:none;color:#fff;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:transform .15s}
+.plan-bar a:hover{transform:translateY(-2px)}
+.plan-bar b{font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plan-bar span{font-family:var(--f-mono);font-size:.7rem;opacity:.85}
+.plan-scale{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.68rem;color:var(--muted)}
+/* ---------- TABS ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--navy);color:var(--navy-fg)}
+.bar .wrap{display:flex;gap:6px;align-items:center;padding-block:8px;overflow-x:auto;scrollbar-width:none}
+.tab{flex:0 0 auto;border:0;background:transparent;color:var(--navy-fg);font-family:var(--f-display);font-size:.9rem;padding:9px 16px;border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--gold);color:#172437}
+.bar .sep{flex:0 0 1px;height:24px;background:rgba(255,255,255,.25);margin-inline:6px}
+.jump{flex:0 0 auto;color:#C9D6E4;text-decoration:none;font-size:.86rem;padding:6px 10px;border-radius:8px}
+.jump:hover{color:#fff;background:rgba(255,255,255,.08)}
+.jump b{font-family:var(--f-mono);color:var(--gold);font-size:.75rem;margin-right:5px}
+
+/* ---------- SECTIONS ---------- */
+section.stage{padding-block:54px 4px;scroll-margin-top:70px}
+.head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start;margin-bottom:24px}
+.n{font-family:var(--f-display);font-size:1.1rem;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:var(--gold)}
+.head h2{font-size:clamp(1.6rem,4vw,2.2rem)}
+.head p{color:var(--muted);margin-top:6px;max-width:66ch}
+.min{display:inline-block;vertical-align:middle;margin-left:8px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.04em;padding:3px 9px;border-radius:999px;background:var(--gold);color:#172437;transform:translateY(-3px)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.label{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:700}
+.card h3{font-size:1.15rem}
+.tip{font-size:.92rem;background:var(--tint);border-radius:10px;padding:12px 14px;color:var(--ink)}
+.tip b{color:var(--green)}
+.q{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;font-weight:800;font-size:.95rem;padding:10px 18px;border-radius:999px;background:var(--navy);color:var(--navy-fg);transition:transform .1s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--rule)}
+.btn.gold{background:var(--gold);color:#172437}
+.score{font-family:var(--f-mono);font-weight:700;color:var(--green)}
+
+/* warm-up: make questions */
+.mkq{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:m}
+.mkq li{counter-increment:m}
+.mkq button{width:100%;text-align:left;border:1.5px solid var(--rule);background:var(--paper);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:26px minmax(0,1fr);gap:4px 8px;align-items:baseline}
+.mkq button::before{content:counter(m);font-family:var(--f-mono);font-size:.8rem;color:var(--muted);grid-row:span 2}
+.mkq .cue{font-family:var(--f-mono);font-size:.9rem}
+.mkq .ans{font-weight:800;color:var(--green)}
+.mkq button.on{border-color:var(--green)}
+/* warm-up form (unused) */
+.idform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.idform label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);font-weight:700}
+.idform input{width:100%;font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:10px;padding:9px 11px;min-width:0}
+.spin{min-height:96px;display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-size:clamp(1.05rem,2.6vw,1.35rem);padding:18px;border-radius:12px;background:var(--navy);color:var(--navy-fg);line-height:1.3}
+
+/* MC items */
+.unitgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.unit header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.unit header h3{font-size:1.02rem}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:it}
+.items li{counter-increment:it;display:flex;flex-direction:column;gap:7px}
+.items li .s::before{content:counter(it) ". ";font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.slot{display:inline-block;min-width:4.5em;border-bottom:2px solid var(--ink);text-align:center;font-weight:800;padding:0 4px;color:var(--navy)}
+:root[data-theme="dark"] .slot{color:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .slot{color:var(--gold)}}
+.slot.ok{border-color:var(--ok);color:var(--ok)!important}
+.slot.no{border-color:var(--bad);color:var(--bad)!important;text-decoration:line-through}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:1.5px solid var(--rule);background:var(--paper);border-radius:999px;padding:4px 12px;font-size:.9rem;cursor:pointer;font-weight:600}
+.opt[aria-pressed="true"]{background:var(--navy);color:var(--navy-fg);border-color:var(--navy)}
+.opt.right{box-shadow:0 0 0 2px var(--ok)}
+.unit .foot{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+
+/* result */
+.result{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:118px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:.82rem}
+.bar-row .track{height:14px;border-radius:7px;background:var(--tint);overflow:hidden;position:relative}
+.bar-row .fill{height:100%;border-radius:7px;background:var(--green);width:0;transition:width .6s ease}
+.bar-row .fill.mid{background:var(--gold)} .bar-row .fill.low{background:var(--red)}
+.bar-row .track::after{content:"";position:absolute;top:-3px;bottom:-3px;left:80%;width:2px;background:var(--ink);opacity:.35}
+.bar-row b{font-family:var(--f-mono);font-size:.78rem;text-align:right}
+.bar-row span{color:var(--muted)}
+.verdict{border-radius:14px;padding:20px;background:var(--navy);color:var(--navy-fg)}
+.verdict h3{color:var(--gold);font-size:1.3rem;margin-bottom:8px}
+.legend{font-size:.8rem;color:var(--muted)}
+
+/* vocab sort */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;padding:12px;border-radius:12px;border:1.5px dashed var(--rule);margin-bottom:16px}
+.w{border:1.5px solid var(--rule);background:var(--card);border-radius:8px;padding:5px 11px;font-weight:700;cursor:pointer;font-size:.92rem}
+.w.sel{background:var(--gold);color:#172437;border-color:var(--gold)}
+.w.ok{border-color:var(--ok);box-shadow:inset 0 -3px 0 var(--ok)} .w.no{border-color:var(--bad);box-shadow:inset 0 -3px 0 var(--bad)}
+.bins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.bin{border-radius:12px;background:var(--paper);border:1.5px solid var(--rule);padding:10px;min-height:118px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.bin.ready{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 30%,transparent)}
+.bin h4{margin:0;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bin .in{display:flex;flex-wrap:wrap;gap:5px}
+.odd{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.odd li{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.odd li > i{font-style:normal;font-family:var(--f-mono);font-size:.8rem;color:var(--muted);width:22px}
+
+/* reading */
+.text{font-size:1.02rem;line-height:1.75;display:flex;flex-direction:column;gap:12px;max-width:66ch}
+.text mark{background:color-mix(in srgb,var(--gold) 40%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.tf{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tf li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;background:var(--paper);border:1.5px solid transparent}
+.tf li.ok{border-color:var(--ok)} .tf li.no{border-color:var(--bad)}
+.tog{display:flex;border-radius:999px;overflow:hidden;border:1.5px solid var(--rule)}
+.tog button{border:0;background:var(--card);padding:4px 13px;cursor:pointer;font-weight:800}
+.tog button[aria-pressed="true"]{background:var(--navy);color:var(--navy-fg)}
+.hunt{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.hunt li{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center;font-size:.92rem}
+.hunt input{width:100%;font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:8px;padding:6px 9px;min-width:0}
+.hunt span{font-weight:700}
+
+/* speaking */
+.topics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.topic{border-radius:12px;border:1.5px solid var(--rule);background:var(--card);padding:14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:118px}
+.topic .ic{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.topic b{font-family:var(--f-display);font-size:.98rem;line-height:1.2}
+.topic ol{margin:0;padding-left:1.1em;font-size:.86rem;display:flex;flex-direction:column;gap:4px}
+.topic.open{border-color:var(--green);background:color-mix(in srgb,var(--green) 7%,var(--card))}
+.topic.pick{animation:pick .6s ease}
+@keyframes pick{30%{transform:scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.topic.pick{animation:none}}
+.timer{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.clock{font-family:var(--f-display);font-size:2.6rem;font-variant-numeric:tabular-nums;min-width:3ch}
+.ring{width:64px;height:64px}
+.menu{width:100%;border-collapse:collapse;font-size:.95rem}
+.menu td{padding:6px 0;border-bottom:1px dashed var(--rule)}
+.menu td:last-child{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.role{border-radius:12px;padding:14px;background:var(--paper)}
+.role b{display:block;font-family:var(--f-display);font-size:.95rem;margin-bottom:4px}
+.phr{display:flex;flex-wrap:wrap;gap:6px}
+.phr span{background:var(--tint);border-radius:6px;padding:3px 8px;font-size:.86rem;font-weight:600}
+
+/* wrap-up */
+.checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.checks fieldset{border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin:0;min-width:0}
+.checks legend{font-weight:800;padding:0 6px;font-size:.95rem}
+.checks label{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:.93rem;cursor:pointer}
+.checks input{accent-color:var(--green);width:17px;height:17px}
+textarea{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:10px;padding:10px;width:100%;min-height:90px;resize:vertical}
+
+/* ---------- GRAMMAR TAB ---------- */
+.g-intro{padding-block:44px 10px}
+.g-intro h2{font-size:clamp(1.7rem,4.4vw,2.5rem)}
+.g-intro p{color:var(--muted);margin-top:10px;max-width:64ch}
+.g-index{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.g-index a{text-decoration:none;color:var(--ink);font-size:.86rem;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--rule)}
+.g-index a:hover{border-color:var(--green)}
+.g-unit{padding-block:34px 0;scroll-margin-top:70px}
+.g-unit > h3{display:flex;gap:12px;align-items:baseline;font-size:1.3rem;margin-bottom:16px}
+.g-unit > h3 span{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;color:var(--green);text-transform:uppercase}
+.rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.rule{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.rule h4{margin:0;font-family:var(--f-display);font-size:1.02rem}
+.rule p{font-size:.95rem}
+.form{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;font-size:.92rem;background:var(--paper);border-radius:10px;padding:10px 12px}
+.form i{font-style:normal;font-family:var(--f-mono);font-weight:700;color:var(--green)}
+.form code{font-family:var(--f-mono);font-size:.84rem;overflow-wrap:anywhere}
+.ex{font-size:.93rem;display:flex;flex-direction:column;gap:3px;padding-left:12px;border-left:3px solid var(--gold)}
+.ex em{font-style:normal;font-weight:800}
+.ex small{color:var(--muted)}
+.trap{font-size:.88rem;color:var(--muted)}
+.trap{border-top:1px dashed var(--rule);padding-top:8px}
+.trap b{color:var(--ink)}
+.tbl{overflow-x:auto}
+.rule.wide{grid-column:1/-1}
+.rule.wide .tbl td{white-space:normal;vertical-align:top;min-width:120px}
+.rule.wide .tbl td:first-child{font-weight:800;white-space:nowrap}
+.te{display:flex;flex-direction:column;gap:6px}
+.te-l{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.te div{display:flex;flex-wrap:wrap;gap:5px}
+.te div span{font-size:.84rem;font-weight:700;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--gold) 26%,transparent);color:var(--ink)}
+.te p{font-size:.86rem;color:var(--muted)}
+.tbl table{border-collapse:collapse;font-size:.88rem;width:100%}
+.tbl th,.tbl td{border-bottom:1px solid var(--rule);padding:5px 8px;text-align:left;white-space:nowrap}
+.tbl th{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+footer{padding-block:60px 44px;color:var(--muted);font-size:.86rem}
+
+@media (max-width:900px){
+  .topics,.bins{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .checks,.grid3{grid-template-columns:minmax(0,1fr)}
+  .unitgrid,.rules{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:740px){
+  .plan-bar{flex-direction:column;height:auto}.plan-bar a{flex:none;flex-direction:row;align-items:center;padding:9px 12px}.plan-scale{display:none}
+  .grid2,.result{grid-template-columns:minmax(0,1fr)}
+  .idform{grid-template-columns:minmax(0,1fr)}
+  .hunt li{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px}
+}
+@media (max-width:420px){
+  .topics,.bins{grid-template-columns:1fr}
+  .bar-row{grid-template-columns:96px minmax(0,1fr) 40px}
+}
+</style>
+
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="chip g">Level A2</span><span class="chip">60 minutes</span><span class="chip">Focus 1 · 2nd edition</span><span class="chip" id="qCount">— questions</span></div>
+    <h1>Trial lesson: <em>let's meet!</em></h1>
+    <p class="lede">Пробний урок для нової учениці: знайомство, швидка перевірка всієї граматики Focus 1, лексика за вісьмома темами книжки, читання і говоріння. Після тесту сторінка підкаже, з якої книжки і розділу почати.</p>
+    <div class="plan">
+      <div class="plan-bar">
+        <a href="#s1" style="--m:10;background:#1E8C6E"><b>Warm-up</b><span>10 min</span></a>
+        <a href="#s2" style="--m:20;background:#1D3557"><b>Grammar check</b><span>20 min</span></a>
+        <a href="#s3" style="--m:8;background:#C0392F"><b>Words</b><span>8 min</span></a>
+        <a href="#s4" style="--m:7;background:#B07A12"><b>Reading</b><span>7</span></a>
+        <a href="#s5" style="--m:12;background:#1E8C6E"><b>Speaking</b><span>12 min</span></a>
+        <a href="#s6" style="--m:3;background:#1D3557" title="Wrap-up · 3 min"><b>Goals</b><span>3</span></a>
+      </div>
+      <div class="plan-scale"><span>0 min</span><span>30</span><span>60 min</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="bar" aria-label="Pages">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" id="tabLesson" aria-selected="true" aria-controls="lesson">Урок</button>
+    <button class="tab" role="tab" id="tabGrammar" aria-selected="false" aria-controls="grammar">Граматика</button>
+    <span class="sep" id="sep"></span>
+    <span id="jumps" style="display:contents">
+      <a class="jump" href="#s1"><b>01</b>Warm-up</a>
+      <a class="jump" href="#s2"><b>02</b>Grammar check</a>
+      <a class="jump" href="#s3"><b>03</b>Vocabulary</a>
+      <a class="jump" href="#s4"><b>04</b>Reading</a>
+      <a class="jump" href="#s5"><b>05</b>Speaking</a>
+      <a class="jump" href="#s6"><b>06</b>Wrap-up</a>
+    </span>
+  </div>
+</nav>
+
+<!-- =================== LESSON =================== -->
+<main id="lesson" role="tabpanel" aria-labelledby="tabLesson">
+<div class="wrap">
+
+<section class="stage" id="s1">
+  <div class="head"><div class="n">01</div><div>
+    <h2>Warm-up: Nice to meet you! <span class="min">10 min</span></h2>
+    <p>Ask your teacher questions, answer the question cards and play “Two truths and a lie”.</p></div></div>
+  <div class="grid2">
+    <div class="card stack">
+      <span class="label">Task 1 · Interview your teacher</span>
+      <p style="font-size:.95rem;color:var(--muted)">Make questions from the words and ask your teacher. Tap a question to check it.</p>
+      <ol class="mkq" id="mkq"></ol>
+    </div>
+    <div class="stack">
+      <div class="card stack">
+        <span class="label">Task 2 · Question cards</span>
+        <div class="spin" id="spin">Press the button for a question!</div>
+        <div class="row"><button class="btn gold" type="button" id="spinBtn">Next question</button><span class="mono" style="color:var(--muted)" id="spinN"></span></div>
+      </div>
+      <div class="card stack">
+        <span class="label">Task 3 · Two truths and a lie</span>
+        <p>Say three sentences about yourself. Two are true, one is false. Can your teacher guess the lie?</p>
+        <div class="tip"><b>Приклад учителя:</b><br>1. I have got two cats.<br>2. I can play the guitar.<br>3. I have never been to Italy.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stage" id="s2">
+  <div class="head"><div class="n">02</div><div>
+    <h2>Grammar check <span class="min">20 min</span></h2>
+    <p>Choose the correct answer. One block for every unit of Focus 1. Check each block, then see the result at the end.</p></div></div>
+  <div class="unitgrid" id="units"></div>
+  <div class="card" style="margin-top:24px">
+    <div class="result">
+      <div class="stack">
+        <span class="label">Result · Where to start</span>
+        <div class="bars" id="bars"></div>
+        <p class="legend">Вертикальна риска позначає 80%. Зелене означає впевнено, жовте — треба повторити, червоне — тема нова.</p>
+      </div>
+      <div class="stack">
+        <div class="verdict" id="verdict"><h3>Ще немає результату</h3><p>Перевірте блоки вище й натисніть кнопку нижче.</p></div>
+        <div class="row"><button class="btn gold" type="button" id="showResult">Show result</button><button class="btn alt" type="button" id="checkAll">Check all blocks</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stage" id="s3">
+  <div class="head"><div class="n">03</div><div>
+    <h2>Vocabulary: 8 topics <span class="min">8 min</span></h2>
+    <p>Words from the eight topics of Focus 1. Tap a word, then tap its topic.</p></div></div>
+  <div class="card">
+    <span class="label">Task 1 · Sort the words</span>
+    <div class="pool" id="pool" style="margin-top:12px"></div>
+    <div class="bins" id="bins"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="button" id="sortCheck">Check</button><button class="btn alt" type="button" id="sortReset">Reset</button><span class="score" id="sortScore"></span></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card stack">
+      <span class="label">Task 2 · Odd one out</span>
+      <p style="color:var(--muted);font-size:.92rem">Which word is different? Explain why.</p>
+      <ol class="odd" id="odd"></ol>
+      <div class="row"><button class="btn" type="button" id="oddCheck">Check</button><span class="score" id="oddScore"></span></div>
+    </div>
+    <div class="card stack">
+      <span class="label">Task 3 · Talk about it</span>
+      <p>Choose 5 words from Task 1 and make a sentence about <b>your life</b> with each.</p>
+      <div class="tip"><i>My cousin lives in Lviv.</i><br><i>I've never had a serious injury.</i><br><i>I always forget my passport!</i></div>
+    </div>
+  </div>
+</section>
+
+<section class="stage" id="s4">
+  <div class="head"><div class="n">04</div><div>
+    <h2>Reading: Meet Oliver <span class="min">7 min</span></h2>
+    <p>Read about Oliver. Are the sentences true or false? Then find the grammar in the text.</p></div></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="text" id="oliver">
+        <p>Hi! I'm Oliver and I'm sixteen. I live in Bristol with my mum, my dad and my little sister, Emma. My mum is a doctor and she works very long hours. My dad has got a small café, so we always have fresh bread at home!</p>
+        <p>I go to a big school near the river. My favourite subject is biology because I love nature. I'm not very good at maths – it's harder than any other subject for me.</p>
+        <p>At the moment I'm learning Spanish because we are going to visit Spain next summer. I've never been there, but my sister has already been there twice with her school.</p>
+        <p>Last weekend was great. On Saturday I played football with my friends, and on Sunday we went to the forest and had a picnic. It rained in the afternoon, but we didn't care.</p>
+        <p>In the future, I think I'll be a vet. I have to study a lot, but I'm sure it will be worth it.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card stack">
+        <span class="label">Task 1 · True or false?</span>
+        <ul class="tf" id="tf"></ul>
+        <div class="row"><button class="btn" type="button" id="tfCheck">Check</button><span class="score" id="tfScore"></span></div>
+      </div>
+      <div class="card stack">
+        <span class="label">Task 2 · Grammar hunt</span>
+        <p style="font-size:.92rem;color:var(--muted)">Find one example of each in the text and type it.</p>
+        <ul class="hunt">
+          <li><span>Present Continuous</span><input id="h1" placeholder="I'm …"></li>
+          <li><span>Present Perfect</span><input id="h2"></li>
+          <li><span>Past Simple</span><input id="h3"></li>
+          <li><span>be going to</span><input id="h4"></li>
+          <li><span>Comparative</span><input id="h5"></li>
+          <li><span>have to</span><input id="h6"></li>
+        </ul>
+        <div class="row"><button class="btn alt" type="button" id="huntShow">Highlight in the text</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stage" id="s5">
+  <div class="head"><div class="n">05</div><div>
+    <h2>Speaking <span class="min">12 min</span></h2>
+    <p>Pick a topic and answer the questions. Use the timer: try to speak for one minute without stopping.</p></div></div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:14px">
+      <span class="label">Task 1 · Topic cards</span>
+      <button class="btn gold" type="button" id="randTopic">Random topic</button>
+    </div>
+    <div class="topics" id="topics"></div>
+  </div>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card stack">
+      <span class="label">Task 2 · One-minute talk</span>
+      <div class="timer">
+        <svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="none" stroke="var(--tint)" stroke-width="7"/><circle id="ringFg" cx="32" cy="32" r="27" fill="none" stroke="var(--green)" stroke-width="7" stroke-linecap="round" transform="rotate(-90 32 32)" stroke-dasharray="169.6" stroke-dashoffset="0"/></svg>
+        <div class="clock" id="clock" aria-live="off">1:00</div>
+      </div>
+      <div class="row"><button class="btn" type="button" id="t30">30 s</button><button class="btn" type="button" id="t60">60 s</button><button class="btn alt" type="button" id="tStop">Stop</button></div>
+      <p style="font-size:.92rem;color:var(--muted)">Talk about: <b>my perfect weekend</b>, <b>my town</b>, <b>my best holiday</b>.</p>
+    </div>
+    <div class="card stack">
+      <span class="label">Task 3 · Compare!</span>
+      <p style="font-size:.92rem">Which is better? Give two reasons. Use <b>-er / more … than / the best</b>.</p>
+      <ul class="q">
+        <li>summer or winter?</li>
+        <li>cats or dogs?</li>
+        <li>a big city or a village?</li>
+        <li>online lessons or lessons in a classroom?</li>
+        <li>films or books?</li>
+      </ul>
+      <p class="tip"><i>I think summer is better than winter because it's warmer and the days are longer.</i></p>
+    </div>
+    <div class="card stack">
+      <span class="label">Task 4 · Role-play: At a café</span>
+      <table class="menu"><tbody>
+        <tr><td>Cheese sandwich</td><td>£3.50</td></tr>
+        <tr><td>Tomato soup</td><td>£3.00</td></tr>
+        <tr><td>Chicken salad</td><td>£4.20</td></tr>
+        <tr><td>Pizza slice</td><td>£2.80</td></tr>
+        <tr><td>Chocolate cake</td><td>£2.50</td></tr>
+        <tr><td>Orange juice</td><td>£1.90</td></tr>
+        <tr><td>Hot chocolate</td><td>£2.20</td></tr>
+      </tbody></table>
+      <div class="role"><b>Student · Customer</b>You've got £8. Order lunch and a drink. You don't eat meat.</div>
+      <div class="role"><b>Teacher · Waiter</b>There isn't any pizza today. Ask: “Anything else?”</div>
+      <div class="phr"><span>Can I have…?</span><span>I'd like…</span><span>How much is…?</span><span>Is there any…?</span><span>Have you got any…?</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="stage" id="s6">
+  <div class="head"><div class="n">06</div><div>
+    <h2>Wrap-up: My English goals <span class="min">3 min</span></h2>
+    <p>Tell your teacher about your goals. Відмітки потрібні вчителю, щоб спланувати курс. Вони зберігаються лише в цьому браузері.</p></div></div>
+  <div class="checks" id="checks"></div>
+  <div class="card" style="margin-top:20px">
+    <label for="notes" class="label" style="display:block;margin-bottom:8px">Нотатки вчителя</label>
+    <textarea id="notes" placeholder="Інтереси, улюблені серіали, складні звуки, слова, які вона не знала…"></textarea>
+  </div>
+</section>
+
+</div>
+</main>
+
+<!-- =================== GRAMMAR =================== -->
+<main id="grammar" role="tabpanel" aria-labelledby="tabGrammar" hidden>
+<div class="wrap">
+  <div class="g-intro">
+    <span class="label">Довідник · Focus 1</span>
+    <h2>Граматика коротко і зрозуміло</h2>
+    <p>Кожне правило вміщується в одну картку: коли вживаємо, формула, приклади і типова пастка. Порядок такий самий, як у розділах книжки.</p>
+    <nav class="g-index" id="gIndex"></nav>
+  </div>
+  <div id="gBody"></div>
+</div>
+</main>
+
+<footer><div class="wrap">Пробний урок англійської · рівень A2 · за програмою Focus 1 (Pearson, 2nd edition). Тексти й завдання створено для цього уроку.</div></footer>
+
+<script>
+/* ================= DATA ================= */
+
+const QUESTIONS=["What's your name? Where are you from?","How old are you? When is your birthday?","Have you got any brothers or sisters?","Have you got a pet? What's its name?","What can you do really well?","What's your favourite film or series?","What do you usually do after school?","What's your favourite food?","Why do you want to learn English?","What did you do last weekend?","What's something you can't do but want to learn?","What's in your bag right now?","Where would you like to travel?","What music do you listen to?"];
+
+/* each item: [sentence with ___, [correct, wrong, wrong]] — options shuffled on screen */
+const UNITS=[
+ {id:"u0",t:"Starter",g:"to be · have got · can · this/that · my/his · prepositions",it:[
+  ["My sister ___ fifteen years old.",["is","are","am"]],
+  ["We ___ a big dog.",["have got","has got","are"]],
+  ["___ you swim? — Yes, I can.",["Can","Do","Are"]],
+  ["This is ___ brother. His name is Max.",["my","me","I"]],
+  ["Look at ___ shoes over there!",["those","this","that"]],
+  ["___ there a park near your house?",["Is","Are","Do"]],
+  ["My birthday is ___ May.",["in","on","at"]],
+  ["___ your books, please!",["Open","Opens","Opening"]]]},
+ {id:"u1",t:"Unit 1",g:"Present Simple",it:[
+  ["My dad ___ in a bank.",["works","work","working"]],
+  ["___ your best friend live near you?",["Does","Do","Is"]],
+  ["I ___ like horror films.",["don't","doesn't","not"]],
+  ["She ___ TV in the morning.",["never watches","watches never","never watch"]],
+  ["What time ___ you usually get up?",["do","does","are"]]]},
+ {id:"u2",t:"Unit 2",g:"Countable / uncountable · a/an/the",it:[
+  ["There isn't ___ milk in the fridge.",["any","some","a"]],
+  ["How ___ apples do you want?",["many","much","any"]],
+  ["I eat ___ apple every day.",["an","a","the"]],
+  ["___ sun is very hot today.",["The","A","An"]],
+  ["We need ___ bread for breakfast.",["some","many","a"]]]},
+ {id:"u3",t:"Unit 3",g:"Present Continuous vs Simple",it:[
+  ["Shh! The baby ___.",["is sleeping","sleeps","sleep"]],
+  ["Look! It ___.",["is raining","rains","rain"]],
+  ["My mum is a nurse. She ___ in a hospital.",["works","is working","work"]],
+  ["What ___ you doing right now?",["are","do","is"]],
+  ["I usually ___ to school, but today I'm taking the bus.",["walk","am walking","walks"]]]},
+ {id:"u4",t:"Unit 4",g:"Comparatives · have to",it:[
+  ["My brother is ___ than me.",["taller","more tall","tallest"]],
+  ["This is the ___ day of the year.",["hottest","hotter","most hot"]],
+  ["For me, English is ___ than maths.",["easier","more easy","easyer"]],
+  ["Tomorrow is Saturday, so I ___ get up early.",["don't have to","have to","doesn't have to"]],
+  ["A doctor ___ work at night sometimes.",["has to","have to","having to"]]]},
+ {id:"u5",t:"Unit 5",g:"must · should · was/were · could",it:[
+  ["You ___ use your phone during the test. It's a rule.",["mustn't","don't have to","should"]],
+  ["You look tired. You ___ go to bed early.",["should","mustn't","shouldn't"]],
+  ["I ___ at home yesterday evening.",["was","were","am"]],
+  ["When I was three, I ___ read.",["couldn't","can't","didn't could"]],
+  ["___ your teachers strict at primary school?",["Were","Was","Did"]]]},
+ {id:"u6",t:"Unit 6",g:"Past Simple",it:[
+  ["Last weekend I ___ to the cinema.",["went","goed","go"]],
+  ["We ___ tennis yesterday.",["played","plaied","play"]],
+  ["She ___ breakfast this morning.",["didn't eat","didn't ate","not ate"]],
+  ["___ you see the match last night?",["Did","Do","Were"]],
+  ["I ___ my leg two years ago.",["broke","breaked","have broken"]]]},
+ {id:"u7",t:"Unit 7",g:"Present Perfect",it:[
+  ["Have you ever ___ to London?",["been","went","go"]],
+  ["I've ___ eaten sushi. I'd like to try it!",["never","ever","yet"]],
+  ["She has ___ arrived. She's here now!",["just","yet","ever"]],
+  ["Have you packed your bag ___?",["yet","already","just"]],
+  ["We ___ Paris in 2023.",["visited","have visited","has visited"]]]},
+ {id:"u8",t:"Unit 8",g:"will · be going to",it:[
+  ["Look at those dark clouds! It ___ rain.",["is going to","will","going to"]],
+  ["I think people ___ live on Mars one day.",["will","are going","going to"]],
+  ["I'm hungry. — Wait, I ___ make you a sandwich!",["'ll","'m going","am"]],
+  ["We ___ visit grandma this weekend. We've got the tickets.",["are going to","will to","go to"]],
+  ["___ it be cold tomorrow?",["Will","Is","Does"]]]}
+];
+
+const TOPICS=[
+ ["Family & friends",["cousin","grandparents","neighbour"]],
+ ["Food",["cucumber","flour","salmon"]],
+ ["Work",["nurse","salary","plumber"]],
+ ["People",["curly","generous","shy"]],
+ ["Education",["timetable","exam","subject"]],
+ ["Health & sport",["headache","injury","gym"]],
+ ["Travel",["luggage","ticket","passport"]],
+ ["Nature",["forest","river","cloudy"]]
+];
+
+const ODD=[
+ [["aunt","uncle","cousin","teacher"],3],
+ [["carrot","onion","cheese","potato"],2],
+ [["pilot","waiter","office","farmer"],2],
+ [["tall","slim","kind","short"],2],
+ [["maths","history","biology","homework"],3],
+ [["headache","cough","sore throat","helmet"],3],
+ [["beach","mountain","suitcase","lake"],2]
+];
+
+const TF=[
+ ["Oliver has got a brother.",false],
+ ["His dad has got a café.",true],
+ ["Maths is Oliver's easiest subject.",false],
+ ["Oliver has been to Spain twice.",false],
+ ["The weather was bad on Sunday afternoon.",true],
+ ["Oliver wants to work with animals.",true]
+];
+const HUNT=["I'm learning Spanish","I've never been there","has already been","played football","went to the forest","had a picnic","It rained","didn't care","are going to visit","harder than","have to study"];
+
+const SPEAK=[
+ ["Family & friends",["Who do you live with?","What does your best friend look like?","What do you do with your family at weekends?"]],
+ ["Food",["What do you usually have for breakfast?","Is there any food you hate?","What's the best café in your town?"]],
+ ["Work",["What do your parents do?","What job would you like in the future?","Is it better to work at home or in an office?"]],
+ ["People",["Describe a person you admire.","Who is the funniest person you know?","Are you more like your mum or your dad?"]],
+ ["Education",["What's your favourite subject? Why?","What do you have to do at school that you don't like?","What were you like at primary school?"]],
+ ["Health & sport",["What sports did you do as a child?","What should people do to stay healthy?","Have you ever broken a bone?"]],
+ ["Travel",["Have you ever been abroad?","What's the most beautiful place you've visited?","Where are you going to travel next?"]],
+ ["Nature",["Do you prefer the mountains or the sea?","What will the weather be like tomorrow?","What can we do to protect nature?"]]
+];
+
+const GOALS=[
+ ["Why do you learn English?","goal",["For school / exams (НМТ)","For travel","For my future job","For films, series, games","To talk to people online","To study or live abroad"]],
+ ["What's difficult for you?","hard",["Speaking","Listening","Grammar","Vocabulary","Writing","Pronunciation"]],
+ ["How do you like to learn?","like",["Games","Songs and videos","Films and series","Speaking practice","Grammar exercises","Homework online"]]
+];
+
+/* ================= STATE / STORAGE ================= */
+const KEY="flp-v1";
+let store={};
+try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){store={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+
+function stamp(){}
+
+/* ================= TABS ================= */
+const tabL=document.getElementById('tabLesson'),tabG=document.getElementById('tabGrammar');
+const pL=document.getElementById('lesson'),pG=document.getElementById('grammar'),jumps=document.getElementById('jumps'),sep=document.getElementById('sep');
+function show(which){
+  const g=which==='grammar';
+  pL.hidden=g;pG.hidden=!g;tabL.setAttribute('aria-selected',!g);tabG.setAttribute('aria-selected',g);
+  jumps.style.display=g?'none':'contents';sep.style.display=g?'none':'';
+}
+const goTop=()=>window.scrollTo({top:document.querySelector('.hero').offsetHeight});
+tabL.addEventListener('click',()=>{show('lesson');goTop()});
+tabG.addEventListener('click',()=>{show('grammar');goTop()});
+if(location.hash==='#grammar')show('grammar');
+
+/* ================= WARM-UP ================= */
+const MKQ=[["where / you / live?","Where do you live?"],["how old / you?","How old are you?"],["you / have got / any pets?","Have you got any pets?"],["you / can / speak / other languages?","Can you speak any other languages?"],["what / you / do / in your free time?","What do you do in your free time?"],["what / your favourite / film?","What's your favourite film?"],["you / ever / be / abroad?","Have you ever been abroad?"],["why / you / become / a teacher?","Why did you become a teacher?"]];
+const mkq=document.getElementById('mkq');
+MKQ.forEach(([c,a])=>{const li=document.createElement('li');const b=document.createElement('button');b.type='button';
+  b.innerHTML=`<span class="cue">${c}</span><span class="ans" hidden>${a}</span>`;
+  b.addEventListener('click',()=>{const on=b.classList.toggle('on');b.querySelector('.ans').hidden=!on});li.appendChild(b);mkq.appendChild(li)});
+let qOrder=QUESTIONS.map((_,i)=>i).sort(()=>Math.random()-.5),qi=-1;
+document.getElementById('spinBtn').addEventListener('click',()=>{
+  qi=(qi+1)%qOrder.length;document.getElementById('spin').textContent=QUESTIONS[qOrder[qi]];
+  document.getElementById('spinN').textContent=(qi+1)+' / '+QUESTIONS.length;stamp('s1');
+});
+
+/* ================= GRAMMAR CHECK ================= */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const unitsEl=document.getElementById('units');const results={};
+let total=0;
+UNITS.forEach(u=>{
+  const card=document.createElement('div');card.className='card unit';card.id='blk-'+u.id;
+  card.innerHTML=`<header><h3>${u.t} · ${u.g}</h3><span class="score" id="sc-${u.id}"></span></header><ol class="items"></ol>
+    <div class="foot"><button class="btn" type="button">Check</button><button class="btn alt" type="button">Show answers</button></div>`;
+  const ol=card.querySelector('ol');
+  u.it.forEach(([s,opts],k)=>{
+    total++;
+    const li=document.createElement('li');const parts=s.split('___');
+    li.innerHTML=`<span class="s">${parts[0]}<span class="slot" id="sl-${u.id}-${k}">&nbsp;</span>${parts[1]||''}</span><div class="opts"></div>`;
+    const box=li.querySelector('.opts');
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.setAttribute('aria-pressed','false');b.dataset.v=o;
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');
+        const sl=li.querySelector('.slot');sl.textContent=o;sl.classList.remove('ok','no');li.dataset.v=o;});
+      box.appendChild(b)});
+    li.dataset.a=opts[0];ol.appendChild(li);
+  });
+  const [chk,ans]=card.querySelectorAll('.foot button');
+  chk.addEventListener('click',()=>checkUnit(u,card));
+  ans.addEventListener('click',()=>{card.querySelectorAll('li').forEach(li=>li.querySelectorAll('.opt').forEach(b=>b.classList.toggle('right',b.dataset.v===li.dataset.a)))});
+  unitsEl.appendChild(card);
+});
+document.getElementById('qCount').textContent=total+' questions';
+function checkUnit(u,card){
+  let ok=0;const lis=card.querySelectorAll('li');
+  lis.forEach(li=>{const sl=li.querySelector('.slot');const good=li.dataset.v===li.dataset.a;
+    if(li.dataset.v){sl.classList.toggle('ok',good);sl.classList.toggle('no',!good)}else{sl.classList.add('no');sl.innerHTML='&nbsp;?&nbsp;'}
+    if(good)ok++;});
+  results[u.id]=ok/lis.length;
+  document.getElementById('sc-'+u.id).textContent=ok+' / '+lis.length;
+  drawBars();
+}
+const barsEl=document.getElementById('bars');
+function drawBars(){
+  barsEl.innerHTML='';
+  UNITS.forEach(u=>{const r=results[u.id];const pct=r==null?null:Math.round(r*100);
+    const row=document.createElement('div');row.className='bar-row';
+    row.innerHTML=`<span>${u.t}</span><div class="track"><div class="fill ${pct==null?'':pct>=80?'':pct>=50?'mid':'low'}"></div></div><b>${pct==null?'—':pct+'%'}</b>`;
+    barsEl.appendChild(row);requestAnimationFrame(()=>row.querySelector('.fill').style.width=(pct||0)+'%');});
+}
+drawBars();
+document.getElementById('checkAll').addEventListener('click',()=>{UNITS.forEach(u=>checkUnit(u,document.getElementById('blk-'+u.id)))});
+document.getElementById('showResult').addEventListener('click',()=>{
+  const v=document.getElementById('verdict');const done=UNITS.filter(u=>results[u.id]!=null);
+  if(done.length<3){v.innerHTML='<h3>Замало даних</h3><p>Перевірте щонайменше три блоки, зокрема Starter.</p>';return}
+  stamp('s2');
+  const s=results.u0;let title,text;
+  const weak=UNITS.slice(1).find(u=>results[u.id]!=null&&results[u.id]<.8);
+  const n=weak?+weak.id.slice(1):null;
+  if(s!=null&&s<.6){title='Focus 1 · Unit 0';text='Базові конструкції (to be, have got, can) ще не автоматичні. Почніть зі стартового розділу і працюйте без поспіху.'}
+  else if(!weak){title='Focus 2';text='Усю граматику Focus 1 учениця знає впевнено. Беріть Focus 2, а його Unit 0 пройдіть як швидке повторення.'}
+  else if(n<=2){title='Focus 1 · Unit 1';text=`Перша слабка тема: ${weak.g}. Ідіть по Focus 1 з початку, Unit 0 можна пробігти за один урок.`}
+  else if(n>=7){title=`Focus 1 · Unit ${n}`;text=`Основа сильна, слабке місце: ${weak.g}. Можна пройти розділи ${n}–8 Focus 1 і переходити на Focus 2. Або взяти Focus 2 і окремо підтягнути цю тему.`}
+  else{title=`Focus 1 · Unit ${n}`;text=`Перша слабка тема: ${weak.g}. Розділи до ${n}-го можна пройти як швидке повторення, а детально працювати з Unit ${n}.`}
+  const untested=UNITS.filter(u=>results[u.id]==null).map(u=>u.t);
+  v.innerHTML=`<h3>${title}</h3><p>${text}</p>${untested.length?`<p style="margin-top:8px;opacity:.75;font-size:.88rem">Не перевірено: ${untested.join(', ')}.</p>`:''}`;
+});
+
+/* ================= VOCABULARY ================= */
+const pool=document.getElementById('pool'),bins=document.getElementById('bins');
+let selected=null;
+const allWords=shuffle(TOPICS.flatMap(([t,ws],ti)=>ws.map(w=>({w,ti}))));
+TOPICS.forEach(([t],ti)=>{const b=document.createElement('div');b.className='bin';b.dataset.ti=ti;b.tabIndex=0;b.setAttribute('role','button');b.innerHTML=`<h4>${t}</h4><div class="in"></div>`;
+  const drop=()=>{if(selected){b.querySelector('.in').appendChild(selected);selected.classList.remove('sel','ok','no');selected=null;bins.querySelectorAll('.bin').forEach(x=>x.classList.remove('ready'))}};
+  b.addEventListener('click',e=>{if(e.target.classList.contains('w'))return;drop()});
+  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drop()}});
+  bins.appendChild(b)});
+function makeWords(){pool.innerHTML='';bins.querySelectorAll('.in').forEach(x=>x.innerHTML='');
+  allWords.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='w';b.textContent=o.w;b.dataset.ti=o.ti;
+    b.addEventListener('click',e=>{e.stopPropagation();
+      if(b.parentElement!==pool&&selected!==b){pool.appendChild(b);b.classList.remove('ok','no');return}
+      if(selected===b){b.classList.remove('sel');selected=null;bins.querySelectorAll('.bin').forEach(x=>x.classList.remove('ready'));return}
+      if(selected)selected.classList.remove('sel');selected=b;b.classList.add('sel');bins.querySelectorAll('.bin').forEach(x=>x.classList.add('ready'));});
+    pool.appendChild(b)});
+  document.getElementById('sortScore').textContent='';}
+makeWords();
+document.getElementById('sortReset').addEventListener('click',makeWords);
+document.getElementById('sortCheck').addEventListener('click',()=>{let ok=0;
+  bins.querySelectorAll('.bin').forEach(b=>b.querySelectorAll('.w').forEach(w=>{const g=w.dataset.ti===b.dataset.ti;w.classList.toggle('ok',g);w.classList.toggle('no',!g);if(g)ok++}));
+  document.getElementById('sortScore').textContent=ok+' / '+allWords.length+(pool.children.length?' · '+pool.children.length+' left':'');stamp('s3');});
+
+const oddEl=document.getElementById('odd');
+ODD.forEach(([ws,a],i)=>{const li=document.createElement('li');li.innerHTML=`<i>${i+1}.</i>`;li.dataset.a=a;
+  ws.forEach((w,k)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=w;b.setAttribute('aria-pressed','false');b.dataset.k=k;
+    b.addEventListener('click',()=>{li.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right')});b.setAttribute('aria-pressed','true');li.dataset.v=k});li.appendChild(b)});
+  oddEl.appendChild(li)});
+document.getElementById('oddCheck').addEventListener('click',()=>{let ok=0;
+  oddEl.querySelectorAll('li').forEach(li=>{li.querySelectorAll('.opt').forEach(b=>b.classList.toggle('right',b.dataset.k===li.dataset.a));if(li.dataset.v===li.dataset.a)ok++});
+  document.getElementById('oddScore').textContent=ok+' / '+ODD.length;stamp('s3');});
+
+/* ================= READING ================= */
+const tfEl=document.getElementById('tf');
+TF.forEach(([s,a],i)=>{const li=document.createElement('li');li.innerHTML=`<span>${i+1}. ${s}</span><div class="tog"><button type="button" aria-pressed="false" data-v="1">T</button><button type="button" aria-pressed="false" data-v="0">F</button></div>`;
+  li.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{li.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');li.dataset.v=b.dataset.v;li.classList.remove('ok','no')}));
+  li.dataset.a=a?'1':'0';tfEl.appendChild(li)});
+document.getElementById('tfCheck').addEventListener('click',()=>{let ok=0;
+  tfEl.querySelectorAll('li').forEach(li=>{const g=li.dataset.v===li.dataset.a;li.classList.toggle('ok',g);li.classList.toggle('no',!g);if(g)ok++});
+  document.getElementById('tfScore').textContent=ok+' / '+TF.length;stamp('s4');});
+const oliver=document.getElementById('oliver');const orig=oliver.innerHTML;let marked=false;
+document.getElementById('huntShow').addEventListener('click',e=>{
+  marked=!marked;let h=orig;if(marked)HUNT.forEach(p=>{h=h.replace(p,'<mark>'+p+'</mark>')});
+  oliver.innerHTML=h;e.currentTarget.textContent=marked?'Hide highlights':'Highlight in the text';stamp('s4');});
+['h1','h2','h3','h4','h5','h6'].forEach(id=>{const el=document.getElementById(id);if(store[id])el.value=store[id];el.addEventListener('input',()=>{store[id]=el.value;save()})});
+
+/* ================= SPEAKING ================= */
+const topicsEl=document.getElementById('topics');
+SPEAK.forEach(([t,qs],i)=>{const b=document.createElement('button');b.type='button';b.className='topic';b.id='tp'+i;
+  b.innerHTML=`<span class="ic">Topic ${i+1}</span><b>${t}</b><ol hidden>${qs.map(q=>'<li>'+q+'</li>').join('')}</ol><span class="ic" data-h>Tap to open</span>`;
+  b.addEventListener('click',()=>openTopic(b));topicsEl.appendChild(b)});
+function openTopic(b){const o=b.classList.toggle('open');b.querySelector('ol').hidden=!o;b.querySelector('[data-h]').hidden=o;if(o)stamp('s5')}
+document.getElementById('randTopic').addEventListener('click',()=>{
+  const closed=[...topicsEl.children].filter(x=>!x.classList.contains('open'));if(!closed.length)return;
+  const b=closed[Math.floor(Math.random()*closed.length)];openTopic(b);b.classList.remove('pick');void b.offsetWidth;b.classList.add('pick');
+  b.scrollIntoView({block:'nearest',behavior:'smooth'});});
+const clock=document.getElementById('clock'),ring=document.getElementById('ringFg');let tId=null,tEnd=0,tLen=60;
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function tick(){const left=Math.max(0,Math.ceil((tEnd-Date.now())/1000));clock.textContent=fmt(left);
+  ring.setAttribute('stroke-dashoffset',169.6*(1-left/tLen));if(left<=0){clearInterval(tId);tId=null;clock.textContent='Time!';stamp('s5')}}
+function start(s){clearInterval(tId);tLen=s;tEnd=Date.now()+s*1000;tick();tId=setInterval(tick,250)}
+document.getElementById('t30').addEventListener('click',()=>start(30));
+document.getElementById('t60').addEventListener('click',()=>start(60));
+document.getElementById('tStop').addEventListener('click',()=>{clearInterval(tId);tId=null;clock.textContent=fmt(tLen);ring.setAttribute('stroke-dashoffset',0)});
+
+/* ================= WRAP-UP ================= */
+const checksEl=document.getElementById('checks');
+GOALS.forEach(([q,k,opts])=>{const fs=document.createElement('fieldset');fs.innerHTML=`<legend>${q}</legend>`;
+  opts.forEach((o,i)=>{const id=k+i;const l=document.createElement('label');l.innerHTML=`<input type="checkbox" id="${id}"> ${o}`;const c=l.querySelector('input');c.checked=!!store[id];
+    c.addEventListener('change',()=>{store[id]=c.checked;save();stamp('s6')});fs.appendChild(l)});checksEl.appendChild(fs)});
+const notes=document.getElementById('notes');notes.value=store.notes||'';notes.addEventListener('input',()=>{store.notes=notes.value;save()});
+
+/* ================= GRAMMAR TAB ================= */
+const G=[
+ {u:"Starter",t:"Стартовий розділ",r:[
+  {h:"to be: am / is / are",p:"Дієслово «бути». В українській ми його часто пропускаємо (Я учениця), а в англійській воно обов'язкове.",
+   f:[["+","I am · he/she/it is · we/you/they are"],["−","I'm not · he isn't · they aren't"],["?","Are you…? · Is she…?"]],
+   e:[["I'm 15. She is my sister.",""],["Are you from Kyiv? — Yes, I am.",""]],x:"Не можна казати <b>I 15</b> або <b>She my sister</b>: без am/is/are речення неправильне."},
+  {h:"have got / has got",p:"Означає «мати»: родичів, речі, тварин, зовнішність.",
+   f:[["+","I/you/we/they have got · he/she/it has got"],["−","haven't got · hasn't got"],["?","Have you got…? · Has he got…?"]],
+   e:[["I've got a cat. She's got blue eyes.",""],["Have you got a brother? — No, I haven't.",""]],x:"Для he/she/it завжди <b>has</b> got, а не have."},
+  {h:"can / can't",p:"Вміння і можливість. Після can дієслово без to і без -s.",
+   f:[["+","I/she can swim"],["−","He can't (cannot) cook"],["?","Can you draw?"]],
+   e:[["She can speak three languages.",""]],x:"<b>She cans</b>, <b>can to swim</b>: так неправильно."},
+  {h:"this / that / these / those",p:"Вказують на предмет. This і these для того, що близько, that і those для того, що далеко.",
+   f:[["близько","this book (1) · these books (2+)"],["далеко","that car (1) · those cars (2+)"]],e:[["This is my phone. Look at those birds!",""]]},
+  {h:"my / your / his · Ann's",p:"Присвійні слова відповідають на питання «чий?». Апостроф 's також показує, кому щось належить.",
+   f:[["","I → my · you → your · he → his · she → her"],["","it → its · we → our · they → their"],["'s","Ann's bag · my parents' house"]],
+   e:[["This is my brother. His name is Max.",""]],x:"<b>its</b> означає «його/її» для предмета, а <b>it's</b> = it is."},
+  {h:"there is / there are",p:"Кажемо, що щось є або існує в якомусь місці. Зазвичай перекладаємо як «є».",
+   f:[["1 / незлічуване","There is a sofa. There's some milk."],["2+","There are two windows."],["?","Is there a park? · Are there any shops?"]],
+   e:[["There isn't a TV in my room.",""]]},
+  {h:"Прийменники місця і часу",p:"Місце: in (всередині), on (на поверхні), under (під), next to (поруч), between (між), behind (за), in front of (перед).",
+   f:[["in","місяці, роки, пори року: in May, in 2024, in summer"],["on","дні й дати: on Monday, on 5th May"],["at","години й свята: at 7 o'clock, at the weekend, at night"]],
+   e:[["The cat is under the bed. My birthday is in May.",""]]},
+  {h:"Наказовий спосіб",p:"Прохання, вказівка, інструкція. Беремо дієслово в початковій формі без підмета.",
+   f:[["+","Open your books."],["−","Don't talk!"]],e:[["Listen and repeat. Don't be late!",""]]}
+ ]},
+ {u:"Unit 1",t:"Present Simple",r:[
+  {h:"Present Simple: що це",te:["always","usually","often","sometimes","rarely","never","every day / week / year","on Mondays","at weekends","in the morning","once a week","twice a month"],tp:"Прислівники частоти (always…never) ставимо перед дієсловом, вирази часу (every day, on Mondays) — на початку або в кінці речення.",p:"Звички, розклад, факти, те, що відбувається регулярно.",
+   f:[["+","I/you/we/they work · he/she/it works"],["−","I don't work · she doesn't work"],["?","Do you work? · Does he work?"]],
+   e:[["My dad works in a bank.",""],["She doesn't like coffee.",""],["What time do you get up?",""]],
+   x:"Після <b>doesn't / does</b> закінчення -s зникає: <b>Does she likes</b> — неправильно, треба <b>Does she like</b>."},
+  {h:"Закінчення -s і порядок слів",p:"Для he/she/it до дієслова додаємо -s або -es. Прислівник частоти стоїть перед основним дієсловом, але після am/is/are.",
+   f:[["-es","watch → watches, go → goes, do → does"],["-ies","study → studies"],["порядок","She never watches TV. He is always late."]],
+   e:[["I usually walk to school.",""]]}
+ ]},
+ {u:"Unit 2",t:"Їжа: злічувані й незлічувані, артиклі",r:[
+  {h:"Злічувані й незлічувані",p:"Злічувані можна порахувати (an apple, two apples). Незлічувані рахувати не можна (milk, bread, water, money). Вони не мають множини і вживаються без a/an.",
+   f:[["some","у ствердженнях: some apples, some milk"],["any","у запереченнях і питаннях: Is there any juice?"],["many / much","How many apples? · How much milk?"],["a lot of","для обох: a lot of friends, a lot of time"]],
+   e:[["There isn't any bread. We need some.",""]],x:"Кажемо <b>some bread</b>, а не <b>a bread</b> чи <b>breads</b>."},
+  {h:"a / an / the",p:"a або an: один предмет, згадуємо вперше або будь-який. The: конкретний предмет, про який уже знаємо, або єдиний у своєму роді.",
+   f:[["a","перед приголосним звуком: a cat, a university"],["an","перед голосним звуком: an apple, an hour"],["the","the sun, the door (цих дверей), the best"]],
+   e:[["I've got a dog. The dog is very funny.",""]],x:"Вибір між a і an залежить від <b>звуку</b>, а не від літери: an hour, a university."}
+ ]},
+ {u:"Unit 3",t:"Present Continuous",r:[
+  {h:"Present Continuous",te:["now","right now","at the moment","today","this week / month / year","these days","Look!","Listen!","at present"],tp:"Look! і Listen! на початку речення підказують, що дія відбувається саме зараз.",p:"Дія відбувається зараз, у момент мовлення, або тимчасово в цей період.",
+   f:[["+","I am working · she is working · they are working"],["−","I'm not · he isn't · we aren't working"],["?","Are you working? · What is she doing?"]],
+   e:[["Look! It's raining.",""],["I'm learning Spanish this month.",""]],x:"Не пропускайте am/is/are: <b>I working</b> — неправильно."},
+  {h:"Simple чи Continuous?",p:"Present Simple вживаємо для того, що буває завжди або регулярно, а Present Continuous — для того, що відбувається зараз.",
+   f:[["Simple","usually, every day, often"],["Continuous","now, at the moment, today, Look!"]],
+   e:[["I usually walk to school, but today I'm taking the bus.",""]],x:"Дієслова like, love, know, want, need зазвичай не вживаються в Continuous: <b>I'm knowing</b> — неправильно."}
+ ]},
+ {u:"Unit 4",t:"Порівняння · have to",r:[
+  {h:"Ступені порівняння",p:"Порівнюємо дві речі (вищий ступінь) або виділяємо одну з групи (найвищий ступінь).",
+   tbl:[["прикметник","вищий","найвищий"],["tall (короткий)","taller than","the tallest"],["big (CVC)","bigger","the biggest"],["easy (-y)","easier","the easiest"],["beautiful (довгий)","more beautiful","the most beautiful"],["good","better","the best"],["bad","worse","the worst"],["far","further","the furthest"]],
+   e:[["My brother is taller than me.",""],["It's the best café in town.",""]],x:"<b>more easy</b>, <b>more tall</b> — неправильно, бо для коротких слів беремо -er."},
+  {h:"have to / don't have to",p:"have to означає «треба, змушений»: обов'язок через правила чи обставини. don't have to означає «не треба, не обов'язково».",
+   f:[["+","I have to · she has to get up early"],["−","I don't have to · he doesn't have to"],["?","Do you have to wear a uniform?"]],
+   e:[["Doctors have to work at night.",""],["It's Saturday! I don't have to get up early.",""]]}
+ ]},
+ {u:"Unit 5",t:"must · should · was/were · could",r:[
+  {h:"must / mustn't",p:"must означає «мусиш»: правило або сильна порада. mustn't означає «не можна, заборонено».",
+   f:[["+","You must wear a helmet."],["−","You mustn't use your phone in the test."]],
+   e:[["Students must be on time.",""]],x:"Різниця така: <b>mustn't</b> — заборонено, а <b>don't have to</b> — не обов'язково, можна вибирати."},
+  {h:"should / shouldn't",p:"Порада: «варто, слід» і «не варто».",f:[["+","You should drink more water."],["−","You shouldn't go to bed late."],["?","Should I call him?"]],e:[["You look tired. You should rest.",""]]},
+  {h:"was / were",te:["yesterday","last weekend","at 6 o'clock yesterday","when I was five","in 2015"],p:"Минулий час дієслова to be.",
+   f:[["+","I/he/she/it was · we/you/they were"],["−","wasn't · weren't"],["?","Were you at home? · Was it cold?"]],
+   e:[["I was at home yesterday.",""],["Were your teachers strict?",""]]},
+  {h:"could / couldn't",p:"Минулий час від can, тобто вміння в минулому.",f:[["+","I could swim when I was five."],["−","She couldn't read at three."],["?","Could you ride a bike?"]],
+   e:[["When I was little, I couldn't ride a bike.",""]],x:"<b>didn't could</b> — неправильно, кажемо <b>couldn't</b>."}
+ ]},
+ {u:"Unit 6",t:"Past Simple",r:[
+  {h:"Past Simple: стверджувальні речення",te:["yesterday","the day before yesterday","last night / week / year","two days ago","an hour ago","in 2020","in May","when I was a child","then","after that"],tp:"ago ставимо після проміжку часу: three years ago, а не ago three years.",p:"Завершена дія в минулому з відомим часом: yesterday, last week, two years ago, in 2020.",
+   f:[["правильні","+ed: play → played, live → lived, study → studied, stop → stopped"],["неправильні","2-га форма: go → went, see → saw, eat → ate"]],
+   e:[["We played tennis yesterday.",""],["I went to the cinema last weekend.",""]]},
+  {h:"Заперечення і питання",p:"Допоміжне did. Основне дієслово повертається до початкової форми.",
+   f:[["−","I didn't go · she didn't eat"],["?","Did you see…? · Where did you go?"],["відповідь","Yes, I did. / No, I didn't."]],
+   e:[["Did you see the match? — No, I didn't.",""]],x:"<b>didn't went</b>, <b>Did you saw</b> — неправильно, бо минулий час уже показує did."},
+  {h:"Неправильні дієслова (топ-16)",tbl:[["V1","V2 (Past)","V3"],["be","was/were","been"],["go","went","gone"],["have","had","had"],["do","did","done"],["see","saw","seen"],["eat","ate","eaten"],["get","got","got"],["make","made","made"],["take","took","taken"],["buy","bought","bought"],["come","came","come"],["break","broke","broken"],["write","wrote","written"],["swim","swam","swum"],["meet","met","met"],["leave","left","left"]],p:"2-га форма потрібна для Past Simple, 3-тя — для Present Perfect (Unit 7)."}
+ ]},
+ {u:"Unit 7",t:"Present Perfect",r:[
+  {h:"Present Perfect + ever / never",te:["ever","never","before","in my life","so far","recently","this week (ще не закінчився)","today"],tp:"ever вживаємо в питаннях, never — у стверджувальних реченнях із значенням «ніколи».",p:"Досвід у житті без точного часу: «чи бував ти колись…».",
+   f:[["+","I have (I've) been · she has (she's) seen"],["−","I haven't · I've never tried"],["?","Have you ever been to London?"]],
+   e:[["I've never eaten sushi.",""],["Has she ever met a famous person?",""]],x:"Форма: have/has + 3-тя форма дієслова (been, seen, eaten)."},
+  {h:"just / already / yet",te:["just","already","yet","still not → haven't … yet"],p:"just — «щойно», already — «вже» (раніше, ніж очікували), yet — «вже?» у питанні і «ще не» в запереченні.",
+   f:[["just","She has just arrived. (між have і V3)"],["already","I've already done it."],["yet","Have you finished yet? · I haven't finished yet. (у кінці)"]],
+   e:[["I've just got your message!",""]]},
+  {h:"Present Perfect чи Past Simple?",p:"Якщо є точний час у минулому (yesterday, in 2023, ago), вживаємо Past Simple. Якщо часу немає і важливий сам досвід чи результат, вживаємо Present Perfect.",
+   f:[["Perfect","I've been to Paris. (колись у житті)"],["Past","I went to Paris in 2023. (коли саме)"]],e:[["Have you ever been to Italy? — Yes, I went there last summer.",""]],
+   x:"<b>I have visited Paris in 2023</b> — неправильно, бо при точній даті вживаємо Past Simple."}
+ ]},
+ {u:"Unit 8",t:"Майбутнє: will · be going to",r:[
+  {h:"will",te:["tomorrow","next week / year","soon","in two days","in the future","one day","I think…","probably","maybe"],tp:"Слова I think, probably, maybe часто йдуть разом із will: I think it will rain.",p:"Прогноз (я думаю, що буде), рішення, прийняте в момент мовлення, обіцянка або пропозиція.",
+   f:[["+","I/she/they will ('ll) help"],["−","won't (will not)"],["?","Will it rain tomorrow?"]],
+   e:[["I think people will live on Mars.",""],["I'm hungry. — I'll make you a sandwich!",""]]},
+  {h:"be going to",te:["tonight","tomorrow","this weekend","next summer","on Saturday","Look at…! (прогноз за ознаками)"],p:"План, який уже вирішено заздалегідь, або прогноз на основі того, що бачимо зараз.",
+   f:[["+","I'm going to · she's going to · we're going to visit"],["−","I'm not going to…"],["?","Are you going to travel?"]],
+   e:[["We're going to visit Spain next summer.",""],["Look at the clouds! It's going to rain.",""]],
+   x:"Порівняйте: <b>I'll call her</b> — вирішив щойно, <b>I'm going to call her</b> — планував раніше."}
+ ]},
+ {u:"Підсумок",t:"Маркери часу: усі часи разом",r:[
+  {h:"Як за словом-маркером вибрати час",wide:true,p:"Знайдіть у реченні слово-підказку, і воно покаже, який час потрібен.",
+   tbl:[["Час","Слова-маркери","Приклад"],
+    ["Present Simple","always, usually, often, sometimes, never, every day, on Mondays","She usually walks to school."],
+    ["Present Continuous","now, right now, at the moment, today, Look!, Listen!","Look! It's snowing."],
+    ["Past Simple","yesterday, last week, two days ago, in 2020, when I was…","I saw him yesterday."],
+    ["Present Perfect","ever, never, just, already, yet, before, so far","I've already finished."],
+    ["will","tomorrow, next week, soon, I think, probably, one day","I think it will be sunny."],
+    ["be going to","tonight, this weekend, next summer (вже є план), Look at…!","We're going to fly to Rome on Friday."]],
+   x:"Маркер не завжди однозначний. <b>today</b> буває і з Present Continuous (I'm working today), і з Present Perfect (I've had two lessons today). Дивіться на зміст речення."}
+ ]}
+];const gIndex=document.getElementById('gIndex'),gBody=document.getElementById('gBody');
+G.forEach((blk,bi)=>{
+  const a=document.createElement('a');a.href='#g'+bi;a.textContent=blk.u+' · '+blk.t;
+  a.addEventListener('click',e=>{e.preventDefault();document.getElementById('g'+bi).scrollIntoView({behavior:'smooth'})});gIndex.appendChild(a);
+  const sec=document.createElement('section');sec.className='g-unit';sec.id='g'+bi;
+  sec.innerHTML=`<h3><span>${blk.u}</span>${blk.t}</h3><div class="rules"></div>`;
+  const box=sec.querySelector('.rules');
+  blk.r.forEach(r=>{const d=document.createElement('article');d.className='rule'+(r.wide?' wide':'');
+    let h=`<h4>${r.h}</h4>`;if(r.p)h+=`<p>${r.p}</p>`;
+    if(r.f)h+=`<div class="form">${r.f.map(([k,v])=>`<i>${k}</i><code>${v}</code>`).join('')}</div>`;
+    if(r.tbl)h+=`<div class="tbl"><table><thead><tr>${r.tbl[0].map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${r.tbl.slice(1).map(row=>`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    if(r.te)h+=`<div class="te"><span class="te-l">Слова-маркери</span><div>${r.te.map(t=>`<span>${t}</span>`).join('')}</div>${r.tp?`<p>${r.tp}</p>`:''}</div>`;
+    if(r.e)h+=`<div class="ex">${r.e.map(([en])=>`<em>${en}</em>`).join('')}</div>`;
+    if(r.x)h+=`<p class="trap">⚠ ${r.x}</p>`;
+    d.innerHTML=h;box.appendChild(d)});
+  gBody.appendChild(sec);
+});
+</script>
+
+</body>
+</html>
