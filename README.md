@@ -1,11 +1,10 @@
-# Choices & Consequences
+# English Lessons
 
-B2+ English lesson based on *Spider-Man: No Way Home*: warm-up, vocabulary cards, trailer tasks and third/mixed conditionals.
+Interactive English lessons with exercises, self-check and grammar notes.
 
-Live page: https://irenbirch.github.io/spider-lesson/
+| Lesson | Level | Folder |
+| --- | --- | --- |
+| Choices & Consequences (Spider-Man: No Way Home) | B2+ | `spider-man-b2/` |
+| Trial lesson, Focus 1 | A2 | `trial-lesson-focus1-a2/` |
 
-## A2 Trial Lesson
-
-60-minute trial lesson (Focus 1): warm-up, placement grammar check, vocabulary, reading, speaking, and a grammar reference in Ukrainian.
-
-Live page: https://irenbirch.github.io/spider-lesson/trial-lesson/
+Live site: https://irenbirch.github.io/spider-lesson/
