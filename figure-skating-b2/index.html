@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>On the Edge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,500;0,700;0,800;1,700&family=Onest:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a judges' protocol on ice. Hero = blade tracing a figure on the rink; sections read like segments of a competition; element codes in mono as in real score sheets. */
+:root{
+  --ice:#F1F5FA; --card:#FFFFFF; --ink:#0E1B2C; --muted:#56657A; --rule:rgba(14,27,44,.12);
+  --rink:#0E2A47; --rink-fg:#EAF2FB; --blade:#2B74C7; --tint:#E3ECF6; --frost:#CFE0F2;
+  --gold:#C9A227; --silver:#97A3B0; --bronze:#B47A47; --ok:#1F8A62; --bad:#CF4339;
+  --f-d:"Exo 2","Arial Narrow",system-ui,sans-serif;
+  --f-b:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ice:#08111E; --card:#111C2C; --ink:#E6EEF8; --muted:#93A3B8; --rule:rgba(230,238,248,.12);
+  --rink:#0A1E36; --rink-fg:#EAF2FB; --blade:#6EA9EE; --tint:#172539; --frost:#22344D;
+  --gold:#E2BC45; --silver:#B4BFCB; --bronze:#D0925D; --ok:#3FCB91; --bad:#FF6A5F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ice:#08111E; --card:#111C2C; --ink:#E6EEF8; --muted:#93A3B8; --rule:rgba(230,238,248,.12);
+  --rink:#0A1E36; --rink-fg:#EAF2FB; --blade:#6EA9EE; --tint:#172539; --frost:#22344D;
+  --gold:#E2BC45; --silver:#B4BFCB; --bronze:#D0925D; --ok:#3FCB91; --bad:#FF6A5F; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ice);color:var(--ink);font-family:var(--f-b);font-size:17px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--rink)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--f-d);font-weight:800;line-height:1.08;margin:0;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+a{color:var(--blade)}
+:focus-visible{outline:3px solid var(--blade);outline-offset:2px}
+.code{font-family:var(--f-m);font-weight:600;letter-spacing:.02em}
+.eyebrow{font-family:var(--f-m);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blade);font-weight:600}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;background:var(--rink);color:var(--rink-fg);overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .wrap{position:relative;z-index:1;padding-block:64px 40px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:36px;align-items:end}
+.hero .eyebrow{color:#9CC6F5}
+.hero h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.02em;font-style:italic;margin-top:10px}
+.hero h1 span{display:block;font-style:normal;font-weight:500;font-size:.34em;letter-spacing:0;color:#BFD6EE;margin-top:10px}
+.hero .lede{max-width:56ch;margin-top:18px;color:#C9D9EA}
+.sheet{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px 18px;backdrop-filter:blur(4px);font-family:var(--f-m);font-size:.82rem}
+.sheet header{display:flex;justify-content:space-between;color:#9CC6F5;letter-spacing:.1em;text-transform:uppercase;font-size:.68rem;margin-bottom:8px}
+.sheet table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.sheet td{padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.14)}
+.sheet td:last-child{text-align:right}
+.sheet tr.tot td{border:0;padding-top:10px;font-weight:600;color:#fff;font-size:.95rem}
+.sheet .q{color:#FFB0A8}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chip{font-family:var(--f-m);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.3);color:#E3EEF9}
+.chip.on{background:var(--gold);border-color:var(--gold);color:#1A1405}
+
+/* ---------- NAV ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--rink);border-top:1px solid rgba(255,255,255,.08)}
+.bar .wrap{display:flex;align-items:center;gap:6px;padding-block:8px;overflow-x:auto;scrollbar-width:none}
+.tab{flex:0 0 auto;border:0;cursor:pointer;background:transparent;color:var(--rink-fg);font-family:var(--f-d);font-weight:700;font-size:1rem;padding:8px 16px;border-radius:999px}
+.tab[aria-selected="true"]{background:var(--rink-fg);color:var(--rink)}
+.sep{flex:0 0 1px;height:22px;background:rgba(255,255,255,.22);margin-inline:6px}
+.jump{flex:0 0 auto;text-decoration:none;color:#B9CDE3;font-size:.86rem;padding:6px 9px;border-radius:8px}
+.jump:hover{color:#fff;background:rgba(255,255,255,.08)}
+.jump b{font-family:var(--f-m);font-size:.72rem;color:#7FB3EE;margin-right:5px}
+
+/* ---------- SECTIONS ---------- */
+section.seg{padding-block:64px 6px;scroll-margin-top:66px}
+.seg-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start;margin-bottom:26px}
+.seg-no{font-family:var(--f-m);font-size:.78rem;line-height:1.2;color:var(--blade);border:1.5px solid var(--blade);border-radius:8px;padding:6px 8px;text-align:center;min-width:58px}
+.seg-no b{display:block;font-family:var(--f-d);font-size:1.5rem;color:var(--ink)}
+.seg-head h2{font-size:clamp(1.8rem,4.6vw,2.8rem);font-style:italic}
+.seg-head p{color:var(--muted);margin-top:8px;max-width:68ch}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lbl{font-family:var(--f-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card h3{font-size:1.25rem}
+.q-list{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;font-weight:700;font-size:.92rem;padding:10px 18px;border-radius:999px;background:var(--rink);color:var(--rink-fg);transition:transform .1s}
+:root[data-theme="dark"] .btn{background:var(--blade);color:#06101D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{background:var(--blade);color:#06101D}}
+.btn:hover{transform:translateY(-1px)}
+.btn.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--rule)}
+.score{font-family:var(--f-m);font-weight:600;color:var(--ok)}
+.note{font-size:.9rem;color:var(--muted)}
+
+/* warm-up numbers */
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.num{border:0;text-align:left;cursor:pointer;border-radius:14px;padding:16px;background:var(--tint);display:flex;flex-direction:column;gap:8px;min-height:150px;position:relative;overflow:hidden}
+.num .big{font-family:var(--f-d);font-weight:800;font-size:2.6rem;line-height:1;color:var(--blade);filter:blur(9px);transition:filter .35s}
+.num.on .big{filter:none}
+.num .cl{font-size:.92rem;font-weight:600}
+.num .ans{font-size:.85rem;color:var(--muted)}
+.num:not(.on) .ans{visibility:hidden}
+.num .tap{position:absolute;top:12px;right:12px;font-family:var(--f-m);font-size:.66rem;color:var(--muted);letter-spacing:.08em}
+.num.on .tap{display:none}
+
+/* vocabulary */
+.vocab{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.v{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.v b{font-family:var(--f-d);font-size:1.1rem}
+.v i{font-style:normal;font-family:var(--f-m);font-size:.7rem;color:var(--blade)}
+.v p{font-size:.88rem;color:var(--muted)}
+.v em{font-size:.86rem;font-style:italic;border-left:2px solid var(--frost);padding-left:8px}
+
+/* mc engine */
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;counter-reset:it}
+.items li{counter-increment:it;display:flex;flex-direction:column;gap:7px}
+.items .s::before{content:counter(it) ". ";font-family:var(--f-m);font-size:.8rem;color:var(--muted)}
+.slot{display:inline-block;min-width:5em;border-bottom:2px solid var(--ink);text-align:center;font-weight:700;padding:0 4px;color:var(--blade)}
+.slot.ok{border-color:var(--ok);color:var(--ok)}
+.slot.no{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:1.5px solid var(--rule);background:var(--ice);border-radius:10px;padding:5px 12px;font-size:.92rem;cursor:pointer;text-align:left}
+.opt[aria-pressed="true"]{background:var(--rink);color:var(--rink-fg);border-color:var(--rink)}
+:root[data-theme="dark"] .opt[aria-pressed="true"]{background:var(--blade);color:#06101D;border-color:var(--blade)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .opt[aria-pressed="true"]{background:var(--blade);color:#06101D;border-color:var(--blade)}}
+.opt.right{box-shadow:0 0 0 2px var(--ok)}
+.opts.col{flex-direction:column;align-items:stretch}
+
+/* olympics */
+.medals{overflow-x:auto}
+.medals table{width:100%;border-collapse:collapse;min-width:620px;font-size:.93rem}
+.medals th{font-family:var(--f-m);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}
+.medals td{padding:11px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.medals td:first-child{font-family:var(--f-d);font-weight:700}
+.medals small{display:block;font-family:var(--f-m);font-size:.7rem;color:var(--muted)}
+.m{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.m.g{background:var(--gold)} .m.s{background:var(--silver)} .m.b{background:var(--bronze)}
+.article{font-size:1.02rem;line-height:1.78;display:flex;flex-direction:column;gap:14px;max-width:68ch}
+.article h3{font-size:1.5rem;font-style:italic}
+.article .kick{font-family:var(--f-m);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.article p:first-of-type::first-letter{font-family:var(--f-d);font-weight:800;font-size:3.4em;float:left;line-height:.85;margin:6px 8px 0 0;color:var(--blade)}
+.article b{font-weight:700;background:linear-gradient(transparent 62%,var(--frost) 62%)}
+.tfng{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tfng li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;background:var(--ice);border:1.5px solid transparent}
+.tfng li.ok{border-color:var(--ok)} .tfng li.no{border-color:var(--bad)}
+.tog{display:flex;border:1.5px solid var(--rule);border-radius:9px;overflow:hidden}
+.tog button{border:0;background:var(--card);padding:4px 9px;cursor:pointer;font-family:var(--f-m);font-size:.78rem;font-weight:600}
+.tog button+button{border-left:1.5px solid var(--rule)}
+.tog button[aria-pressed="true"]{background:var(--blade);color:#fff}
+
+/* video */
+.vids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.vid{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--rule);border-radius:16px;overflow:hidden;min-width:0}
+.screen{position:relative;display:grid;place-items:center;aspect-ratio:16/9;max-width:100%;text-decoration:none;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.screen::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 18px)}
+.screen .pl{position:relative;width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.95);display:grid;place-items:center;transition:transform .2s}
+.screen:hover .pl{transform:scale(1.08)}
+.screen .tag{position:absolute;left:12px;bottom:10px;font-family:var(--f-m);font-size:.7rem;letter-spacing:.06em;background:rgba(0,0,0,.4);padding:3px 8px;border-radius:6px}
+.vid .body{padding:18px;display:flex;flex-direction:column;gap:10px}
+.vid h3{font-size:1.15rem}
+.vid ol{margin:0;padding-left:1.2em;font-size:.93rem;display:flex;flex-direction:column;gap:5px}
+.vid .alt{font-size:.82rem;color:var(--muted)}
+
+/* grammar */
+.rule-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.shift{width:100%;border-collapse:collapse;font-size:.92rem}
+.shift td,.shift th{padding:7px 8px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.shift th{font-family:var(--f-m);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.shift td:nth-child(2){color:var(--blade);font-weight:600}
+.ua{font-size:.86rem;color:var(--muted);border-left:3px solid var(--gold);padding-left:10px}
+.pat{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.pat div{background:var(--ice);border-radius:12px;padding:12px 14px}
+.pat b{display:block;font-family:var(--f-m);font-size:.78rem;color:var(--blade);margin-bottom:4px}
+.pat span{font-size:.88rem}
+.quote{font-family:var(--f-d);font-style:italic;font-weight:700;font-size:1.25rem;line-height:1.25}
+.quote small{display:block;font-family:var(--f-m);font-style:normal;font-weight:500;font-size:.72rem;color:var(--muted);margin-top:4px}
+.trans{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:t}
+.trans li{counter-increment:t;background:var(--ice);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.trans li::before{content:counter(t);font-family:var(--f-m);font-size:.75rem;color:var(--muted)}
+.trans .kw{font-family:var(--f-m);font-weight:600;font-size:.8rem;background:var(--rink);color:var(--rink-fg);padding:2px 8px;border-radius:6px;align-self:flex-start}
+.trans input{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--rule);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
+.trans .model{font-weight:600;color:var(--ok)}
+
+/* costumes */
+.cos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.co{background:var(--card);border:1px solid var(--rule);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);min-width:0}
+.frame{position:relative;aspect-ratio:4/5;max-width:100%;background:var(--tint);background-size:cover;background-position:center top;display:grid;place-items:center;cursor:pointer;border-right:1px solid var(--rule);align-self:stretch}
+.frame.has{cursor:default}
+.frame .empty{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);text-align:center;padding:16px;font-size:.85rem}
+.frame .empty svg{width:42px;height:42px}
+.frame.has .empty{display:none}
+.frame input{position:absolute;width:1px;height:1px;opacity:0}
+.frame .rm{position:absolute;top:10px;right:10px;border:0;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:.75rem;padding:4px 10px;cursor:pointer}
+.frame .flag{position:absolute;left:10px;top:10px;font-family:var(--f-m);font-size:.7rem;font-weight:600;background:var(--card);color:var(--ink);padding:3px 8px;border-radius:6px}
+.co .body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.co h3{font-size:1.15rem}
+.co .prog{font-family:var(--f-m);font-size:.74rem;color:var(--blade)}
+.co p{font-size:.9rem}
+.co .by{margin-top:auto;font-size:.78rem;color:var(--muted)}
+.cw{display:flex;flex-wrap:wrap;gap:6px}
+.cw span{font-size:.84rem;font-weight:600;background:var(--tint);padding:4px 10px;border-radius:999px}
+
+/* season */
+.tl-wrap{overflow-x:auto;padding-bottom:6px}
+.tl{position:relative;min-width:820px;height:360px}
+.tl .month{position:absolute;top:0;bottom:0;border-left:1px dashed var(--rule);font-family:var(--f-m);font-size:.68rem;color:var(--muted);padding-left:5px;letter-spacing:.06em;text-transform:uppercase}
+.tl .lane{position:absolute;left:0;right:0;height:1px}
+.tl .ev{position:absolute;height:14px;border-radius:7px;background:var(--blade)}
+.tl .ev.ch{background:var(--gold)}
+.tl .lab{position:absolute;font-size:.74rem;line-height:20px;white-space:nowrap}
+.tl .lab b{font-family:var(--f-d);font-size:.86rem}
+.tl .lab span{font-family:var(--f-m);font-size:.66rem;color:var(--muted)}
+.tl .today{position:absolute;top:18px;bottom:0;width:2px;background:var(--bad)}
+.tl .today span{position:absolute;top:-16px;left:4px;font-family:var(--f-m);font-size:.66rem;color:var(--bad);white-space:nowrap;font-weight:600}
+.lanes-key{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:10px}
+.lanes-key i{display:inline-block;width:18px;height:8px;border-radius:4px;margin-right:6px;vertical-align:1px}
+.who{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.who ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.who li{font-size:.92rem;padding-left:14px;border-left:3px solid var(--k)}
+.who li b{display:block;font-family:var(--f-d);font-size:1rem}
+.pred{display:flex;flex-direction:column;gap:10px}
+.pred div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;font-size:.92rem;align-items:baseline}
+.pred b{font-family:var(--f-m);font-size:.82rem;color:var(--blade)}
+
+/* homework */
+.hw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:start}
+.stampx{font-family:var(--f-d);font-weight:800;font-style:italic;font-size:1.3rem;color:var(--bad);border:3px solid var(--bad);border-radius:8px;padding:6px 12px;transform:rotate(-6deg)}
+.check{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.check label{display:flex;gap:9px;align-items:center;cursor:pointer;font-size:.95rem}
+.check input{width:17px;height:17px;accent-color:var(--blade)}
+
+/* ---------- ELEMENTS TAB ---------- */
+.el-intro{padding-block:52px 10px}
+.el-intro h2{font-size:clamp(2rem,5vw,3.2rem);font-style:italic}
+.el-intro p{color:var(--muted);margin-top:10px;max-width:68ch}
+.el-index{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.el-index a{text-decoration:none;color:var(--ink);font-size:.86rem;font-weight:600;padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--rule)}
+.el-sec{padding-block:44px 0;scroll-margin-top:66px}
+.el-sec > h3{font-size:1.7rem;font-style:italic;margin-bottom:6px}
+.el-sec > p{color:var(--muted);max-width:70ch;margin-bottom:18px}
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-family:var(--f-d);font-weight:700;font-size:1.15rem}
+.formula span{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:10px 14px}
+.formula span small{display:block;font-family:var(--f-b);font-weight:400;font-size:.78rem;color:var(--muted)}
+.formula i{font-style:normal;color:var(--muted)}
+.jumps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.jp{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
+.jp .rank{position:absolute;top:16px;right:16px;font-family:var(--f-m);font-size:.7rem;color:var(--muted)}
+.jp h4{font-size:1.4rem}
+.jp .ua-n{font-size:.85rem;color:var(--muted)}
+.jp .codes{display:flex;gap:6px;flex-wrap:wrap}
+.jp .codes span{font-family:var(--f-m);font-size:.78rem;font-weight:600;background:var(--rink);color:var(--rink-fg);padding:2px 8px;border-radius:6px}
+.jp dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:.88rem}
+.jp dt{font-family:var(--f-m);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.jp dd{margin:0}
+.jp .type{align-self:flex-start;font-family:var(--f-m);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1.5px solid var(--k);color:var(--k)}
+.jp svg{width:100%;height:auto;max-height:90px}
+.mini{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.mini div{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.mini b{font-family:var(--f-d);font-size:1.1rem}
+.mini .code{font-size:.78rem;color:var(--blade)}
+.mini p{font-size:.88rem;color:var(--muted)}
+.decoder{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.codes-list{display:flex;flex-wrap:wrap;gap:8px}
+.codes-list button{border:1.5px solid var(--rule);background:var(--card);border-radius:10px;padding:8px 12px;cursor:pointer;font-family:var(--f-m);font-weight:600;font-size:.95rem}
+.codes-list button[aria-pressed="true"]{background:var(--rink);color:var(--rink-fg);border-color:var(--rink)}
+.decoded{background:var(--rink);color:var(--rink-fg);border-radius:16px;padding:22px;min-height:180px;display:flex;flex-direction:column;gap:10px}
+.decoded .c{font-family:var(--f-m);font-size:2rem;font-weight:600;color:#9CC6F5}
+.decoded p{color:#D3E2F2}
+.parts{display:flex;flex-wrap:wrap;gap:6px}
+.parts span{font-family:var(--f-m);font-size:.8rem;background:rgba(255,255,255,.1);padding:4px 9px;border-radius:6px}
+.marks{overflow-x:auto}
+.marks table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:520px}
+.marks td,.marks th{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.marks th{font-family:var(--f-m);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.marks td:first-child{font-family:var(--f-m);font-weight:600;font-size:1.05rem;color:var(--blade);white-space:nowrap}
+
+footer{padding-block:64px 44px;color:var(--muted);font-size:.84rem}
+footer .wrap{display:flex;flex-direction:column;gap:8px}
+footer a{color:var(--muted)}
+
+@media (max-width:980px){
+  .vocab{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .jumps,.who,.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mini{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){.cos{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.co{grid-template-columns:minmax(0,1fr)}.frame{border-right:0;border-bottom:1px solid var(--rule)}}
+@media (max-width:760px){
+  .hero .wrap{grid-template-columns:minmax(0,1fr);padding-block:46px 30px}
+  .grid2,.rule-grid,.vids,.decoder{grid-template-columns:minmax(0,1fr)}
+  .nums{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .jumps,.who,.grid3{grid-template-columns:minmax(0,1fr)}
+  .hw{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px}
+  .seg-head{grid-template-columns:minmax(0,1fr);gap:10px}
+  .seg-no{justify-self:start}
+  .pred div{grid-template-columns:minmax(0,1fr);gap:2px}
+}
+@media (max-width:440px){
+  .vocab,.nums,.mini{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){.num .big{transition:none}}
+</style>
+
+</head>
+<body>
+<header class="hero" id="top">
+  <canvas id="rink" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">English · B2 · Figure skating</div>
+      <h1>On the Edge<span>Milano Cortina 2026 and the new season on ice</span></h1>
+      <p class="lede">Олімпіада-2026, костюми, відео програм та інтерв'ю, reported speech на реальних цитатах фігуристів, сезон 2026–27 і окремий розбір елементів, від тулупа до тодесу.</p>
+      <div class="chips"><span class="chip on">B2</span><span class="chip">≈ 90 min</span><span class="chip">8 segments</span><span class="chip">Elements guide</span></div>
+    </div>
+    <div class="sheet" aria-label="Example judges' protocol">
+      <header><span>Women · Free skating</span><span>Milano 2026</span></header>
+      <table>
+        <tr><td>Skater</td><td>Alysa LIU · USA</td></tr>
+        <tr><td>Music</td><td>MacArthur Park</td></tr>
+        <tr><td>Free skate</td><td>150.20</td></tr>
+        <tr><td>Short program rank</td><td class="q">3rd</td></tr>
+        <tr class="tot"><td>Total</td><td>226.79 · GOLD</td></tr>
+      </table>
+    </div>
+  </div>
+</header>
+
+<nav class="bar" aria-label="Pages">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" id="tabL" aria-selected="true" aria-controls="lesson">Lesson</button>
+    <button class="tab" role="tab" id="tabE" aria-selected="false" aria-controls="elements">Elements guide</button>
+    <span class="sep" id="sep"></span>
+    <span id="jumps" style="display:contents">
+      <a class="jump" href="#s1"><b>01</b>Warm-up</a>
+      <a class="jump" href="#s2"><b>02</b>Words</a>
+      <a class="jump" href="#s3"><b>03</b>Milano 2026</a>
+      <a class="jump" href="#s4"><b>04</b>Video</a>
+      <a class="jump" href="#s5"><b>05</b>Grammar</a>
+      <a class="jump" href="#s6"><b>06</b>Costumes</a>
+      <a class="jump" href="#s7"><b>07</b>Season 26–27</a>
+      <a class="jump" href="#s8"><b>08</b>Homework</a>
+    </span>
+  </div>
+</nav>
+
+<!-- ======================= LESSON ======================= -->
+<main id="lesson" role="tabpanel" aria-labelledby="tabL">
+<div class="wrap">
+
+<section class="seg" id="s1">
+  <div class="seg-head"><div class="seg-no">SEG<b>01</b></div><div>
+    <h2>Warm-up: Sport or art?</h2>
+    <p>Guess each number before you tap the card. Then discuss the questions with your partner.</p></div></div>
+  <div class="nums" id="nums"></div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card stack">
+      <span class="lbl">Discuss</span>
+      <ol class="q-list">
+        <li>Is figure skating a sport, an art, or both? What makes it different from other Olympic sports?</li>
+        <li>Should judges decide the winner, or should every result be measured, like in speed skating?</li>
+        <li>Why do people love comeback stories so much?</li>
+        <li>How would you deal with the pressure of being the Olympic favourite?</li>
+      </ol>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Would you rather…</span>
+      <ol class="q-list">
+        <li>…win a silver medal with a perfect skate, or gold with two falls?</li>
+        <li>…be the favourite everyone expects to win, or the underdog nobody notices?</li>
+        <li>…skate to a pop hit everyone knows, or to classical music?</li>
+        <li>…design your own costume, or wear one by a famous designer?</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="seg" id="s2">
+  <div class="seg-head"><div class="seg-no">SEG<b>02</b></div><div>
+    <h2>Words on ice</h2>
+    <p>Sixteen words and phrases you'll need for this lesson. Every example comes from Milano Cortina 2026.</p></div></div>
+  <div class="vocab" id="vocab"></div>
+  <div class="card" style="margin-top:20px">
+    <span class="lbl">Practice · Choose the best word</span>
+    <ol class="items" id="vEx" style="margin-top:14px"></ol>
+    <div class="row" style="margin-top:18px"><button class="btn" type="button" data-check="vEx">Check</button><button class="btn alt" type="button" data-key="vEx">Show answers</button><span class="score" id="vEx-sc"></span></div>
+  </div>
+</section>
+
+<section class="seg" id="s3">
+  <div class="seg-head"><div class="seg-no">SEG<b>03</b></div><div>
+    <h2>Milano Cortina 2026</h2>
+    <p>Figure skating at the Winter Olympics, Milano Ice Skating Arena, 6–19 February 2026. Five events, fifteen medals and a few big surprises.</p></div></div>
+  <div class="card medals">
+    <table>
+      <thead><tr><th>Event</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr></thead>
+      <tbody>
+        <tr><td>Men</td><td><span class="m g"></span>Mikhail Shaidorov<small>Kazakhstan · 291.58</small></td><td><span class="m s"></span>Yuma Kagiyama<small>Japan · 280.06</small></td><td><span class="m b"></span>Shun Sato<small>Japan · 274.90</small></td></tr>
+        <tr><td>Women</td><td><span class="m g"></span>Alysa Liu<small>USA · 226.79</small></td><td><span class="m s"></span>Kaori Sakamoto<small>Japan</small></td><td><span class="m b"></span>Ami Nakai<small>Japan</small></td></tr>
+        <tr><td>Pairs</td><td><span class="m g"></span>Riku Miura / Ryuichi Kihara<small>Japan · record free skate 158.13</small></td><td><span class="m s"></span>Anastasiia Metelkina / Luka Berulava<small>Georgia</small></td><td><span class="m b"></span>Minerva Hase / Nikita Volodin<small>Germany</small></td></tr>
+        <tr><td>Ice dance</td><td><span class="m g"></span>Laurence Fournier Beaudry / Guillaume Cizeron<small>France</small></td><td><span class="m s"></span>Madison Chock / Evan Bates<small>USA</small></td><td><span class="m b"></span>Piper Gilles / Paul Poirier<small>Canada</small></td></tr>
+        <tr><td>Team event</td><td><span class="m g"></span>USA</td><td><span class="m s"></span>Japan</td><td><span class="m b"></span>Italy</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <article class="card">
+      <div class="article">
+        <span class="kick">Reading · 5 minutes</span>
+        <h3>Falls, comebacks and a golden disco</h3>
+        <p>The Olympic figure skating competition was supposed to be Ilia Malinin's moment. The American, the only skater who has ever landed a quadruple Axel in competition, arrived in Milan as a two-time world champion and the clear <b>favourite</b>. Instead, the “Quad God” <b>fell</b> twice in the free skate and finished eighth. Afterwards he admitted that the <b>nerves</b> had been “so overwhelming”. “I blew it,” he told reporters.</p>
+        <p>His mistakes opened the door for Mikhail Shaidorov. Skating to music by the Kazakh singer Dimash Kudaibergen, he <b>landed</b> five clean quadruple jumps, something he had never managed in competition, and won Kazakhstan's first Olympic gold in the sport. He <b>dedicated</b> the medal to his country and to Denis Ten, who had won Kazakhstan's first Olympic figure skating medal, a bronze, in 2014.</p>
+        <p>The women's event produced an even bigger <b>comeback</b> story. Alysa Liu had retired in 2022, when she was only 16. She returned to the ice for the 2024–25 season and became world champion. In Milan she <b>climbed</b> from third after the short program to gold, skating to Donna Summer's “MacArthur Park” in a gold dress that had taken more than 100 hours to make. She was the first American woman to win individual Olympic gold since 2002. Kaori Sakamoto of Japan, in her final season, took silver, and 17-year-old Ami Nakai won bronze in her <b>debut</b> senior season.</p>
+        <p>In pairs, Japan's Riku Miura and Ryuichi Kihara were only fifth after the short program, but their free skate <b>set a record</b> score of 158.13 and gave Japan its first Olympic pairs title.</p>
+        <p>Not every story ended happily. France's Laurence Fournier Beaudry and Guillaume Cizeron won ice dance by less than 1.5 points despite errors in their twizzles. Then it emerged that the French judge had scored the American silver medallists, Madison Chock and Evan Bates, more than five points below the other judges' average. Many fans called it a <b>judging controversy</b>. The ISU insisted it had “full confidence in the scores”, and Chock and Bates chose not to <b>appeal</b>.</p>
+      </div>
+    </article>
+    <div class="stack">
+      <div class="card stack">
+        <span class="lbl">Task 1 · True, False or Not Given?</span>
+        <ul class="tfng" id="tfng"></ul>
+        <div class="row"><button class="btn" type="button" id="tfCheck">Check</button><span class="score" id="tfSc"></span></div>
+      </div>
+      <div class="card stack">
+        <span class="lbl">Task 2 · Talk about it</span>
+        <ol class="q-list">
+          <li>Whose story impressed you most: Shaidorov's, Liu's or Miura and Kihara's? Why?</li>
+          <li>Malinin said the cause of his falls was “definitely mental”. How can athletes train their minds?</li>
+          <li>Should judges from the same country as a skater be allowed to score them?</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seg" id="s4">
+  <div class="seg-head"><div class="seg-no">SEG<b>04</b></div><div>
+    <h2>Watch: programs &amp; interviews</h2>
+    <p>Videos open on Olympics.com, YouTube or NBC in a new tab. Do the tasks before, while and after watching.</p></div></div>
+  <div class="vids">
+    <div class="vid">
+      <a class="screen" href="https://www.olympics.com/en/video/alysa-liu-usa-gold-women-s-free-skating-figure-skating-milano-cortina-2026" target="_blank" rel="noopener" style="--c1:#B8860B;--c2:#4A2A06">
+        <span class="pl"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#0E2A47"/></svg></span><span class="tag">Olympics.com · free skate</span></a>
+      <div class="body">
+        <span class="lbl">Video 1 · Alysa Liu, gold</span>
+        <h3>The golden disco free skate</h3>
+        <ol>
+          <li><b>Before:</b> What makes a performance unforgettable: the jumps, the music or the emotion?</li>
+          <li><b>While:</b> Note three things the crowd does and three adjectives to describe her skating.</li>
+          <li><b>After:</b> Describe the moment she finishes in three sentences. Use <i>land, crowd, standing ovation</i>.</li>
+        </ol>
+        <p class="alt">Also on YouTube: <a href="https://www.youtube.com/watch?v=qDSpKLqmylM" target="_blank" rel="noopener">MacArthur Park free skate</a> · <a href="https://www.youtube.com/watch?v=nBRsF6KyQqg" target="_blank" rel="noopener">How Alysa Liu won gold</a></p>
+      </div>
+    </div>
+    <div class="vid">
+      <a class="screen" href="https://www.nbcchicago.com/olympics/2026-milan-cortina/ilia-malinin-reveals-his-first-thought-after-heartbreaking-olympic-skate/3892854/" target="_blank" rel="noopener" style="--c1:#1D4E89;--c2:#0A1B33">
+        <span class="pl"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#0E2A47"/></svg></span><span class="tag">NBC · interview</span></a>
+      <div class="body">
+        <span class="lbl">Video 2 · Ilia Malinin interview</span>
+        <h3>“I blew it”: after the free skate</h3>
+        <ol>
+          <li><b>Before:</b> What do you think an athlete says right after a big failure?</li>
+          <li><b>While:</b> Write down every phrase he uses to talk about <i>nerves</i> and <i>confidence</i>.</li>
+          <li><b>After:</b> Report three things he said. Use <i>admitted, explained, said</i> (see Segment 05).</li>
+        </ol>
+        <p class="alt">The interview clip is in the NBC article.</p>
+      </div>
+    </div>
+    <div class="vid">
+      <a class="screen" href="https://www.youtube.com/watch?v=ulDm2PXIjiI" target="_blank" rel="noopener" style="--c1:#5B3FA8;--c2:#130B2E">
+        <span class="pl"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#0E2A47"/></svg></span><span class="tag">YouTube · gala</span></a>
+      <div class="body">
+        <span class="lbl">Video 3 · Exhibition gala</span>
+        <h3>Liu, Shaidorov, Malinin and others at the gala</h3>
+        <ol>
+          <li><b>Before:</b> In the gala there are no judges. How might the skating be different?</li>
+          <li><b>While:</b> Choose your favourite number. Note the music, costume and one trick.</li>
+          <li><b>After:</b> Recommend it to a friend in 60 seconds. Why should they watch it?</li>
+        </ol>
+      </div>
+    </div>
+    <div class="vid">
+      <a class="screen" href="https://www.youtube.com/results?search_query=Fournier+Beaudry+Cizeron+free+dance+Milano+Cortina+2026" target="_blank" rel="noopener" style="--c1:#1F7A8C;--c2:#06222B">
+        <span class="pl"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#0E2A47"/></svg></span><span class="tag">YouTube · search</span></a>
+      <div class="body">
+        <span class="lbl">Video 4 · Ice dance final</span>
+        <h3>Fournier Beaudry &amp; Cizeron vs Chock &amp; Bates</h3>
+        <ol>
+          <li><b>Before:</b> Ice dance has no big jumps. What do you think the judges look at?</li>
+          <li><b>While:</b> Watch both free dances. Find the twizzles (see the Elements guide).</li>
+          <li><b>After:</b> Who would <i>you</i> have given gold to? Defend your opinion.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seg" id="s5">
+  <div class="seg-head"><div class="seg-no">SEG<b>05</b></div><div>
+    <h2>Grammar: reported speech &amp; reporting verbs</h2>
+    <p>Journalists rarely quote everything word for word. They report it. Here's how, with real quotes from Milan.</p></div></div>
+  <div class="rule-grid">
+    <div class="card stack">
+      <span class="lbl">1 · Backshift</span>
+      <p>After a past reporting verb (<i>said, told, admitted</i>), the tense usually moves one step back.</p>
+      <table class="shift">
+        <thead><tr><th>Direct speech</th><th>Reported speech</th></tr></thead>
+        <tbody>
+          <tr><td>“I <b>want</b> to change the sport.”</td><td>He said he <b>wanted</b> to change the sport.</td></tr>
+          <tr><td>“The nerves <b>are</b> overwhelming.”</td><td>He said the nerves <b>were</b> overwhelming.</td></tr>
+          <tr><td>“I <b>blew</b> it.”</td><td>He admitted he <b>had blown</b> it.</td></tr>
+          <tr><td>“I'<b>ve</b> never <b>landed</b> five quads.”</td><td>He said he <b>had</b> never <b>landed</b> five quads.</td></tr>
+          <tr><td>“I'<b>ll</b> come back.”</td><td>He promised he <b>would</b> come back.</td></tr>
+          <tr><td>“I <b>can</b> do it.”</td><td>She said she <b>could</b> do it.</td></tr>
+        </tbody>
+      </table>
+      <p class="ua">Також змінюються слова часу й місця: today → that day, tomorrow → the next day, yesterday → the day before, here → there, this → that.</p>
+    </div>
+    <div class="card stack">
+      <span class="lbl">2 · Say or tell? Questions</span>
+      <p><b>say</b> (something) · <b>tell</b> + person: <i>He <u>told reporters</u> he had blown it.</i> Never <s>he said me</s>.</p>
+      <p>In reported questions the word order is like a statement, with no <i>do/does/did</i>:</p>
+      <table class="shift">
+        <tbody>
+          <tr><td>“<b>Will you</b> skate next season?”</td><td>They asked if she <b>would</b> skate the next season.</td></tr>
+          <tr><td>“Why <b>did you change</b> the program?”</td><td>They asked why he <b>had changed</b> the program.</td></tr>
+        </tbody>
+      </table>
+      <p class="ua">Backshift не обов'язковий, якщо факт досі правдивий: <i>He said medals don't define a person.</i> Обидва варіанти правильні.</p>
+      <div class="quote">“Medals don't define a person.”<small>Ilia Malinin, 2026</small></div>
+    </div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">3 · Reporting verbs: the B2 upgrade</span>
+    <p>Instead of <i>said</i> every time, choose a verb that shows <b>how</b> or <b>why</b> someone spoke. Each verb has its own pattern.</p>
+    <div class="pat">
+      <div><b>verb + to-infinitive</b><span>promise, refuse, agree, offer, threaten, decide<br><i>He promised to come back stronger.</i></span></div>
+      <div><b>verb + person + to-inf.</b><span>advise, tell, ask, warn, encourage, remind<br><i>The coach warned him not to look at the scores.</i></span></div>
+      <div><b>verb + -ing</b><span>admit, deny, suggest, recommend<br><i>She denied seeing the scores.</i></span></div>
+      <div><b>verb + preposition + -ing</b><span>apologise for, insist on, congratulate sb on, accuse sb of, blame sb for<br><i>He congratulated Shaidorov on winning.</i></span></div>
+      <div><b>verb + that-clause</b><span>admit, claim, explain, insist, announce, complain<br><i>The ISU insisted that the scores were fair.</i></span></div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <span class="lbl">Exercise A · Report the real quotes</span>
+      <ol class="items" id="gA" style="margin-top:14px"></ol>
+      <div class="row" style="margin-top:18px"><button class="btn" type="button" data-check="gA">Check</button><button class="btn alt" type="button" data-key="gA">Show answers</button><span class="score" id="gA-sc"></span></div>
+    </div>
+    <div class="card">
+      <span class="lbl">Exercise B · Choose the reporting verb</span>
+      <ol class="items" id="gB" style="margin-top:14px"></ol>
+      <div class="row" style="margin-top:18px"><button class="btn" type="button" data-check="gB">Check</button><button class="btn alt" type="button" data-key="gB">Show answers</button><span class="score" id="gB-sc"></span></div>
+    </div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Exercise C · Key-word transformation</span>
+    <p class="note">Rewrite the sentence using the word given. Then compare with the model answer.</p>
+    <ol class="trans" id="gC"></ol>
+  </div>
+</section>
+
+<section class="seg" id="s6">
+  <div class="seg-head"><div class="seg-no">SEG<b>06</b></div><div>
+    <h2>The costumes of Milan</h2>
+    <p>A costume tells the story before the first jump. Tap an empty frame to add a photo; it stays saved in this browser.</p></div></div>
+  <div class="card stack" style="margin-bottom:20px">
+    <span class="lbl">Costume vocabulary</span>
+    <div class="cw"><span>sequins</span><span>crystals / rhinestones</span><span>beading</span><span>sheer / mesh</span><span>lace</span><span>ombré</span><span>bodice</span><span>neckline</span><span>open back</span><span>corset</span><span>flowing skirt</span><span>tailored</span><span>embellished</span><span>off-the-shoulder</span></div>
+    <p class="note">Rules: since 2004 women may compete in trousers, and men must wear trousers. If part of a costume falls on the ice, the skater loses a point.</p>
+  </div>
+  <div class="cos" id="cos"></div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card stack">
+      <span class="lbl">Speaking</span>
+      <ol class="q-list">
+        <li>Which costume is your favourite? Describe it using at least four words from the list.</li>
+        <li>Which costume fits its music best? Which one would you change, and how?</li>
+        <li>Should skating costumes be simple, so judges focus on the skating, or as dramatic as possible?</li>
+      </ol>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Design challenge · pairs</span>
+      <p>Choose a song you love. Design a costume for a skater performing to it: colour, fabric, details, and why it fits the music. Present it in one minute.</p>
+      <p class="note">Useful language: <i>It's inspired by… · The bodice is covered in… · It's meant to look like… · It would catch the light when…</i></p>
+    </div>
+  </div>
+</section>
+
+<section class="seg" id="s7">
+  <div class="seg-head"><div class="seg-no">SEG<b>07</b></div><div>
+    <h2>The 2026–27 season</h2>
+    <p>A new four-year cycle has started. The Grand Prix series opens in France this weekend and ends with the Final in China in December.</p></div></div>
+  <div class="card">
+    <span class="lbl">Season calendar · October 2026 – April 2027</span>
+    <div class="tl-wrap" style="margin-top:14px"><div class="tl" id="tl"></div></div>
+    <div class="lanes-key"><span><i style="background:var(--blade)"></i>Grand Prix series</span><span><i style="background:var(--gold)"></i>ISU championships</span><span><i style="background:var(--bad);width:3px"></i>Today</span></div>
+  </div>
+  <div class="who" style="margin-top:20px">
+    <div class="card stack" style="--k:var(--bad)">
+      <span class="lbl">Not on the ice this season</span>
+      <ul>
+        <li><b>Kaori Sakamoto, Japan</b>Retired after winning her fourth world title in Prague, March 2026. She plans to become a coach.</li>
+        <li><b>Alysa Liu, USA</b>The Olympic champion is sitting out the season.</li>
+        <li><b>Yuma Kagiyama, Japan</b>Two-time Olympic silver medallist, taking the season off.</li>
+        <li><b>Riku Miura &amp; Ryuichi Kihara, Japan</b>The Olympic pairs champions retired.</li>
+        <li><b>Madison Chock &amp; Evan Bates, USA</b>Not competing this season, but they haven't announced retirement.</li>
+      </ul>
+    </div>
+    <div class="card stack" style="--k:var(--ok)">
+      <span class="lbl">Back and chasing titles</span>
+      <ul>
+        <li><b>Ilia Malinin, USA</b>Came back from eighth in Milan to win a third world title. Grand Prix: Skate America and NHK Trophy.</li>
+        <li><b>Mikhail Shaidorov, Kazakhstan</b>The Olympic champion is back. The Four Continents Championships will be on home ice in Astana.</li>
+        <li><b>Laurence Fournier Beaudry &amp; Guillaume Cizeron, France</b>Olympic and world ice dance champions.</li>
+        <li><b>Ami Nakai, Japan</b>The Olympic bronze medallist in her second senior season.</li>
+      </ul>
+    </div>
+    <div class="card stack" style="--k:var(--gold)">
+      <span class="lbl">What's new</span>
+      <ul>
+        <li><b>Neutral athletes</b>From 30 June 2026, Russian and Belarusian skaters may compete as Individual Neutral Athletes, without flags or anthems, after individual checks.</li>
+        <li><b>New pairs team for the USA</b>Deanna Stellato-Dudek has switched from Canada to the USA with a new partner, Danil Siianytsia.</li>
+        <li><b>Malinin's new mindset</b>“Medals don't define a person. That's the mindset I have now.” He also says he wants “to change the sport”.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card stack">
+      <span class="lbl">Make predictions · future of probability</span>
+      <div class="pred">
+        <div><b>is bound to</b><span>almost certain: <i>Malinin is bound to land a quad Axel this season.</i></span></div>
+        <div><b>is likely to</b><span>probable: <i>The Final is likely to be very close.</i></span></div>
+        <div><b>may / might well</b><span>possible: <i>A junior might well surprise everyone.</i></span></div>
+        <div><b>is unlikely to</b><span>improbable: <i>Liu is unlikely to compete before 2027.</i></span></div>
+        <div><b>there's no way</b><span>impossible (informal): <i>There's no way he'll fall twice again.</i></span></div>
+      </div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Speaking · your season forecast</span>
+      <ol class="q-list">
+        <li>Who will win the Grand Prix Final in men's and women's singles? Use at least three structures from the left.</li>
+        <li>Is it fair that neutral athletes can compete again? Give arguments for both sides.</li>
+        <li>Malinin says medals don't define a person. Do you agree? What does define an athlete?</li>
+        <li>If you could watch one event of the season live, which one would it be and why?</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="seg" id="s8">
+  <div class="seg-head"><div class="seg-no">SEG<b>08</b></div><div>
+    <h2>Homework</h2>
+    <p>Write it like a sports journalist.</p></div></div>
+  <div class="card hw">
+    <div class="stampx">HOMEWORK</div>
+    <div class="stack">
+      <h3>A report from the rink</h3>
+      <p>Watch one program from Milano 2026 or from this Grand Prix season. Write a news report of 180–220 words: what happened, how the skater performed, and what they said afterwards. Find a real interview, or invent one.</p>
+      <div class="check">
+        <label><input type="checkbox" id="hw1"> at least 4 different reporting verbs</label>
+        <label><input type="checkbox" id="hw2"> one reported question</label>
+        <label><input type="checkbox" id="hw3"> 6 words from Segment 02</label>
+        <label><input type="checkbox" id="hw4"> 2 element names from the Elements guide</label>
+        <label><input type="checkbox" id="hw5"> one prediction: <i>is likely to / is bound to</i></label>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</main>
+
+<!-- ======================= ELEMENTS ======================= -->
+<main id="elements" role="tabpanel" aria-labelledby="tabE" hidden>
+<div class="wrap">
+  <div class="el-intro">
+    <span class="eyebrow">Elements guide</span>
+    <h2>How to read figure skating</h2>
+    <p>Що роблять фігуристи на льоду, як називаються елементи англійською та українською і як читати протокол суддів. Наприкінці є декодер кодів і міні-тест «Який це стрибок?».</p>
+    <nav class="el-index" id="elIndex">
+      <a href="#e1">Disciplines</a><a href="#e2">Scoring</a><a href="#e3">Jumps</a><a href="#e4">Jump quiz</a><a href="#e5">Marks</a><a href="#e6">Spins</a><a href="#e7">Steps</a><a href="#e8">Pairs</a><a href="#e9">Ice dance</a><a href="#e10">Decoder</a>
+    </nav>
+  </div>
+
+  <section class="el-sec" id="e1">
+    <h3>Disciplines &amp; programs</h3>
+    <p>Four disciplines, each with two programs. At the Olympics there's also a team event.</p>
+    <div class="mini">
+      <div><b>Men's / Women's singles</b><span class="code">SP + FS</span><p>Short program (≈ 2 min 40 s) with required elements, then the free skate (≈ 4 min).</p></div>
+      <div><b>Pairs</b><span class="code">SP + FS</span><p>A man and a woman. Lifts, throws and twists that singles skaters never do.</p></div>
+      <div><b>Ice dance</b><span class="code">RD + FD</span><p>Rhythm dance and free dance. No big jumps: the focus is on edges, rhythm and partnering.</p></div>
+      <div><b>Team event</b><span class="code">Olympics</span><p>Ten countries; skaters from all four disciplines earn points for their team.</p></div>
+    </div>
+  </section>
+
+  <section class="el-sec" id="e2">
+    <h3>Scoring</h3>
+    <p>Every element has a fixed base value. Nine judges then give it a Grade of Execution (GOE) from −5 to +5. The program components measure the artistry.</p>
+    <div class="formula">
+      <span>TES<small>Technical score: base values + GOE</small></span><i>+</i>
+      <span>PCS<small>Composition · Presentation · Skating skills</small></span><i>−</i>
+      <span>Deductions<small>falls (−1 each, more for repeated falls), time, costume</small></span><i>=</i>
+      <span style="background:var(--rink);color:var(--rink-fg);border-color:var(--rink)">Segment score<small style="color:#BFD6EE">SP + FS = total</small></span>
+    </div>
+  </section>
+
+  <section class="el-sec" id="e3">
+    <h3>The six jumps</h3>
+    <p>From easiest to hardest. The skater takes off from one foot and lands backwards on the right foot (for most skaters). In <b>toe jumps</b> they push off with the toe pick of the other foot; <b>edge jumps</b> start from the blade's edge alone. The Axel is the only jump with a forward take-off, so it has an extra half rotation.</p>
+    <div class="jumps" id="jumpsGrid"></div>
+  </section>
+
+  <section class="el-sec" id="e4">
+    <h3>Quiz · Which jump is it?</h3>
+    <p>Read the description and choose the jump.</p>
+    <div class="card"><ol class="items" id="jq"></ol>
+      <div class="row" style="margin-top:18px"><button class="btn" type="button" data-check="jq">Check</button><button class="btn alt" type="button" data-key="jq">Show answers</button><span class="score" id="jq-sc"></span></div></div>
+  </section>
+
+  <section class="el-sec" id="e5">
+    <h3>Marks on the protocol</h3>
+    <p>Small symbols after a jump code tell you what went wrong. They lower the score.</p>
+    <div class="card marks"><table>
+      <thead><tr><th>Mark</th><th>Name</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr><td>q</td><td>Quarter</td><td>The jump is a quarter of a rotation short. Small GOE penalty.</td></tr>
+        <tr><td>&lt;</td><td>Under-rotated</td><td>More than a quarter but less than half a rotation short. Lower base value.</td></tr>
+        <tr><td>&lt;&lt;</td><td>Downgraded</td><td>Half a rotation or more short. Counted as a jump with one rotation less (4T&lt;&lt; is scored as 3T).</td></tr>
+        <tr><td>e</td><td>Wrong edge</td><td>A Lutz or flip taken off from the wrong edge. Often seen on the Lutz.</td></tr>
+        <tr><td>!</td><td>Unclear edge</td><td>The take-off edge isn't clear. Smaller penalty than <span class="code">e</span>.</td></tr>
+        <tr><td>F</td><td>Fall</td><td>The skater fell on the element: GOE −5 and a one-point deduction.</td></tr>
+        <tr><td>+</td><td>Combination</td><td>Two or three jumps with no step between them: <span class="code">4Lz+3T</span>. In a combination, the extra jumps can only be toe loops or loops.</td></tr>
+        <tr><td>+1Eu+</td><td>Euler</td><td>A small linking jump (half-loop) that connects a combination: <span class="code">3F+1Eu+3S</span>.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="el-sec" id="e6">
+    <h3>Spins</h3>
+    <p>Three basic positions, plus variations. Levels 1–4 (or B for base) depend on difficult features: changes of foot, edge, position and speed.</p>
+    <div class="mini">
+      <div><b>Upright spin</b><span class="code">USp</span><p>Standing on one leg. Variations: <b>layback</b> (LSp), back arched; <b>Biellmann</b> (Більман), free leg pulled over the head from behind.</p></div>
+      <div><b>Sit spin</b><span class="code">SSp</span><p>Spinning low, with the skating knee bent and the free leg stretched forward («вовчок»).</p></div>
+      <div><b>Camel spin</b><span class="code">CSp</span><p>Body and free leg parallel to the ice, like a letter T («ластівка»).</p></div>
+      <div><b>Combination spin</b><span class="code">CoSp · CCoSp</span><p>Changes of position. A <b>C</b> before the code means a change of foot. <b>F</b> means a flying entry: <span class="code">FCSp</span>.</p></div>
+    </div>
+  </section>
+
+  <section class="el-sec" id="e7">
+    <h3>Step &amp; choreographic sequences</h3>
+    <div class="mini">
+      <div><b>Step sequence</b><span class="code">StSq1–4</span><p>Turns and steps (brackets, rockers, counters, twizzles) covering the whole rink. Levels 1–4.</p></div>
+      <div><b>Choreographic sequence</b><span class="code">ChSq1</span><p>A free, artistic passage in the free skate: spirals, spread eagles, hydroblades. Judged mostly by GOE.</p></div>
+      <div><b>Spread eagle</b><span class="code">move</span><p>Gliding on both feet with toes pointing outwards and heels facing each other, in a straight line or curve.</p></div>
+      <div><b>Hydroblade</b><span class="code">move</span><p>A very deep lean, the body almost touching the ice, on a strong edge.</p></div>
+    </div>
+  </section>
+
+  <section class="el-sec" id="e8">
+    <h3>Pairs elements</h3>
+    <div class="mini">
+      <div><b>Twist lift</b><span class="code">3Tw4</span><p>The man throws the woman up; she rotates (here three times) in the air and is caught by the waist.</p></div>
+      <div><b>Throw jump</b><span class="code">3LzTh · 4STh</span><p>The man throws the woman into a jump; she lands alone on one foot.</p></div>
+      <div><b>Lift</b><span class="code">5ALi4</span><p>The woman is held above the man's head as he turns. Groups 1–5; group 5 (lasso, Axel take-off) is the hardest.</p></div>
+      <div><b>Death spiral</b><span class="code">BoDs · FiDs</span><p>«Тодес»: the man pivots while the woman circles around him, her head almost touching the ice.</p></div>
+      <div><b>Side-by-side jumps</b><span class="code">3T+2T</span><p>Both partners jump at the same time. They must be perfectly in time.</p></div>
+      <div><b>Pair spin</b><span class="code">PCoSp4</span><p>Spinning together on one axis, changing positions.</p></div>
+    </div>
+  </section>
+
+  <section class="el-sec" id="e9">
+    <h3>Ice dance elements</h3>
+    <div class="mini">
+      <div><b>Twizzles</b><span class="code">SyTw4</span><p>«Твізли»: fast one-foot turns travelling across the ice, done by both partners in sync. Errors here cost the French champions points in Milan.</p></div>
+      <div><b>Dance lifts</b><span class="code">StaLi · RoLi · CuLi</span><p>Stationary, rotational, curve, straight-line or combination lifts. Shorter than pairs lifts, without lifting over the head.</p></div>
+      <div><b>Pattern dance</b><span class="code">PSt · in RD</span><p>A set step pattern danced to a given rhythm, chosen by the ISU each season.</p></div>
+      <div><b>One-foot step sequence</b><span class="code">OFTW</span><p>Both partners skate difficult turns on one foot each, side by side.</p></div>
+    </div>
+  </section>
+
+  <section class="el-sec" id="e10">
+    <h3>Protocol decoder</h3>
+    <p>Tap a code from a real score sheet and see what it means.</p>
+    <div class="decoder">
+      <div class="codes-list" id="codes"></div>
+      <div class="decoded" id="decoded" aria-live="polite"><div class="c">—</div><p>Choose a code on the left.</p></div>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer><div class="wrap">
+  <span>English · B2 · figure skating lesson. Facts as of 23 October 2026.</span>
+  <span>Sources: <a href="https://en.wikipedia.org/wiki/Figure_skating_at_the_2026_Winter_Olympics" target="_blank" rel="noopener">Wikipedia: Figure skating at the 2026 Winter Olympics</a> · <a href="https://www.nbcolympics.com/news/olympic-figure-skating-milan-cortina-2026-biggest-stories-highlights-replays-medal-results-and-top-athletes" target="_blank" rel="noopener">NBC Olympics</a> · <a href="https://www.euronews.com/2026/02/14/mikhail-shaidorov-wins-historic-figure-skating-olympic-gold-for-kazakhstan-at-milano-corti" target="_blank" rel="noopener">Euronews</a> · <a href="https://www.aol.com/best-figure-skating-costumes-2026-140000637.html" target="_blank" rel="noopener">Best costumes 2026</a> · <a href="https://en.wikipedia.org/wiki/2026%E2%80%9327_figure_skating_season" target="_blank" rel="noopener">2026–27 season</a> · <a href="https://kwsn.com/2026/10/21/figure-skating-grand-prix-opens-new-olympic-cycle-with-reshaped-field/" target="_blank" rel="noopener">Reuters season preview</a></span>
+</div></footer>
+
+<script>
+/* ============ DATA ============ */
+const NUMS=[
+ ["4.5","rotations in a quadruple Axel","The Axel takes off forwards, so it has an extra half turn. Only Malinin has landed it in competition."],
+ ["100+","hours to make Alysa Liu's gold dress","Designer Lisa McKinnon: “classically beautiful with a hint of disco”."],
+ ["5","clean quads in Shaidorov's free skate","A first in his career, and it won Kazakhstan's first Olympic gold in the sport."],
+ ["17","Ami Nakai's age at the Olympics","She won bronze in her first senior season."],
+ ["2002","the last individual Olympic gold for a US woman before Liu","Liu ended a 24-year wait."],
+ ["158.13","Miura & Kihara's free skate score","A record. They climbed from fifth to gold."]
+];
+const VOCAB=[
+ ["favourite","n.","the competitor most people expect to win","Malinin arrived in Milan as the clear favourite."],
+ ["underdog","n.","a competitor few people expect to win","Shaidorov was the underdog, until he wasn't."],
+ ["land a jump","v. phr.","to finish a jump on your feet, cleanly","He landed five quads."],
+ ["fall / a fall","v. / n.","to lose balance and hit the ice","Two falls cost him a medal."],
+ ["nerves","n. pl.","the anxious feeling before a big moment","“The nerves just went so overwhelming.”"],
+ ["comeback","n.","a return to success after a break or failure","Liu's comeback ended in gold."],
+ ["climb (from… to…)","v.","to move up in the rankings","She climbed from third to first."],
+ ["debut","n. / adj.","your first appearance at a level","Nakai won bronze in her debut season."],
+ ["set a record","v. phr.","to achieve the best result ever recorded","Miura and Kihara set a free skate record."],
+ ["upset","n.","a surprising result where the favourite loses","Malinin's eighth place was a huge upset."],
+ ["dedicate sth to sb","v.","to say an achievement is in honour of someone","He dedicated the medal to Denis Ten."],
+ ["judging controversy","n.","public disagreement about the judges' scores","Ice dance ended in a judging controversy."],
+ ["appeal (a decision)","v.","to formally ask for a decision to be changed","Chock and Bates chose not to appeal."],
+ ["personal best","n.","your highest score ever","Sakamoto won Worlds with a personal best."],
+ ["withdraw (from)","v.","to stop taking part in a competition","Liu withdrew from the World Championships."],
+ ["sit out (a season)","phr. v.","to not take part for a period","Kagiyama is sitting out the season."]
+];
+const VEX=[
+ ["Nobody expected him to win. He was the ___ of the competition.",["underdog","favourite","debut"]],
+ ["She ___ a triple Axel for the first time in her career.",["landed","fell","appealed"]],
+ ["After two years away, her ___ was the story of the Games.",["comeback","upset","withdrawal"]],
+ ["The pair ___ from fifth place to gold in the free skate.",["climbed","set","sat out"]],
+ ["With 158.13 points, they ___ a new world record.",["set","made","did"]],
+ ["The champion decided to ___ from the event because of an injury.",["withdraw","appeal","dedicate"]],
+ ["Fans were angry about the scores: it was a real judging ___.",["controversy","upset","best"]],
+ ["He ___ his gold medal to his late coach.",["dedicated","devoted to","offered"]]
+];
+const TFNG=[
+ ["Malinin was expected to win the gold medal.","T"],
+ ["Malinin blamed the judges for his result.","F"],
+ ["Shaidorov had landed five quads in competition before Milan.","F"],
+ ["Denis Ten won Kazakhstan's first Olympic medal in figure skating.","T"],
+ ["Liu was leading after the short program.","F"],
+ ["Liu's dress was made by an Italian fashion house.","NG"],
+ ["Miura and Kihara won both the short program and the free skate.","F"],
+ ["Chock and Bates asked for the result to be changed.","F"]
+];
+const GA=[
+ ["“I blew it.” (Malinin) → He admitted that he ___ it.",["had blown","has blown","blows"]],
+ ["“I was too confident.” (Malinin) → He said he ___ too confident.",["had been","has been","is"]],
+ ["“Today, everything came together.” (Shaidorov) → He said everything had come together ___.",["that day","today","the day before"]],
+ ["“I want to change the sport.” (Malinin) → He ___ that he wanted to change the sport.",["said","told","said us"]],
+ ["“We just went straight for it.” (designer Lisa McKinnon) → She said they ___ straight for it.",["had just gone","just go","have just went"]],
+ ["“Will you skate next season?” → A reporter asked Liu ___ skate the next season.",["whether she would","will she","if would she"]],
+ ["“Why did you change your program?” → They asked Shaidorov why ___ his program.",["he had changed","did he change","had he changed"]]
+];
+const GB=[
+ ["“I'll come back stronger,” Malinin said. → He ___ to come back stronger.",["promised","admitted","denied"]],
+ ["“It was my nerves, not the judges.” → He ___ that his nerves were to blame.",["admitted","refused","promised"]],
+ ["“We have full confidence in the scores.” → The ISU ___ that the scores were fair.",["insisted","apologised","suggested"]],
+ ["“Well done, Mikhail!” → Malinin ___ Shaidorov on his victory.",["congratulated","praised","thanked"]],
+ ["“We won't appeal.” → Chock and Bates ___ to appeal.",["refused","denied","admitted"]],
+ ["“You should enjoy every moment,” her coach said. → Her coach ___ her to enjoy every moment.",["advised","suggested","said"]],
+ ["“I didn't look at the scoreboard.” → She ___ looking at the scoreboard.",["denied","refused","promised"]],
+ ["“Let's watch the gala together!” → He ___ watching the gala together.",["suggested","offered","advised"]]
+];
+const GC=[
+ ["“I'm sorry I fell twice,” Malinin said.","APOLOGISED","Malinin apologised for falling twice."],
+ ["“You should rest after the Olympics,” the doctor told her.","ADVISED","The doctor advised her to rest after the Olympics."],
+ ["“The French judge favoured her own team!” fans said.","ACCUSED","Fans accused the French judge of favouring her own team."],
+ ["“I'll retire after the World Championships,” Sakamoto said.","ANNOUNCED","Sakamoto announced (that) she would retire after the World Championships."],
+ ["“Don't look at the scores,” the coach told him.","WARNED","The coach warned him not to look at the scores."],
+ ["“Yes, we'll design the costumes together,” Chock told her coach.","AGREED","Chock agreed to design the costumes together."]
+];
+const COS=[
+ {k:"liu",n:"Alysa Liu",c:"USA",p:"Free skate · “MacArthur Park”, Donna Summer",d:"All-gold dress with hand-placed beading, made from one gold fabric. It took more than 100 hours to make. The brief was “flirty fun, but classically beautiful with a hint of disco”.",by:"Design: Lisa McKinnon"},
+ {k:"sakamoto",n:"Kaori Sakamoto",c:"JPN",p:"Free skate · “Non, je ne regrette rien”, Édith Piaf",d:"Open-back ombré dress. The neckline looks like a pearl necklace, a nod to Piaf herself.",by:"Design: Astraee Couture"},
+ {k:"shaidorov",n:"Mikhail Shaidorov",c:"KAZ",p:"Short program · Dune",d:"A replica of the stillsuit, the survival suit from the film Dune. Fans called it one of the boldest looks of the Games.",by:""},
+ {k:"malinin",n:"Ilia Malinin",c:"USA",p:"Short program · Prince of Persia",d:"Inspired by the video game hero Sargon: sand-coloured mesh with leather-strap details. His free skate costume was all black with gold and blue jewels.",by:"Design: Satomi Ito"},
+ {k:"glenn",n:"Amber Glenn",c:"USA",p:"Short program · “Like a Prayer”, Madonna",d:"Burgundy off-the-shoulder dress with a lace corset and frills at the wrists. Instead of crystals, it has layered necklaces and chains, like Madonna's 1980s look. Madonna sent her a good-luck video.",by:"Design: Lisa McKinnon"},
+ {k:"gilles",n:"Piper Gilles & Paul Poirier",c:"CAN",p:"Free dance · “Vincent”",d:"A dress inspired by Van Gogh's “The Starry Night”. The bodice mirrors the painting and the skirt turns into it.",by:"Ice dance · bronze"},
+ {k:"chock",n:"Madison Chock & Evan Bates",c:"USA",p:"Free dance · “Paint It Black” (Ramin Djawadi)",d:"Matador-inspired costumes with a red fabric skirt that moves with the choreography. Madison Chock designed them herself.",by:"Design: Madison Chock with Mathieu Caron"},
+ {k:"miura",n:"Riku Miura & Ryuichi Kihara",c:"JPN",p:"Free skate · Gladiator",d:"She wore a grey-and-gold dress painted to look like marble; he wore a Roman-inspired printed top. They won Japan's first Olympic pairs gold in them.",by:"Design: Mathieu Caron"},
+ {k:"carreira",n:"Christina Carreira & Anthony Ponomarenko",c:"USA",p:"Free dance · Perfume: The Story of a Murderer",d:"Blush-pink dress with flower-petal details. It got lost in FedEx shipping and arrived just in time after the skaters asked for help on TikTok.",by:"Design: Lisa McKinnon"},
+ {k:"fbc",n:"Laurence Fournier Beaudry & Guillaume Cizeron",c:"FRA",p:"Free dance",d:"Sheer, flowing costumes inspired by the movement of water, matching their modern-dance style.",by:"Ice dance · gold"}
+];
+const EVENTS=[
+ ["Grand Prix de France","Angers","2026-10-23","2026-10-25","gp"],
+ ["Skate Canada","Kelowna","2026-10-30","2026-11-01","gp"],
+ ["Cup of China","Shenzhen","2026-11-06","2026-11-08","gp"],
+ ["Skate America","Everett","2026-11-13","2026-11-15","gp"],
+ ["Finlandia Trophy","Helsinki","2026-11-20","2026-11-21","gp"],
+ ["NHK Trophy","Tokyo","2026-11-27","2026-11-29","gp"],
+ ["Grand Prix Final","Chongqing","2026-12-10","2026-12-13","gp"],
+ ["Europeans","Lausanne","2027-01-27","2027-01-31","ch"],
+ ["Four Continents","Astana","2027-02-09","2027-02-14","ch"],
+ ["Junior Worlds","Sofia","2027-02-24","2027-02-28","ch"],
+ ["World Championships","Tampere","2027-03-17","2027-03-21","ch"],
+ ["World Team Trophy","Tokyo","2027-04-08","2027-04-11","ch"]
+];
+const JUMPS=[
+ {n:"Toe loop",ua:"тулуп",code:"T",type:"toe",to:"Back outside edge + toe pick of the other foot",tip:"The easiest jump: the most common quad, and the usual second jump in a combination.",r:1},
+ {n:"Salchow",ua:"сальхов",code:"S",type:"edge",to:"Back inside edge; the free leg swings round",tip:"Named after the Swedish skater Ulrich Salchow (1909). Looks like a swing of the free leg.",r:2},
+ {n:"Loop",ua:"ріттбергер",code:"Lo",type:"edge",to:"Back outside edge, same foot as the landing",tip:"The legs look crossed at take-off; no toe pick at all. In Ukrainian it's named after Werner Rittberger.",r:3},
+ {n:"Flip",ua:"фліп",code:"F",type:"toe",to:"Back inside edge + toe pick",tip:"Like a Lutz, but on the inside edge. Wrong edge → “!” or “e” on the protocol.",r:4},
+ {n:"Lutz",ua:"лутц",code:"Lz",type:"toe",to:"Back outside edge + toe pick, long backward glide into a corner",tip:"The body turns against the curve of the entry, which makes it hard. The jump most often marked “e”.",r:5},
+ {n:"Axel",ua:"аксель",code:"A",type:"edge",to:"Forward outside edge; skater steps up into the jump",tip:"The only forward take-off, so a “triple” Axel has 3.5 rotations. Named after Axel Paulsen (1882).",r:6}
+];
+const JQ=[
+ ["The skater takes off <i>forwards</i>. The jump has an extra half rotation.",["Axel","Lutz","Loop"]],
+ ["Back outside edge plus toe pick: the easiest jump and the usual second jump in a combination.",["Toe loop","Flip","Salchow"]],
+ ["Back outside edge with a toe pick after a long glide into a corner. Often marked “e”.",["Lutz","Flip","Toe loop"]],
+ ["Back inside edge, no toe pick; the free leg swings round to help the rotation.",["Salchow","Loop","Flip"]],
+ ["Back outside edge on the same foot as the landing, no toe pick; the legs look crossed.",["Loop","Salchow","Axel"]],
+ ["Back inside edge plus toe pick. Very similar to the Lutz.",["Flip","Toe loop","Loop"]]
+];
+const CODES=[
+ ["4Lz+3T",["4 = quadruple","Lz = Lutz","+ = combination","3T = triple toe loop"],"A quadruple Lutz followed straight away by a triple toe loop. One of the most valuable combinations in men's skating."],
+ ["4A",["4 = quadruple","A = Axel"],"A quadruple Axel: 4.5 rotations. Ilia Malinin is the only skater to land it in competition."],
+ ["3A<",["3A = triple Axel","< = under-rotated"],"A triple Axel short by more than a quarter turn. It gets a lower base value."],
+ ["3Lze",["3Lz = triple Lutz","e = wrong edge"],"A triple Lutz taken off from the inside edge instead of the outside one."],
+ ["4T<<",["4T = quad toe loop","<< = downgraded"],"Half a rotation or more short, so it's scored as a triple toe loop."],
+ ["3F+1Eu+3S",["3F = triple flip","1Eu = Euler","3S = triple Salchow"],"A three-jump combination linked by an Euler, a small half-loop."],
+ ["CCoSp4",["C = change of foot","Co = combination","Sp = spin","4 = level 4"],"A combination spin with a change of foot, at the highest level."],
+ ["FCSp3",["F = flying entry","C = camel","Sp = spin","3 = level 3"],"The skater jumps into a camel spin. Level 3."],
+ ["StSq4",["StSq = step sequence","4 = level 4"],"A step sequence with the most difficult turns and steps."],
+ ["ChSq1",["ChSq = choreographic sequence"],"An artistic passage in the free skate. It has no levels, only GOE."],
+ ["3Tw4",["3 = triple","Tw = twist lift","4 = level 4"],"Pairs: the woman spins three times in the air before being caught."],
+ ["4STh",["4S = quad Salchow","Th = throw"],"Pairs: the man throws the woman into a quadruple Salchow."],
+ ["5ALi4",["5 = lift group 5","A = Axel take-off","Li = lift","4 = level 4"],"Pairs: the hardest lift group, entered from an Axel-like take-off."],
+ ["BoDs4",["Bo = backward outside","Ds = death spiral","4 = level 4"],"Pairs: a death spiral on a backward outside edge."],
+ ["SyTw4",["Sy = synchronised","Tw = twizzles","4 = level 4"],"Ice dance: synchronised twizzles, a set of fast turns on one foot."]
+];
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id);
+const KEY="onedge-v1";let store={};try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));return true}catch(e){return false}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* mc engine: items [sentence with ___ (or no blank), [correct,...]] */
+function buildMC(id,data,col){
+  const ol=$(id);
+  data.forEach(([s,opts])=>{
+    const li=document.createElement('li');const has=s.includes('___');const parts=s.split('___');
+    li.innerHTML=has?`<span class="s">${parts[0]}<span class="slot">&nbsp;</span>${parts[1]||''}</span><div class="opts${col?' col':''}"></div>`:`<span class="s">${s}</span><div class="opts${col?' col':''}"></div>`;
+    const box=li.querySelector('.opts');li.dataset.a=opts[0];
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right')});b.setAttribute('aria-pressed','true');li.dataset.v=o;
+        const sl=li.querySelector('.slot');if(sl){sl.textContent=o;sl.classList.remove('ok','no')}});
+      box.appendChild(b)});
+    ol.appendChild(li)});
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-check]');if(c){const ol=$(c.dataset.check);let ok=0,n=0;
+    ol.querySelectorAll(':scope > li').forEach(li=>{n++;const good=li.dataset.v===li.dataset.a;if(good)ok++;
+      const sl=li.querySelector('.slot');if(sl){if(!li.dataset.v)sl.innerHTML='&nbsp;?&nbsp;';sl.classList.toggle('ok',good);sl.classList.toggle('no',!good)}
+      else li.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('right',good&&b.dataset.v===li.dataset.a)})});
+    $(c.dataset.check+'-sc').textContent=ok+' / '+n;}
+  const k=e.target.closest('[data-key]');if(k){$(k.dataset.key).querySelectorAll(':scope > li').forEach(li=>li.querySelectorAll('.opt').forEach(b=>b.classList.toggle('right',b.dataset.v===li.dataset.a)))}
+});
+
+/* ============ TABS ============ */
+function show(t){const e=t==='elements';$('lesson').hidden=e;$('elements').hidden=!e;$('tabL').setAttribute('aria-selected',!e);$('tabE').setAttribute('aria-selected',e);
+  $('jumps').style.display=e?'none':'contents';$('sep').style.display=e?'none':'';}
+const goTop=()=>window.scrollTo({top:$('top').offsetHeight});
+$('tabL').addEventListener('click',()=>{show('lesson');goTop()});
+$('tabE').addEventListener('click',()=>{show('elements');goTop()});
+if(location.hash==='#elements')show('elements');
+document.querySelectorAll('#elIndex a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();$(a.getAttribute('href').slice(1)).scrollIntoView({behavior:'smooth'})}));
+
+/* ============ WARM-UP ============ */
+NUMS.forEach(([n,c,a])=>{const b=document.createElement('button');b.type='button';b.className='num';
+  b.innerHTML=`<span class="tap">TAP</span><span class="big">${n}</span><span class="cl">${c}</span><span class="ans">${a}</span>`;
+  b.addEventListener('click',()=>b.classList.toggle('on'));$('nums').appendChild(b)});
+
+/* ============ VOCAB ============ */
+VOCAB.forEach(([w,p,d,e])=>{const v=document.createElement('div');v.className='v';v.innerHTML=`<i>${p}</i><b>${w}</b><p>${d}</p><em>${e}</em>`;$('vocab').appendChild(v)});
+buildMC('vEx',VEX);
+
+/* ============ READING ============ */
+TFNG.forEach(([s,a],i)=>{const li=document.createElement('li');li.dataset.a=a;
+  li.innerHTML=`<span>${i+1}. ${s}</span><div class="tog">${['T','F','NG'].map(x=>`<button type="button" aria-pressed="false" data-v="${x}">${x}</button>`).join('')}</div>`;
+  li.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{li.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');li.dataset.v=b.dataset.v;li.classList.remove('ok','no')}));
+  $('tfng').appendChild(li)});
+$('tfCheck').addEventListener('click',()=>{let ok=0;$('tfng').querySelectorAll('li').forEach(li=>{const g=li.dataset.v===li.dataset.a;li.classList.toggle('ok',g);li.classList.toggle('no',!g);if(g)ok++});$('tfSc').textContent=ok+' / '+TFNG.length});
+
+/* ============ GRAMMAR ============ */
+buildMC('gA',GA);buildMC('gB',GB);
+GC.forEach(([s,k,m],i)=>{const li=document.createElement('li');
+  li.innerHTML=`<span>${s}</span><span class="kw">${k}</span><input id="gc${i}" placeholder="Write your sentence…" autocomplete="off"><div class="row"><button class="btn alt" type="button">Show model</button><span class="model" hidden>${m}</span></div>`;
+  const inp=li.querySelector('input');if(store['gc'+i])inp.value=store['gc'+i];inp.addEventListener('input',()=>{store['gc'+i]=inp.value;save()});
+  li.querySelector('button').addEventListener('click',e=>{const m=li.querySelector('.model');m.hidden=!m.hidden;e.currentTarget.textContent=m.hidden?'Show model':'Hide model'});
+  $('gC').appendChild(li)});
+
+/* ============ COSTUMES (photo frames) ============ */
+const camera='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function shrink(file,cb){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height));
+  const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};im.src=fr.result};fr.readAsDataURL(file)}
+COS.forEach(o=>{const card=document.createElement('article');card.className='co';
+  card.innerHTML=`<label class="frame" for="ph-${o.k}"><span class="flag">${o.c}</span><input type="file" accept="image/*" id="ph-${o.k}"><span class="empty">${camera}Add a photo of<br><b>${o.n}</b></span></label>
+    <div class="body"><span class="prog">${o.p}</span><h3>${o.n}</h3><p>${o.d}</p>${o.by?`<span class="by">${o.by}</span>`:''}</div>`;
+  const fr=card.querySelector('.frame'),inp=card.querySelector('input'),key='ph-'+o.k;
+  const rm=document.createElement('button');rm.type='button';rm.className='rm';rm.textContent='Remove';rm.hidden=true;fr.appendChild(rm);
+  const set=u=>{fr.style.backgroundImage=u?`url("${u}")`:'';fr.classList.toggle('has',!!u);rm.hidden=!u;};
+  try{const u=localStorage.getItem('onedge-'+key);if(u)set(u)}catch(e){}
+  fr.addEventListener('click',e=>{if(fr.classList.contains('has')&&e.target!==rm)e.preventDefault()});
+  inp.addEventListener('change',()=>{const f=inp.files[0];if(!f)return;shrink(f,u=>{set(u);try{localStorage.setItem('onedge-'+key,u)}catch(e){}inp.value=''})});
+  rm.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();set(null);try{localStorage.removeItem('onedge-'+key)}catch(err){}});
+  fr.addEventListener('dragover',e=>e.preventDefault());
+  fr.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))shrink(f,u=>{set(u);try{localStorage.setItem('onedge-'+key,u)}catch(err){}})});
+  $('cos').appendChild(card)});
+
+/* ============ SEASON TIMELINE ============ */
+(function(){
+  const tl=$('tl');const start=new Date('2026-10-01'),end=new Date('2027-04-30');const span=end-start;
+  const x=d=>((new Date(d)-start)/span*100);
+  const months=['Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+  months.forEach((m,i)=>{const d=new Date(2026,9+i,1);const el=document.createElement('div');el.className='month';el.style.left=x(d)+'%';el.textContent=m+(i===3?' 2027':'');tl.appendChild(el)});
+  const fmt=d=>d.getDate()+' '+d.toLocaleString('en-GB',{month:'short'});
+  EVENTS.forEach(([n,c,s,e,t],i)=>{const top=30+i*27;const L=x(s),W=Math.max(.9,x(e)-x(s)+.5);
+    const ev=document.createElement('div');ev.className='ev'+(t==='ch'?' ch':'');ev.style.left=L+'%';ev.style.width=W+'%';ev.style.top=(top+3)+'px';tl.appendChild(ev);
+    const lab=document.createElement('div');lab.className='lab';lab.style.top=top+'px';
+    const ds=new Date(s),de=new Date(e);
+    lab.innerHTML=`<b>${n}</b> <span>${c} · ${fmt(ds)}–${fmt(de)}</span>`;
+    if(L>62){lab.style.right=(100-L+.8)+'%';lab.style.textAlign='right'}else{lab.style.left=(L+W+.8)+'%'}
+    tl.appendChild(lab)});
+  const now=new Date();if(now>=start&&now<=end){const t=document.createElement('div');t.className='today';t.style.left=x(now)+'%';t.innerHTML='<span>today</span>';tl.appendChild(t)}
+})();
+
+/* ============ HOMEWORK ============ */
+['hw1','hw2','hw3','hw4','hw5'].forEach(id=>{const c=$(id);c.checked=!!store[id];c.addEventListener('change',()=>{store[id]=c.checked;save()})});
+
+/* ============ ELEMENTS ============ */
+JUMPS.forEach(j=>{const d=document.createElement('article');d.className='jp';
+  const k=j.type==='toe'?'var(--blade)':'var(--bronze)';d.style.setProperty('--k',k);
+  d.innerHTML=`<span class="rank">${j.r} / 6</span><span class="type">${j.type==='toe'?'Toe jump':'Edge jump'}</span><h4>${j.n}</h4><span class="ua-n">укр.: ${j.ua}</span>
+   <div class="codes"><span>1${j.code}</span><span>2${j.code}</span><span>3${j.code}</span><span>4${j.code}</span></div>
+   <dl><dt>Take-off</dt><dd>${j.to}</dd><dt>Landing</dt><dd>Back outside edge</dd><dt>Spot it</dt><dd>${j.tip}</dd></dl>`;
+  $('jumpsGrid').appendChild(d)});
+buildMC('jq',JQ.map(([s,o])=>[s,o]),false);
+CODES.forEach(([c,parts,ex],i)=>{const b=document.createElement('button');b.type='button';b.textContent=c;b.setAttribute('aria-pressed','false');
+  b.addEventListener('click',()=>{$('codes').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');
+    $('decoded').innerHTML=`<div class="c">${c.replace(/</g,'&lt;')}</div><div class="parts">${parts.map(p=>`<span>${p.replace(/</g,'&lt;')}</span>`).join('')}</div><p>${ex}</p>`});
+  $('codes').appendChild(b);if(i===0)setTimeout(()=>b.click(),0)});
+
+/* ============ HERO: blade tracing a figure eight ============ */
+(function(){
+  const cv=$('rink'),ctx=cv.getContext('2d');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W,H,dpr;function size(){dpr=Math.min(2,devicePixelRatio||1);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+  size();addEventListener('resize',size);
+  const pts=[];let t=0;
+  function pos(t){const cx=W*.72,cy=H*.5,a=Math.min(W*.24,H*.42);const s=Math.sin(t),c=Math.cos(t);return [cx+a*s,cy+a*s*c*.9]}
+  function bg(){const g=ctx.createRadialGradient(W*.7,H*.4,10,W*.6,H*.5,Math.max(W,H));g.addColorStop(0,'#16406B');g.addColorStop(1,'#0B1F37');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;for(let i=0;i<40;i++){const y=(i*37)%H;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y+((i%3)-1)*20);ctx.stroke()}}
+  function draw(){bg();
+    const n=reduce?900:Math.min(900,pts.length);
+    if(reduce&&!pts.length){for(let i=0;i<900;i++)pts.push(pos(i/900*Math.PI*2*1.5))}
+    ctx.lineCap='round';
+    for(let i=1;i<pts.length;i++){const a=i/pts.length;ctx.strokeStyle=`rgba(200,225,250,${.08+a*.55})`;ctx.lineWidth=1.2+a*1.6;ctx.beginPath();ctx.moveTo(pts[i-1][0],pts[i-1][1]);ctx.lineTo(pts[i][0],pts[i][1]);ctx.stroke()}
+    if(!reduce&&pts.length){const p=pts[pts.length-1];const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],26);g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p[0],p[1],26,0,7);ctx.fill();
+      for(let k=0;k<3;k++){ctx.fillStyle='rgba(220,236,255,.7)';ctx.fillRect(p[0]+(Math.random()-.5)*18,p[1]+(Math.random()-.5)*18,1.5,1.5)}}
+  }
+  function loop(){t+=.012;pts.push(pos(t));if(pts.length>520)pts.shift();draw();requestAnimationFrame(loop)}
+  if(reduce){draw()}else{for(let i=0;i<300;i++){t+=.012;pts.push(pos(t))}loop()}
+})();
+</script>
+
+</body>
+</html>
