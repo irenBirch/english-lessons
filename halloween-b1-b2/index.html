@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>The Blackwood Manor Mystery</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@600;800;900&display=swap">
+<style>
+/* Layout: a detective's case file on Halloween night. Hero = case cover + suspect board that updates as clues are found; each lesson stage is a numbered "file" that unlocks a clue; ends with the accusation and a team board game. Single dark theme by choice. */
+:root{
+  --night:#100A18; --panel:#1C1428; --panel2:#271C38; --line:rgba(240,228,206,.13);
+  --ink:#F0E4CE; --muted:#B3A3C2; --paper:#E9DCC0; --paper-ink:#2A1E12;
+  --pumpkin:#FF7A1A; --amber:#FFB15C; --slime:#8BE04E; --blood:#E5394F; --moon:#F6E7B0;
+  --f-scary:"Creepster","Impact",fantasy; --f-type:"Special Elite","Courier New",monospace;
+  --f-body:"Lora",Georgia,serif; --f-ui:"Nunito",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--night);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--night)}
+#fog{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.page{position:relative;z-index:1}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-scary);font-weight:400;letter-spacing:.03em;line-height:1;margin:0}
+h3,h4{font-family:var(--f-ui);font-weight:900;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+a{color:var(--amber)}
+:focus-visible{outline:3px solid var(--slime);outline-offset:3px}
+.type{font-family:var(--f-type)}
+.lbl{font-family:var(--f-type);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+
+/* hero */
+.hero{padding-block:54px 26px}
+.hero-top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:34px;align-items:start}
+.case-no{font-family:var(--f-type);color:var(--blood);font-size:1rem;letter-spacing:.12em}
+.hero h1{font-size:clamp(3rem,8.5vw,6.2rem);color:var(--pumpkin);text-shadow:0 0 26px rgba(255,122,26,.4),0 4px 0 #5E2200;margin-top:6px}
+.brief{background:var(--paper);color:var(--paper-ink);border-radius:4px;padding:22px 24px;font-family:var(--f-type);font-size:1rem;line-height:1.65;transform:rotate(1deg);box-shadow:0 18px 40px -16px rgba(0,0,0,.85);position:relative}
+.brief::before{content:"";position:absolute;top:-12px;left:40%;width:90px;height:24px;background:rgba(255,255,255,.35);transform:rotate(-3deg)}
+.brief b{color:#7A1A10}
+.brief .stamp{position:absolute;right:16px;bottom:-14px;font-family:var(--f-type);color:var(--blood);border:3px solid var(--blood);padding:2px 10px;transform:rotate(-8deg);background:var(--paper);font-size:.9rem}
+.lede{margin-top:16px;max-width:56ch;color:#E2D6EC}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.tag{font-family:var(--f-ui);font-weight:800;font-size:.76rem;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tag.hot{background:var(--pumpkin);color:#1A0B00;border-color:var(--pumpkin)}
+
+/* suspects board */
+.board{margin-top:34px;background:#3A2A1C;background-image:radial-gradient(rgba(0,0,0,.25) 1px,transparent 1.5px);background-size:6px 6px;border:8px solid #2A1C12;border-radius:10px;padding:20px;position:relative}
+.board header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.board header span{font-family:var(--f-type);color:var(--paper)}
+.sus{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.s{background:var(--paper);color:var(--paper-ink);padding:10px 10px 12px;border-radius:2px;box-shadow:0 8px 14px rgba(0,0,0,.45);position:relative;transform:rotate(var(--r));display:flex;flex-direction:column;gap:6px;min-width:0}
+.s::before{content:"";position:absolute;top:-7px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--blood);box-shadow:0 2px 3px rgba(0,0,0,.5);transform:translateX(-50%)}
+.s svg{width:100%;height:auto;background:#CDBB98;border-radius:2px}
+.s b{font-family:var(--f-ui);font-weight:900;font-size:.95rem;line-height:1.15}
+.s small{font-family:var(--f-type);font-size:.74rem;line-height:1.3;color:#5A4630}
+.s .st{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%) rotate(-14deg);font-family:var(--f-type);font-size:1rem;padding:2px 8px;border:3px solid;display:none;background:rgba(233,220,192,.85);white-space:nowrap}
+.s.cleared .st{display:block;color:#1E6B2A;border-color:#1E6B2A}
+.s.prime .st{display:block;color:#B0141F;border-color:#B0141F}
+.s.guilty .st{display:block;color:#fff;background:#B0141F;border-color:#B0141F}
+.s.cleared svg{filter:grayscale(1) opacity(.55)}
+.s .why{font-family:var(--f-type);font-size:.72rem;color:#1E6B2A;display:none}
+.s.cleared .why,.s.prime .why{display:block}
+.s.prime .why{color:#B0141F}
+.clues-found{font-family:var(--f-type);color:var(--paper);font-size:.9rem}
+
+/* nav */
+.map{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(16,10,24,.93);backdrop-filter:blur(6px);border-block:1px solid var(--line)}
+.map .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.map a{flex:0 0 auto;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--muted);font-family:var(--f-ui);font-weight:800;font-size:.85rem;padding:7px 12px;border-radius:999px;border:1px solid var(--line)}
+.map a .d{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.map a.done{color:var(--ink);border-color:rgba(139,224,78,.5)}
+.map a.done .d{background:var(--slime);box-shadow:0 0 8px var(--slime)}
+.map a.hl{color:var(--amber)}
+
+/* sections */
+section.file{padding-block:64px 6px;scroll-margin-top:70px}
+.fhead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:24px}
+.folder{width:70px;height:56px;position:relative;background:#C9A86A;border-radius:3px 6px 4px 4px;display:grid;place-items:center;font-family:var(--f-type);color:#3A2412;font-size:1.3rem}
+.folder::before{content:"";position:absolute;top:-9px;left:0;width:30px;height:12px;background:#C9A86A;border-radius:4px 4px 0 0}
+.done-file .folder{background:#7FBF5A}.done-file .folder::before{background:#7FBF5A}
+.fhead h2{font-size:clamp(2.1rem,5.6vw,3.3rem);color:var(--moon)}
+.fhead p{color:var(--muted);margin-top:4px;max-width:70ch}
+.min{font-family:var(--f-type);font-size:.8rem;padding:5px 10px;border-radius:4px;background:var(--panel2);color:var(--amber);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.q-list{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.btn{border:0;cursor:pointer;font-family:var(--f-ui);font-weight:900;font-size:1rem;padding:11px 20px;border-radius:999px;background:var(--pumpkin);color:#1A0B00;box-shadow:0 5px 0 #8A3A00;transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #8A3A00}
+.btn.ghost{background:var(--panel2);color:var(--ink);box-shadow:0 5px 0 #08050D}
+.msg{font-family:var(--f-ui);font-weight:800}
+.msg.ok{color:var(--slime)}.msg.no{color:var(--blood)}
+
+/* clue card */
+.clue{display:none;margin-top:18px;background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:18px 20px;font-family:var(--f-type);position:relative;box-shadow:0 10px 24px rgba(0,0,0,.5)}
+.clue.on{display:block;animation:drop .6s cubic-bezier(.3,1.5,.5,1)}
+@keyframes drop{0%{transform:translateY(-14px) rotate(-3deg);opacity:0}100%{transform:none;opacity:1}}
+.clue h4{font-family:var(--f-type);font-weight:400;color:#B0141F;font-size:1.1rem;margin-bottom:6px}
+.clue p{line-height:1.6}
+.clue .ded{margin-top:8px;color:#1E6B2A}
+
+/* myth/fact + tfng */
+.toggles{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.toggles li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1.5px solid transparent}
+.toggles li.ok{border-color:var(--slime)}.toggles li.no{border-color:var(--blood)}
+.toggles .x{grid-column:1/-1;font-size:.88rem;color:var(--muted)}
+.tog{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.tog button{border:0;background:var(--panel);padding:5px 11px;cursor:pointer;font-family:var(--f-ui);font-weight:800;font-size:.84rem}
+.tog button+button{border-left:1.5px solid var(--line)}
+.tog button[aria-pressed="true"]{background:var(--pumpkin);color:#1A0B00}
+
+/* vocab */
+.idioms{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.idi{background:var(--panel2);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);min-width:0}
+.idi b{font-family:var(--f-ui);font-weight:900;font-size:1rem;color:var(--amber)}
+.idi p{font-size:.86rem;color:var(--ink)}
+.idi em{font-size:.82rem;color:var(--muted)}
+
+/* mc */
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;counter-reset:it}
+.items > li{counter-increment:it;display:flex;flex-direction:column;gap:8px}
+.items .s0::before{content:counter(it) ". ";font-family:var(--f-type);font-size:.85rem;color:var(--muted)}
+.gap{display:inline-block;min-width:5.5em;border-bottom:2px dashed var(--amber);text-align:center;color:var(--amber);padding:0 4px;font-family:var(--f-ui);font-weight:800}
+.gap.ok{border-color:var(--slime);color:var(--slime);border-bottom-style:solid}.gap.no{border-color:var(--blood);color:var(--blood)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--panel2);border-radius:10px;padding:6px 13px;cursor:pointer;font-family:var(--f-ui);font-weight:700;font-size:.95rem}
+.opt[aria-pressed="true"]{border-color:var(--pumpkin);background:rgba(255,122,26,.16)}
+.opt.right{border-color:var(--slime);background:rgba(139,224,78,.14)}.opt.wrong{border-color:var(--blood);background:rgba(229,57,79,.14)}
+
+/* reading */
+.article{display:flex;flex-direction:column;gap:14px;font-size:1.04rem;line-height:1.8;max-width:66ch}
+.article h3{font-family:var(--f-scary);font-weight:400;font-size:2.2rem;color:var(--amber);letter-spacing:.03em}
+.article p:first-of-type::first-letter{font-family:var(--f-scary);font-size:3.6em;float:left;line-height:.8;margin:8px 10px 0 0;color:var(--pumpkin)}
+
+/* video */
+.screen{position:relative;display:grid;place-items:center;aspect-ratio:16/9;max-width:100%;border-radius:18px;overflow:hidden;text-decoration:none;color:#fff;background:radial-gradient(circle at 30% 30%,#7A2A12,#1A0606)}
+.screen::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 2px,transparent 2px 4px)}
+.screen .pl{position:relative;width:78px;height:78px;border-radius:50%;background:var(--pumpkin);display:grid;place-items:center;box-shadow:0 0 0 10px rgba(255,122,26,.25);transition:transform .2s}
+.screen:hover .pl{transform:scale(1.08)}
+.screen .t{position:absolute;left:14px;bottom:12px;font-family:var(--f-type);font-size:.8rem;background:rgba(0,0,0,.5);padding:4px 9px;border-radius:6px}
+
+/* grammar */
+.scale{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.scale div{padding:14px;display:flex;flex-direction:column;gap:6px}
+.scale .p{font-family:var(--f-ui);font-weight:900;font-size:1.6rem}
+.scale div:nth-child(1){background:rgba(139,224,78,.12)}.scale div:nth-child(1) .p{color:var(--slime)}
+.scale div:nth-child(2){background:rgba(255,177,92,.12)}.scale div:nth-child(2) .p{color:var(--amber)}
+.scale div:nth-child(3){background:rgba(229,57,79,.12)}.scale div:nth-child(3) .p{color:var(--blood)}
+.scale b{font-family:var(--f-ui)}
+.scale em{font-size:.9rem;color:var(--muted)}
+.forms{width:100%;border-collapse:collapse;font-size:.95rem}
+.forms th,.forms td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.forms th{font-family:var(--f-type);font-weight:400;color:var(--muted);font-size:.85rem}
+.forms td:first-child{font-family:var(--f-ui);font-weight:900;color:var(--amber);white-space:nowrap}
+.ua{font-family:var(--f-ui);font-size:.9rem;color:var(--muted);border-left:3px solid var(--pumpkin);padding-left:10px}
+.evid{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:e}
+.evid li{counter-increment:e;background:var(--panel2);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.evid li>span::before{content:"Evidence " counter(e) ": ";font-family:var(--f-type);color:var(--amber)}
+.evid input{font:inherit;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
+.evid .model{font-family:var(--f-ui);font-weight:800;color:var(--slime)}
+
+/* interrogation */
+.roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.role{background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:14px;font-family:var(--f-type);font-size:.86rem;display:flex;flex-direction:column;gap:8px;min-width:0}
+.role b{font-family:var(--f-ui);font-weight:900;font-size:.98rem}
+.role .sec{display:none;background:#2A1E12;color:var(--paper);padding:8px;border-radius:3px}
+.role.open .sec{display:block}
+.role button{border:1.5px dashed #7A5A3A;background:transparent;color:var(--paper-ink);border-radius:6px;padding:4px 8px;cursor:pointer;font-family:var(--f-type);font-size:.8rem;margin-top:auto}
+.qprompts{display:flex;flex-wrap:wrap;gap:8px}
+.qprompts span{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 11px;font-family:var(--f-ui);font-weight:700;font-size:.92rem}
+
+/* accusation */
+.accuse{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.pick fieldset{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0;min-width:0}
+.pick legend{font-family:var(--f-type);color:var(--amber);padding:0 6px}
+.pick label{display:flex;gap:10px;align-items:center;padding:5px 0;cursor:pointer;font-family:var(--f-ui);font-weight:700}
+.pick input{accent-color:var(--pumpkin);width:17px;height:17px}
+.solved{display:none;margin-top:20px;text-align:center;padding:26px;border-radius:18px;background:radial-gradient(circle at 50% 0,rgba(139,224,78,.18),transparent 70%),var(--panel);border:1px solid rgba(139,224,78,.4)}
+.solved.on{display:block}
+.solved h2{font-size:clamp(2.6rem,8vw,4.6rem);color:var(--slime)}
+.solved p{max-width:64ch;margin:10px auto 0}
+
+/* boozle */
+.bz-setup{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bz-setup input{font:inherit;font-family:var(--f-ui);font-weight:800;background:var(--panel2);border:1.5px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 10px;width:150px}
+.teams{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px;margin-block:18px}
+.team{border-radius:16px;padding:14px;background:var(--panel2);border:2px solid transparent;text-align:center;transition:transform .2s}
+.team.turn{border-color:var(--pumpkin);transform:translateY(-4px);box-shadow:0 10px 24px -10px rgba(255,122,26,.6)}
+.team b{font-family:var(--f-ui);font-weight:900;font-size:1.05rem;display:block}
+.team .sc{font-family:var(--f-scary);font-size:2.6rem;color:var(--moon);line-height:1}
+.team .tu{font-family:var(--f-type);font-size:.75rem;color:var(--amber);visibility:hidden}
+.team.turn .tu{visibility:visible}
+.tiles{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.tile{aspect-ratio:1;max-width:100%;border:0;border-radius:14px;cursor:pointer;font-family:var(--f-scary);font-size:clamp(1.6rem,4vw,2.6rem);color:#1A0B00;background:radial-gradient(circle at 50% 35%,#FFB15C,#E8650F);box-shadow:0 6px 0 #7A3200;transition:transform .15s;position:relative}
+.tile:hover{transform:translateY(-3px)}
+.tile.used{background:var(--panel2);box-shadow:none;color:var(--muted);cursor:default;font-size:1rem;font-family:var(--f-ui);font-weight:800}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(5,2,10,.78);display:grid;place-items:center;padding:20px max(16px,env(safe-area-inset-left,0px)) 20px max(16px,env(safe-area-inset-right,0px))}
+.modal[hidden]{display:none}
+.mbox{width:min(640px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:16px;text-align:center;max-height:90vh;overflow:auto}
+.mbox .kind{font-family:var(--f-type);color:var(--amber)}
+.mbox .mq{font-family:var(--f-ui);font-weight:900;font-size:clamp(1.25rem,3.4vw,1.7rem);line-height:1.3}
+.mbox .ma{font-family:var(--f-ui);font-weight:800;color:var(--slime)}
+.mbox .pts{font-family:var(--f-scary);font-size:2.4rem;color:var(--moon)}
+.mbox .power{font-family:var(--f-scary);font-size:clamp(2.2rem,7vw,3.4rem);color:var(--pumpkin)}
+.mbox .row{justify-content:center}
+.winner{text-align:center;margin-top:18px;font-family:var(--f-scary);font-size:2.4rem;color:var(--slime)}
+
+footer{padding-block:70px 46px;color:var(--muted);font-size:.86rem;font-family:var(--f-ui)}
+
+@media (max-width:1000px){.sus,.roles{grid-template-columns:repeat(3,minmax(0,1fr))}.idioms{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){
+  .hero-top,.grid2,.accuse{grid-template-columns:minmax(0,1fr)}
+  .sus,.roles,.idioms{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fhead{grid-template-columns:auto minmax(0,1fr)}.fhead .min{grid-column:2;justify-self:start}
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .scale{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px}
+}
+@media (max-width:440px){.idioms{grid-template-columns:minmax(0,1fr)}.teams{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.clue.on{animation:none}.team{transition:none}}
+</style>
+
+</head>
+<body>
+<canvas id="fog" aria-hidden="true"></canvas>
+<div class="page">
+<header class="wrap hero" id="top">
+  <div class="hero-top">
+    <div>
+      <div class="case-no">CASE FILE #1031 · HALLOWEEN NIGHT</div>
+      <h1>The Blackwood Manor Mystery</h1>
+      <p class="lede">A detective quest for B1+/B2. Solve five case files: idioms, a reading, a video, modals of deduction and an interrogation. Each file gives you a clue. Clear the innocent, find the thief, then battle it out on the Boo-zle board.</p>
+      <div class="tags"><span class="tag hot">B1+ / B2</span><span class="tag">90 min</span><span class="tag">5 case files</span><span class="tag">Modals of deduction</span><span class="tag">Boo-zle board</span></div>
+    </div>
+    <div class="brief">
+      <p><b>31 October, 11:50 pm.</b> The Halloween party at Blackwood Manor is in full swing when the lights suddenly go out. Ten minutes later they come back on, and the famous <b>Golden Lantern</b>, a 200-year-old jack-o'-lantern made of solid gold, has vanished from its glass case in the library.</p>
+      <p style="margin-top:10px">Nobody left the house. Five guests are suspects. Your job, detective: find out who <b>must have</b> taken it, and who <b>can't have</b>.</p>
+      <span class="stamp">CONFIDENTIAL</span>
+    </div>
+  </div>
+  <div class="board">
+    <header><h3 style="color:var(--paper);font-family:var(--f-type);font-weight:400;font-size:1.2rem">THE SUSPECTS</h3><span class="clues-found" id="cluesFound">Clues found: 0 / 5</span></header>
+    <div class="sus" id="sus"></div>
+  </div>
+</header>
+
+<nav class="map" aria-label="Case files">
+  <div class="wrap" id="map">
+    <a href="#brief"><span class="d"></span>Briefing</a>
+    <a href="#f1" data-f="1"><span class="d"></span>File 1 · Words</a>
+    <a href="#f2" data-f="2"><span class="d"></span>File 2 · Reading</a>
+    <a href="#f3" data-f="3"><span class="d"></span>File 3 · Video</a>
+    <a href="#f4" data-f="4"><span class="d"></span>File 4 · Grammar</a>
+    <a href="#f5" data-f="5"><span class="d"></span>File 5 · Interrogation</a>
+    <a href="#accuse" class="hl"><span class="d"></span>Accusation</a>
+    <a href="#boozle" class="hl"><span class="d"></span>Boo-zle board</a>
+    <a href="#hw" class="hl"><span class="d"></span>Homework</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section class="file" id="brief">
+  <div class="fhead"><div class="folder">0</div><div><h2>Briefing</h2><p>Warm up your detective brain. Myth or fact? Then discuss.</p></div><span class="min">10 min</span></div>
+  <div class="grid2">
+    <div class="card stack">
+      <span class="lbl">Myth or fact?</span>
+      <ul class="toggles" id="myth"></ul>
+      <div class="row"><button class="btn" type="button" id="mythCheck">Check</button><span class="msg" id="mythMsg"></span></div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Discuss</span>
+      <ol class="q-list">
+        <li>Do you believe in ghosts? Has anything strange ever happened to you or someone you know?</li>
+        <li>What's the most spine-chilling film or series you've ever watched? Why did it work?</li>
+        <li>Why do people enjoy being scared, in horror films, haunted houses or escape rooms?</li>
+        <li>Halloween is getting more popular in Ukraine. Is that a good thing? Why or why not?</li>
+        <li>If you were a detective, which would you trust more: evidence or intuition?</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="file" id="f1">
+  <div class="fhead"><div class="folder">1</div><div><h2>File 1 · The language of fear</h2><p>Every good detective needs the right words. Learn the idioms, then complete the witness statements.</p></div><span class="min">12 min</span></div>
+  <div class="idioms" id="idioms"></div>
+  <div class="card" style="margin-top:20px">
+    <span class="lbl">Witness statements · choose the best expression</span>
+    <ol class="items" id="v1" style="margin-top:14px"></ol>
+    <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v1" data-f="1">Check</button><span class="msg" id="v1msg"></span></div>
+    <div class="clue" id="clue1"></div>
+  </div>
+</section>
+
+<section class="file" id="f2">
+  <div class="fhead"><div class="folder">2</div><div><h2>File 2 · An old, old festival</h2><p>A book from the library shelf, open at the page about Halloween. Read it and decide: True, False or Not Given?</p></div><span class="min">12 min</span></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="article">
+        <span class="lbl">From the library</span>
+        <h3>From Samhain to sweets</h3>
+        <p>Long before plastic skeletons and pumpkin-spice lattes, the Celts of Ireland, Britain and northern France celebrated <b>Samhain</b>. The festival, first held about 2,000 years ago on 1 November, marked the end of the harvest and the beginning of the Celtic new year. On the night before, people believed, the border between the living and the dead grew thin, and the ghosts of the dead returned to walk the earth. To keep these wandering spirits happy, families left food and wine outside their doors, and anyone who went out wore a mask so that the ghosts would take them for fellow spirits.</p>
+        <p>In the 8th century, the Christian Church turned the festival into All Saints' Day, also called All Hallows. The evening before became All Hallows' Eve, a name that was eventually shortened to “Halloween”.</p>
+        <p>In medieval Britain, the poor went from door to door on All Souls' Day, 2 November, asking for “soul cakes”. In return, they promised to pray for the family's dead relatives. This custom was known as souling. Young people, meanwhile, practised guising: they dressed up and sang, recited poems or told jokes in exchange for food, wine or money.</p>
+        <p>The jack-o'-lantern has its own legend. A man called Stingy Jack was said to have tricked the Devil so many times that, when he died, he was forced to wander the earth with only a burning coal inside a carved turnip to light his way. In Ireland and Scotland people carved scary faces into turnips to keep him away. When Irish and Scottish immigrants arrived in 19th-century America, they discovered that pumpkins were bigger and far easier to carve.</p>
+        <p>At first, American trick-or-treating was more about pranks and chaos than sweets. It only became the family-friendly tradition we know today in the 1950s. Now Americans spend up to six billion dollars on Halloween every year, which makes it the country's second biggest commercial holiday after Christmas.</p>
+      </div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">True · False · Not Given</span>
+      <ul class="toggles" id="tfng"></ul>
+      <div class="row"><button class="btn" type="button" id="tfCheck">Check</button><span class="msg" id="tfMsg"></span></div>
+      <div class="clue" id="clue2"></div>
+    </div>
+  </div>
+</section>
+
+<section class="file" id="f3">
+  <div class="fhead"><div class="folder">3</div><div><h2>File 3 · The tape in the drawer</h2><p>You find an old video in the butler's desk. Watch it and answer the questions: the last one unlocks the next clue.</p></div><span class="min">12 min</span></div>
+  <div class="grid2">
+    <div class="stack">
+      <a class="screen" href="https://www.youtube.com/watch?v=dHQZErtwA3E" target="_blank" rel="noopener">
+        <span class="pl"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1A0B00"/></svg></span>
+        <span class="t">YouTube · HISTORY · Bet You Didn't Know: Halloween</span>
+      </a>
+      <div class="card stack">
+        <span class="lbl">Before you watch</span>
+        <ol class="q-list"><li>From File 2, what do you already know? Predict two facts the video will mention.</li><li>What do you think <i>guising</i> and <i>souling</i> look like today?</li></ol>
+        <span class="lbl">After you watch</span>
+        <ol class="q-list"><li>Which fact surprised you most?</li><li>Six billion dollars a year: is Halloween now more about money than tradition?</li></ol>
+      </div>
+    </div>
+    <div class="card">
+      <span class="lbl">While you watch</span>
+      <ol class="items" id="v3" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v3" data-f="3">Check</button><span class="msg" id="v3msg"></span></div>
+      <div class="clue" id="clue3"></div>
+    </div>
+  </div>
+</section>
+
+<section class="file" id="f4">
+  <div class="fhead"><div class="folder">4</div><div><h2>File 4 · Modals of deduction</h2><p>Detectives don't just guess. They deduce. Here's how to say how sure you are about the present and the past.</p></div><span class="min">15 min</span></div>
+  <div class="scale">
+    <div><span class="p">≈ 100%</span><b>must / must have + V3</b><em>I'm sure it's true.<br>“The thief must have known the house.”</em></div>
+    <div><span class="p">≈ 50%</span><b>might · may · could (+ have + V3)</b><em>It's possible.<br>“She might have seen something.”</em></div>
+    <div><span class="p">≈ 0%</span><b>can't · couldn't (+ have + V3)</b><em>I'm sure it's impossible.<br>“He can't have done it: he was outside.”</em></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card stack">
+      <span class="lbl">Present vs past</span>
+      <table class="forms">
+        <thead><tr><th>Modal</th><th>Present</th><th>Past</th></tr></thead>
+        <tbody>
+          <tr><td>must</td><td>She must <b>be</b> scared.</td><td>She must <b>have been</b> scared.</td></tr>
+          <tr><td>might / may</td><td>He might <b>know</b> the code.</td><td>He might <b>have known</b> the code.</td></tr>
+          <tr><td>could</td><td>It could <b>be</b> a trick.</td><td>It could <b>have been</b> a trick.</td></tr>
+          <tr><td>can't</td><td>That can't <b>be</b> a real ghost.</td><td>Rosie can't <b>have taken</b> it.</td></tr>
+          <tr><td>-ing</td><td>He must <b>be lying</b>.</td><td>He must <b>have been lying</b>.</td></tr>
+        </tbody>
+      </table>
+      <p class="ua">Пастка: протилежність <b>must</b> у дедукції — це <b>can't</b>, а не <i>mustn't</i>. <i>Mustn't</i> означає заборону. Також кажемо <b>might not have</b> (можливо, не), але <b>can't have</b> (точно не).</p>
+    </div>
+    <div class="card">
+      <span class="lbl">Exercise A · Choose the right modal</span>
+      <ol class="items" id="v4" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v4" data-f="4">Check</button><span class="msg" id="v4msg"></span></div>
+      <div class="clue" id="clue4"></div>
+    </div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Exercise B · Deduce from the evidence</span>
+    <p style="color:var(--muted)">Write one deduction for each piece of evidence. Use a different modal each time, then compare with the model.</p>
+    <ol class="evid" id="evid"></ol>
+  </div>
+</section>
+
+<section class="file" id="f5">
+  <div class="fhead"><div class="folder">5</div><div><h2>File 5 · The interrogation</h2><p>Role-play. Five students are the suspects; the rest are detectives. Suspects read their card, and only they may open the secret. Detectives ask questions in narrative tenses.</p></div><span class="min">12 min</span></div>
+  <div class="roles" id="roles"></div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card stack">
+      <span class="lbl">Detectives' questions</span>
+      <div class="qprompts"><span>What were you doing at 11:50?</span><span>Where had you been before the lights went out?</span><span>Who were you with?</span><span>Had you ever seen the lantern up close?</span><span>Why were you so nervous?</span><span>What did you do when the lights came back?</span><span>Could anyone else have…?</span></div>
+      <p class="ua">Past Continuous: дія в процесі (<i>I was dancing</i>). Past Perfect: дія, що сталася раніше за іншу (<i>I had already left</i>).</p>
+    </div>
+    <div class="card">
+      <span class="lbl">Checkpoint · unlock the forensic report</span>
+      <ol class="items" id="v5" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v5" data-f="5">Open the report</button><span class="msg" id="v5msg"></span></div>
+      <div class="clue" id="clue5"></div>
+    </div>
+  </div>
+</section>
+
+<section class="file" id="accuse">
+  <div class="fhead"><div class="folder">!</div><div><h2>The Accusation</h2><p>Look at the suspect board. Who, why and how? Then say it out loud, like a real detective, using at least three modals.</p></div><span class="min">5 min</span></div>
+  <div class="card pick">
+    <div class="accuse">
+      <fieldset id="aWho"><legend>Who did it?</legend></fieldset>
+      <fieldset id="aWhy"><legend>Why?</legend></fieldset>
+      <fieldset id="aHow"><legend>How?</legend></fieldset>
+    </div>
+    <div class="row" style="margin-top:18px"><button class="btn" type="button" id="accuseBtn">Make the accusation</button><span class="msg" id="aMsg"></span></div>
+    <div class="solved" id="solved">
+      <h2>Case closed!</h2>
+      <p>Dr Felix Moreau was drowning in debt. During his “vanishing act” he switched off the lights in the cellar, slipped into the library in the dark and hid the Golden Lantern in his magic trunk. He must have thought nobody would notice the glitter and his favourite card. He was wrong.</p>
+      <p style="color:var(--muted);font-size:.95rem">Now explain your reasoning to the class: <i>Rosie can't have taken it because… Moreau must have…</i></p>
+    </div>
+  </div>
+</section>
+
+<section class="file" id="boozle">
+  <div class="fhead"><div class="folder">★</div><div><h2>Boo-zle Board</h2><p>Team game on the big screen. Teams take turns choosing a pumpkin. Answer correctly to win its points, but watch out for spooky surprises!</p></div><span class="min">12 min</span></div>
+  <div class="card">
+    <div class="bz-setup" id="bzSetup"></div>
+    <div class="teams" id="teams" style="--n:2"></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="winner" id="winner"></div>
+  </div>
+</section>
+
+<section class="file" id="hw">
+  <div class="fhead"><div class="folder">✎</div><div><h2>Homework</h2><p>Write the newspaper story.</p></div><span class="min">at home</span></div>
+  <div class="card stack">
+    <p><b>“Golden Lantern Thief Caught at Halloween Party”.</b> Write a newspaper article (200–250 words) about the mystery at Blackwood Manor. Describe what happened, how the detectives solved it and what the suspects said.</p>
+    <ul class="q-list" style="list-style:square">
+      <li>at least 5 modals of deduction (present and past)</li>
+      <li>4 expressions from File 1</li>
+      <li>Past Simple, Past Continuous and Past Perfect</li>
+      <li>a catchy headline and one quote from a witness</li>
+    </ul>
+  </div>
+</section>
+</main>
+<footer class="wrap">Halloween detective quest for English B1+/B2. Video: “Bet You Didn't Know: Halloween”, HISTORY, on YouTube. The mystery and all characters are fictional.</footer>
+</div>
+
+<div class="modal" id="modal" hidden><div class="mbox" id="mbox" role="dialog" aria-modal="true"></div></div>
+
+<script>
+/* ============ DATA ============ */
+const SUS=[
+ {k:"agatha",n:"Lady Agatha Blackwood",d:"The host, 74. Owner of the Golden Lantern.",r:"-2deg",c:"#6B4E8A"},
+ {k:"victor",n:"Victor Crane",d:"Antiques dealer. Offered £50,000 for the lantern and was refused.",r:"1.5deg",c:"#2E5A5A"},
+ {k:"ivy",n:"Ivy Marsh",d:"The gardener. Carved every pumpkin at the party.",r:"-1deg",c:"#4E7A2E"},
+ {k:"felix",n:"Dr Felix Moreau",d:"The magician hired for the party's show.",r:"2deg",c:"#7A1A2A"},
+ {k:"rosie",n:"Rosie Blackwood",d:"Agatha's granddaughter, 17. Never stops filming.",r:"-1.5deg",c:"#8A5A1A"}
+];
+const CLUES={
+ 1:{t:"CLUE 1 · The livestream",p:"Rosie was live on TikTok from 11:45 to 12:10. More than 3,000 viewers watched her dancing in the ballroom the whole time, even in the dark, by the light of her phone.",d:"→ Rosie can't have taken the lantern.",clear:"rosie",why:"was streaming live"},
+ 2:{t:"CLUE 2 · The speech",p:"When the lights went out, Lady Agatha was on the stage giving her Halloween speech. Twelve guests stood around her holding candles until the lights came back at midnight.",d:"→ Agatha couldn't have been in the library.",clear:"agatha",why:"was giving a speech"},
+ 3:{t:"CLUE 3 · The garden",p:"The butler says Victor Crane was by the fountain from 11:45 to 12:05, arguing with him about the price of the lantern. Victor's cigarette ends were found there, 200 metres from the library.",d:"→ Victor can't have stolen it, although he really wanted it.",clear:"victor",why:"was in the garden"},
+ 4:{t:"CLUE 4 · The taxi receipt",p:"Ivy Marsh left the party at 11:10. Her taxi receipt shows she arrived home at 11:35, and her neighbour heard her dog barking to greet her.",d:"→ Ivy had already gone home. She can't have done it.",clear:"ivy",why:"had already left"},
+ 5:{t:"CLUE 5 · The forensic report",p:"Gold glitter, the same as in Dr Moreau's magic show, was found inside the empty glass case. Next to it was an Ace of Spades, his signature card. The police also found three letters from his bank about unpaid debts.",d:"→ Moreau must have been in the library. He must have needed the money.",prime:"felix",why:"glitter + Ace of Spades"}
+};
+const MYTH=[
+ ["Halloween started in the USA.","M","Myth. It comes from Samhain, a Celtic festival in Ireland, Britain and northern France."],
+ ["The first jack-o'-lanterns were carved from turnips.","F","Fact. Pumpkins came later, in America."],
+ ["“Halloween” is short for “All Hallows' Eve”.","F","Fact. It's the evening before All Saints' Day."],
+ ["In the USA, Halloween is the biggest commercial holiday of the year.","M","Myth. It's second, after Christmas."],
+ ["Trick-or-treating used to be more about pranks than sweets.","F","Fact. It became family-friendly in the 1950s."],
+ ["Bats are blind.","M","Myth. Bats can see; many also use echolocation."]
+];
+const IDIOMS=[
+ ["spine-chilling","so frightening it makes you feel cold with fear","a spine-chilling scream"],
+ ["eerie","strange and frightening, often because it's so quiet","an eerie silence"],
+ ["give sb the creeps","make sb feel nervous and uncomfortable","That old doll gives me the creeps."],
+ ["scared stiff","so frightened you can't move","I was scared stiff."],
+ ["jump out of your skin","be suddenly very shocked","I nearly jumped out of my skin!"],
+ ["make your blood run cold","make you extremely frightened","His smile made my blood run cold."],
+ ["a skeleton in the cupboard","a shameful secret from the past","Every family has a skeleton in the cupboard."],
+ ["bloodcurdling","(a sound) horribly frightening","a bloodcurdling cry"],
+ ["the graveyard shift","a work shift late at night","The butler works the graveyard shift."],
+ ["a witch-hunt","an unfair attempt to blame or punish sb","This isn't evidence. It's a witch-hunt!"]
+];
+const V1=[
+ ["“When the lights went out, I heard a ___ scream from the library.”",["bloodcurdling","eerie","graveyard"]],
+ ["“The house was completely silent. It was really ___.”",["eerie","scared stiff","bloodcurdling"]],
+ ["“Something touched my arm in the dark. I nearly ___!”",["jumped out of my skin","gave me the creeps","was a witch-hunt"]],
+ ["“That magician and his cold smile ___.”",["give me the creeps","make a skeleton","run cold"]],
+ ["“I couldn't move a muscle. I was ___.”",["scared stiff","spine-chilling","eerie"]],
+ ["“Victor has a ___: he once sold a fake painting.”",["skeleton in the cupboard","graveyard shift","witch-hunt"]],
+ ["“The butler was working ___, so he was awake at midnight.”",["the graveyard shift","a witch-hunt","the spine-chilling"]],
+ ["“Stop accusing Ivy without evidence! It's a ___!”",["witch-hunt","skeleton","graveyard shift"]]
+];
+const TFNG=[
+ ["Samhain marked the beginning of the Celtic new year.","T"],
+ ["The Celts wore masks to frighten away wild animals.","F"],
+ ["The name “Halloween” comes from the evening before All Saints' Day.","T"],
+ ["Souling was mainly practised by rich families.","F"],
+ ["Guisers had to perform something to get a reward.","T"],
+ ["Stingy Jack was a farmer from Scotland.","NG"],
+ ["Trick-or-treating has always been a family-friendly tradition.","F"],
+ ["Halloween is the most profitable holiday in the USA.","F"]
+];
+const V3=[
+ ["Halloween's roots go back about…",["2,000 years","500 years","200 years"]],
+ ["Samhain was celebrated on…",["1 November","31 December","2 November"]],
+ ["To keep wandering spirits happy, people left out…",["food and wine","candles","flowers"]],
+ ["People wore masks so that the ghosts would…",["think they were ghosts too","laugh at them","stay away from the village"]],
+ ["In medieval Britain, poor people asked for soul cakes on…",["All Souls' Day","All Saints' Day","Christmas Eve"]],
+ ["Trick-or-treating took its family-friendly form in the…",["1950s","1850s","1990s"]],
+ ["Every year, Americans spend over ___ on Halloween costumes alone.",["$2.5 billion","$250 million","$25 billion"]]
+];
+const V4=[
+ ["The lights are off and nobody's answering. They ___ be out.",["must","can't","mustn't"]],
+ ["That ___ be a real ghost. Ghosts don't exist!",["can't","must","might"]],
+ ["I'm not sure where Ivy is. She ___ be in the garden.",["might","must","can't"]],
+ ["The glass case is empty. Someone ___ taken the lantern.",["must have","can't have","must"]],
+ ["Rosie ___ stolen it. She was live on TikTok!",["can't have","must have","might have"]],
+ ["The window was open. The thief ___ come in that way. We don't know yet.",["may have","must have","can't have"]],
+ ["His hands are covered in gold glitter. He ___ been near the case.",["must have","can't have","might not have"]],
+ ["Victor ___ have taken it: the butler was with him all the time.",["couldn't","must","might"]]
+];
+const EVID=[
+ ["The library door was locked, but the key was still on the inside.","The thief must have had another key, or must have come in through the window."],
+ ["Moreau was sweating and refused to open his trunk.","He might be hiding something in it. / He must be very nervous."],
+ ["The butler says he heard footsteps on the stairs at 11:55.","Someone may have gone up to the library in the dark."],
+ ["Nobody saw Moreau between 11:45 and 12:05.","He could have been in the library. He can't have been on stage."]
+];
+const ROLES=[
+ {k:"agatha",n:"Lady Agatha",a:"You were giving your Halloween speech on the stage when the lights went out. Guests with candles were all around you.",s:"You had been planning to sell the lantern secretly next month. Don't tell anyone!"},
+ {k:"victor",n:"Victor Crane",a:"You were in the garden by the fountain, arguing with the butler about the lantern's price.",s:"You had offered £50,000 for the lantern. You're angry, but you're not a thief."},
+ {k:"ivy",n:"Ivy Marsh",a:"You had already gone home by taxi at 11:10. You have the receipt in your bag.",s:"You don't like Lady Agatha. She has been paying you very little for years."},
+ {k:"felix",n:"Dr Felix Moreau",a:"Say you were resting in your dressing room before the next show. Alone.",s:"You took the lantern! You owe the bank a lot of money. Stay calm, change the subject, and never open your trunk."},
+ {k:"rosie",n:"Rosie Blackwood",a:"You were dancing in the ballroom and streaming live on TikTok the whole time.",s:"You saw a figure with a big black trunk near the library stairs, but it was dark."}
+];
+const V5=[
+ ["What ___ you doing when the lights went out?",["were","did","had"]],
+ ["When the lights came back, the lantern ___ already disappeared.",["had","has","was"]],
+ ["While Rosie ___, someone crept up the stairs.",["was dancing","danced","had danced"]],
+ ["By midnight, the thief ___ the lantern in a trunk.",["had hidden","has hidden","was hide"]]
+];
+const WHO=["Lady Agatha Blackwood","Victor Crane","Ivy Marsh","Dr Felix Moreau","Rosie Blackwood"];
+const WHY=["Revenge for low pay","Debts: needed money","To sell it to a collector","For a viral video"];
+const HOW=["Climbed in through the window","Used the blackout in his/her “vanishing act”","Swapped it during the speech"];
+const BZQ=[
+ ["Finish the idiom: “a skeleton in the ___”.","cupboard (or closet)"],
+ ["Correct the mistake: “He must have forget his keys.”","He must have forgotten his keys."],
+ ["What's the difference between “eerie” and “scary”?","Eerie = strange, quiet, mysterious; scary = frightening in general."],
+ ["Talk for 30 seconds about the scariest film you've seen.","Any fluent answer!"],
+ ["Make a deduction: the lights are off and nobody opens the door.","They must be out. / They can't be at home."],
+ ["What were the first jack-o'-lanterns carved from?","Turnips"],
+ ["Name 5 Halloween words in 20 seconds.","e.g. ghost, witch, broom, cauldron, skeleton"],
+ ["Rephrase with a modal: “I'm sure she didn't see the ghost.”","She can't have seen the ghost."],
+ ["What does “scared stiff” mean?","So frightened that you can't move"],
+ ["Which Celtic festival is the origin of Halloween?","Samhain"],
+ ["Rephrase: “Perhaps the butler did it.”","The butler might / may / could have done it."],
+ ["What was “souling”?","The poor went door to door for soul cakes and prayed for the dead."],
+ ["Give 3 synonyms of “terrifying”.","spine-chilling, horrifying, bloodcurdling, petrifying, hair-raising"],
+ ["Immigrants from which two countries brought Halloween traditions to America?","Ireland and Scotland"],
+ ["Use “jump out of my skin” in a sentence about yourself.","Any correct sentence"],
+ ["Spell the word for a place where people are buried.","C-E-M-E-T-E-R-Y"],
+ ["Past Perfect: “When we arrived, the party ___ (already / finish).”","had already finished"],
+ ["Who did it, and how do you know? Use two modals.","Moreau must have taken it: there was glitter and his card…"]
+];
+const POWERS=[
+ ["Bat attack!","Lose 10 points.","lose"],
+ ["Pumpkin bonus","+15 points for your team!","bonus"],
+ ["Ghost swap","Swap your score with another team.","swap"],
+ ["Vampire bite","Steal 10 points from another team.","steal"],
+ ["Black cat","Give 10 of your points to the team with the lowest score.","give"],
+ ["Witch's brew","Double your points!","double"]
+];
+
+/* ============ STATE ============ */
+const KEY="blackwood-v1";let st={clues:[]};
+try{st=Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* suspects */
+function face(c){return `<svg viewBox="0 0 100 80" aria-hidden="true"><rect width="100" height="80" fill="#CDBB98"/><circle cx="50" cy="32" r="16" fill="${c}"/><path d="M18 80c4-22 18-30 32-30s28 8 32 30z" fill="${c}"/><text x="50" y="76" font-family="Special Elite,monospace" font-size="9" text-anchor="middle" fill="#2A1E12" opacity=".6">BLACKWOOD MANOR</text></svg>`}
+SUS.forEach(s=>{const d=document.createElement('div');d.className='s';d.id='s-'+s.k;d.style.setProperty('--r',s.r);
+  d.innerHTML=`${face(s.c)}<b>${s.n}</b><small>${s.d}</small><span class="why"></span><span class="st">SUSPECT</span>`;$('sus').appendChild(d)});
+function paintClues(){
+  st.clues.forEach(n=>{const c=CLUES[n];const el=$('clue'+n);el.innerHTML=`<h4>${c.t}</h4><p>${c.p}</p><p class="ded">${c.d}</p>`;el.classList.add('on');
+    const a=document.querySelector(`#map a[data-f="${n}"]`);if(a)a.classList.add('done');$('f'+n).classList.add('done-file');
+    if(c.clear){const s=$('s-'+c.clear);s.classList.add('cleared');s.querySelector('.st').textContent='CLEARED';s.querySelector('.why').textContent='✓ '+c.why}
+    if(c.prime){const s=$('s-'+c.prime);s.classList.add('prime');s.querySelector('.st').textContent='PRIME SUSPECT';s.querySelector('.why').textContent='! '+c.why}});
+  if(st.solved){const s=$('s-felix');s.classList.remove('prime');s.classList.add('guilty');s.querySelector('.st').textContent='GUILTY'}
+  $('cluesFound').textContent='Clues found: '+st.clues.length+' / 5';
+}
+function giveClue(n){if(!st.clues.includes(n)){st.clues.push(n);save()}paintClues()}
+
+/* ============ MC engine ============ */
+function buildMC(id,data){const ol=$(id);
+  data.forEach(([s,opts])=>{const li=document.createElement('li');li.dataset.a=opts[0];const has=s.includes('___');const p=s.split('___');
+    li.innerHTML=has?`<span class="s0">${p[0]}<span class="gap">?</span>${p[1]}</span><div class="opts"></div>`:`<span class="s0">${s}</span><div class="opts"></div>`;
+    const box=li.querySelector('.opts');
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');li.dataset.v=o;const g=li.querySelector('.gap');if(g){g.textContent=o;g.classList.remove('ok','no')}});
+      box.appendChild(b)});
+    ol.appendChild(li)});}
+document.querySelectorAll('[data-check]').forEach(btn=>btn.addEventListener('click',()=>{
+  const ol=$(btn.dataset.check);let ok=0,n=0;
+  ol.querySelectorAll(':scope > li').forEach(li=>{n++;const g=li.dataset.v===li.dataset.a;if(g)ok++;
+    li.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===li.dataset.v)b.classList.add(g?'right':'wrong')});
+    const gp=li.querySelector('.gap');if(gp){gp.classList.toggle('ok',g);gp.classList.toggle('no',!g)}});
+  const m=$(btn.dataset.check+'msg');m.className='msg '+(ok===n?'ok':'no');
+  m.textContent=ok===n?'All correct. A new clue!':ok+' / '+n+'. Fix the red ones to unlock the clue.';
+  if(ok===n)giveClue(+btn.dataset.f);}));
+
+/* toggles (myth/fact, tfng) */
+function buildToggles(id,data,labels,withX){const ul=$(id);
+  data.forEach(([s,a,x])=>{const li=document.createElement('li');li.dataset.a=a;
+    li.innerHTML=`<span>${s}</span><div class="tog">${labels.map(([v,t])=>`<button type="button" aria-pressed="false" data-v="${v}">${t}</button>`).join('')}</div>${withX?`<span class="x" hidden>${x}</span>`:''}`;
+    li.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{li.querySelectorAll('button').forEach(z=>z.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');li.dataset.v=b.dataset.v;li.classList.remove('ok','no')}));
+    ul.appendChild(li)});}
+function checkToggles(id){let ok=0,n=0;$(id).querySelectorAll('li').forEach(li=>{n++;const g=li.dataset.v===li.dataset.a;if(g)ok++;li.classList.toggle('ok',g);li.classList.toggle('no',!g);const x=li.querySelector('.x');if(x)x.hidden=false});return [ok,n]}
+buildToggles('myth',MYTH,[['M','Myth'],['F','Fact']],true);
+$('mythCheck').addEventListener('click',()=>{const [ok,n]=checkToggles('myth');$('mythMsg').className='msg '+(ok===n?'ok':'no');$('mythMsg').textContent=ok+' / '+n});
+buildToggles('tfng',TFNG,[['T','T'],['F','F'],['NG','NG']],false);
+$('tfCheck').addEventListener('click',()=>{const [ok,n]=checkToggles('tfng');const m=$('tfMsg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'All correct. A new clue!':ok+' / '+n+'. Read again!';if(ok===n)giveClue(2)});
+
+/* idioms + mc */
+IDIOMS.forEach(([w,d,e])=>{const c=document.createElement('div');c.className='idi';c.innerHTML=`<b>${w}</b><p>${d}</p><em>${e}</em>`;$('idioms').appendChild(c)});
+buildMC('v1',V1);buildMC('v3',V3);buildMC('v4',V4);buildMC('v5',V5);
+
+/* evidence */
+EVID.forEach(([e,m],i)=>{const li=document.createElement('li');li.innerHTML=`<span>${e}</span><input id="ev${i}" placeholder="The thief must have…" autocomplete="off"><div class="row"><button class="btn ghost" type="button" style="padding:6px 14px;font-size:.88rem">Show model</button><span class="model" hidden>${m}</span></div>`;
+  const inp=li.querySelector('input');if(st['ev'+i])inp.value=st['ev'+i];inp.addEventListener('input',()=>{st['ev'+i]=inp.value;save()});
+  li.querySelector('button').addEventListener('click',ev=>{const md=li.querySelector('.model');md.hidden=!md.hidden;ev.currentTarget.textContent=md.hidden?'Show model':'Hide model'});
+  $('evid').appendChild(li)});
+
+/* roles */
+ROLES.forEach(r=>{const d=document.createElement('div');d.className='role';const s=SUS.find(x=>x.k===r.k);
+  d.innerHTML=`${face(s.c)}<b>${r.n}</b><span><u>Your story:</u> ${r.a}</span><span class="sec">SECRET: ${r.s}</span><button type="button">Show secret (suspect only)</button>`;
+  d.querySelector('button').addEventListener('click',e=>{const o=d.classList.toggle('open');e.currentTarget.textContent=o?'Hide secret':'Show secret (suspect only)'});
+  $('roles').appendChild(d)});
+
+/* accusation */
+function radios(id,name,opts){opts.forEach((o,i)=>{const l=document.createElement('label');l.innerHTML=`<input type="radio" name="${name}" id="${name}${i}" value="${i}"> ${o}`;$(id).appendChild(l)})}
+radios('aWho','who',WHO);radios('aWhy','why',WHY);radios('aHow','how',HOW);
+$('accuseBtn').addEventListener('click',()=>{const g=n=>{const r=document.querySelector(`input[name="${n}"]:checked`);return r?+r.value:-1};const who=g('who'),why=g('why'),how=g('how');const m=$('aMsg');
+  if(who<0||why<0||how<0){m.className='msg no';m.textContent='Choose who, why and how first.';return}
+  if(who!==3){m.className='msg no';m.textContent=`Think again: can ${WHO[who]} have done it? Check the board.`;return}
+  if(why!==1||how!==1){m.className='msg no';m.textContent='Right person! But check the motive and the method again (File 5).';return}
+  m.className='msg ok';m.textContent='';st.solved=true;save();paintClues();$('solved').classList.add('on');$('solved').scrollIntoView({behavior:'smooth',block:'center'})});
+if(st.solved)$('solved').classList.add('on');
+
+/* ============ BOO-ZLE BOARD ============ */
+let bz={teams:[],turn:0,tiles:[],double:false};
+function setup(){const box=$('bzSetup');
+  box.innerHTML=`<span class="lbl">Teams</span>${[2,3,4].map(n=>`<button type="button" class="btn ghost" data-n="${n}" style="padding:7px 14px">${n}</button>`).join('')}<span id="names" class="row"></span><button class="btn" type="button" id="bzStart">New game</button>`;
+  let n=2;const names=()=>{$('names').innerHTML=Array.from({length:n},(_,i)=>`<input id="tn${i}" value="${['Ghosts','Witches','Vampires','Zombies'][i]}" aria-label="Team ${i+1} name">`).join('')};names();
+  box.querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click',()=>{n=+b.dataset.n;names()}));
+  $('bzStart').addEventListener('click',()=>{bz.teams=Array.from({length:n},(_,i)=>({name:$('tn'+i).value.trim()||'Team '+(i+1),score:0}));bz.turn=0;bz.double=false;
+    const pts=[5,10,10,15,15,20,20,25];
+    bz.tiles=shuffle([...BZQ.map(q=>({type:'q',q:q[0],a:q[1],p:pts[Math.floor(Math.random()*pts.length)]})),...POWERS.map(p=>({type:'p',t:p[0],d:p[1],k:p[2]}))]).map(t=>Object.assign(t,{used:false}));
+    $('winner').textContent='';render()});
+}
+function render(){const tm=$('teams');tm.style.setProperty('--n',bz.teams.length);
+  tm.innerHTML=bz.teams.map((t,i)=>`<div class="team${i===bz.turn?' turn':''}"><span class="tu">▼ YOUR TURN</span><b>${t.name}</b><span class="sc">${t.score}</span></div>`).join('');
+  const tl=$('tiles');tl.innerHTML='';
+  bz.tiles.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='tile'+(t.used?' used':'');b.textContent=t.used?(t.type==='q'?t.p+' pts':t.t):i+1;b.disabled=t.used;b.setAttribute('aria-label','Tile '+(i+1));
+    b.addEventListener('click',()=>openTile(i));tl.appendChild(b)});
+  if(bz.tiles.length&&bz.tiles.every(t=>t.used)){const max=Math.max(...bz.teams.map(t=>t.score));const w=bz.teams.filter(t=>t.score===max).map(t=>t.name).join(' & ');$('winner').textContent='The winner: '+w+'!'}
+}
+function nextTurn(){bz.turn=(bz.turn+1)%bz.teams.length;closeM();render()}
+function closeM(){$('modal').hidden=true}
+function openTile(i){const t=bz.tiles[i];t.used=true;const cur=bz.teams[bz.turn];const mb=$('mbox');$('modal').hidden=false;
+  if(t.type==='q'){
+    mb.innerHTML=`<span class="kind">${cur.name} · Question ${i+1}</span><div class="mq">${t.q}</div><span class="pts">${t.p}${bz.double?' × 2':''} pts</span><span class="ma" id="ans" hidden>Answer: ${t.a}</span>
+      <div class="row"><button class="btn ghost" type="button" id="showA">Show answer</button><button class="btn" type="button" id="ok">Correct</button><button class="btn ghost" type="button" id="no">Wrong</button></div>`;
+    $('showA').onclick=()=>{$('ans').hidden=false};
+    $('ok').onclick=()=>{cur.score+=t.p*(bz.double?2:1);bz.double=false;nextTurn()};
+    $('no').onclick=()=>{bz.double=false;nextTurn()};
+  }else{
+    const others=bz.teams.map((x,j)=>j).filter(j=>j!==bz.turn);
+    const needPick=t.k==='swap'||t.k==='steal';
+    mb.innerHTML=`<span class="kind">${cur.name} · Tile ${i+1}</span><div class="power">${t.t}</div><div class="mq">${t.d}</div>
+      ${needPick?`<div class="row">${others.map(j=>`<button class="btn ghost" type="button" data-j="${j}">${bz.teams[j].name}</button>`).join('')}</div>`:`<div class="row"><button class="btn" type="button" id="okp">OK</button></div>`}`;
+    const apply=j=>{
+      if(t.k==='lose')cur.score-=10;
+      if(t.k==='bonus')cur.score+=15;
+      if(t.k==='double')cur.score*=2;
+      if(t.k==='give'){const low=bz.teams.reduce((a,x,k)=>k!==bz.turn&&(a<0||x.score<bz.teams[a].score)?k:a,-1);if(low>=0){const g=Math.min(10,Math.max(cur.score,0));cur.score-=g;bz.teams[low].score+=g}}
+      if(t.k==='swap'){const o=bz.teams[j];[cur.score,o.score]=[o.score,cur.score]}
+      if(t.k==='steal'){const o=bz.teams[j];const g=Math.min(10,Math.max(o.score,0));o.score-=g;cur.score+=g}
+      nextTurn()};
+    if(needPick)mb.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>apply(+b.dataset.j));else $('okp').onclick=()=>apply();
+  }
+  render();$('modal').hidden=false;
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modal').hidden){nextTurn()}});
+setup();$('bzStart').click();
+
+/* ============ FOG + BATS ============ */
+const cv=$('fog'),cx=cv.getContext('2d');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let W,H,blobs=[],flock=[];
+function rs(){const d=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+  blobs=Array.from({length:7},()=>({x:Math.random()*W,y:H*.55+Math.random()*H*.5,r:180+Math.random()*260,v:.15+Math.random()*.3}))}
+rs();addEventListener('resize',rs);
+function bat(x,y,s,f){cx.save();cx.translate(x,y);cx.scale(s,s);const w=Math.sin(f)*6;cx.fillStyle='#05020A';cx.beginPath();cx.moveTo(0,0);cx.quadraticCurveTo(-10,-8-w,-22,-2-w);cx.quadraticCurveTo(-16,0,-14,5);cx.quadraticCurveTo(-8,2,-4,6);cx.quadraticCurveTo(0,3,4,6);cx.quadraticCurveTo(8,2,14,5);cx.quadraticCurveTo(16,0,22,-2-w);cx.quadraticCurveTo(10,-8-w,0,0);cx.fill();cx.restore()}
+let tt=0;
+function frame(){tt+=.016;cx.clearRect(0,0,W,H);
+  const g=cx.createRadialGradient(W*.12,H*.1,0,W*.12,H*.1,Math.max(W,H)*.6);g.addColorStop(0,'rgba(246,231,176,.10)');g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  blobs.forEach(b=>{b.x+=b.v;if(b.x-b.r>W)b.x=-b.r;const f=cx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);f.addColorStop(0,'rgba(180,160,210,.07)');f.addColorStop(1,'rgba(180,160,210,0)');cx.fillStyle=f;cx.beginPath();cx.arc(b.x,b.y,b.r,0,7);cx.fill()});
+  flock=flock.filter(b=>b.x<W+60);flock.forEach(b=>{b.x+=b.v;b.y+=Math.sin(tt*3+b.f)*.7;b.f+=.35;bat(b.x,b.y,b.s,b.f)});
+  if(!reduce&&Math.random()<.003)for(let i=0;i<2;i++)flock.push({x:-40,y:H*.1+Math.random()*H*.5,v:2.5+Math.random()*3,s:.6+Math.random(),f:Math.random()*6});
+  if(!reduce)requestAnimationFrame(frame)}
+frame();paintClues();
+</script>
+
+</body>
+</html>

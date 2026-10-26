@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Escape the Haunted House</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@700&display=swap">
+<style>
+/* Layout: a night-time escape room. Fixed starry sky with bats; a lock with 5 letter slots in the hero; each room is a numbered door you unlock in order; the final door opens the quiz. Deliberately single dark theme. */
+:root{
+  --night:#120B1E; --panel:#1E1430; --panel2:#2A1C42; --line:rgba(244,235,221,.12);
+  --ink:#F4EBDD; --muted:#B9A8CC; --pumpkin:#FF7A1A; --pumpkin2:#FFB15C; --slime:#8BE04E; --blood:#FF4D63; --moon:#F6E7B0;
+  --f-scary:"Creepster","Impact",fantasy; --f-body:"Nunito",system-ui,sans-serif; --f-mono:"Space Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--night);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--night)}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.page{position:relative;z-index:1}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-scary);font-weight:400;letter-spacing:.03em;line-height:1;margin:0}
+h3{font-weight:900;margin:0;font-size:1.2rem}
+p{margin:0}
+button{font:inherit;color:inherit}
+a{color:var(--pumpkin2)}
+:focus-visible{outline:3px solid var(--slime);outline-offset:3px}
+.emo{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+
+/* hero */
+.hero{padding-block:58px 30px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:34px;align-items:center}
+.kicker{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--slime)}
+.hero h1{font-size:clamp(3.4rem,10vw,7rem);color:var(--pumpkin);text-shadow:0 0 24px rgba(255,122,26,.45),0 4px 0 #6B2A00;margin-top:8px}
+.story{margin-top:18px;max-width:54ch;color:#E8DDF2;font-size:1.08rem}
+.story b{color:var(--moon)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.tag{font-family:var(--f-mono);font-size:.72rem;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tag.hot{background:var(--pumpkin);color:#1A0B00;border-color:var(--pumpkin)}
+.lockbox{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:22px;text-align:center;box-shadow:0 20px 50px -20px rgba(0,0,0,.8)}
+.lockbox .kicker{color:var(--muted)}
+.slots{display:flex;justify-content:center;gap:10px;margin:16px 0 10px}
+.slot{width:54px;height:66px;border-radius:12px;border:2px dashed rgba(255,177,92,.4);display:grid;place-items:center;font-family:var(--f-scary);font-size:2.4rem;color:var(--pumpkin);background:rgba(0,0,0,.25)}
+.slot.on{border:2px solid var(--pumpkin);box-shadow:0 0 18px rgba(255,122,26,.5);animation:pop .5s ease}
+@keyframes pop{40%{transform:scale(1.15)}}
+.lockbox p{font-size:.92rem;color:var(--muted)}
+.padlock{width:64px;height:64px;margin:0 auto}
+
+/* map nav */
+.map{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(18,11,30,.92);backdrop-filter:blur(6px);border-block:1px solid var(--line)}
+.map .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.map a{flex:0 0 auto;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--muted);font-weight:800;font-size:.86rem;padding:7px 12px;border-radius:999px;border:1px solid var(--line)}
+.map a .d{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.map a.done{color:var(--ink);border-color:rgba(139,224,78,.5)}
+.map a.done .d{background:var(--slime);box-shadow:0 0 8px var(--slime)}
+.map a.final{color:var(--pumpkin2)}
+
+/* rooms */
+section.room{padding-block:62px 6px;scroll-margin-top:70px}
+.rhead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:22px}
+.door{width:62px;height:78px;border-radius:30px 30px 6px 6px;background:linear-gradient(180deg,#5A3A1E,#3A2412);border:2px solid #7A5230;display:grid;place-items:center;font-family:var(--f-scary);font-size:1.9rem;color:var(--moon);position:relative}
+.door::after{content:"";position:absolute;right:10px;top:46px;width:6px;height:6px;border-radius:50%;background:var(--pumpkin2)}
+.done-room .door{background:linear-gradient(180deg,#1F4A1A,#12300F);border-color:var(--slime)}
+.rhead h2{font-size:clamp(2.2rem,6vw,3.4rem);color:var(--moon)}
+.rhead p{color:var(--muted);margin-top:4px}
+.min{font-family:var(--f-mono);font-size:.72rem;padding:5px 10px;border-radius:999px;background:var(--panel2);color:var(--pumpkin2);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lbl{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slime)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;font-weight:900;font-size:1rem;padding:11px 20px;border-radius:999px;background:var(--pumpkin);color:#1A0B00;box-shadow:0 5px 0 #8A3A00;transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #8A3A00}
+.btn.ghost{background:var(--panel2);color:var(--ink);box-shadow:0 5px 0 #0C0716}
+.msg{font-weight:800}
+.msg.ok{color:var(--slime)} .msg.no{color:var(--blood)}
+.reward{display:none;align-items:center;gap:14px;margin-top:16px;padding:14px 16px;border-radius:14px;background:rgba(139,224,78,.1);border:1px solid rgba(139,224,78,.4)}
+.reward.on{display:flex;animation:pop .5s ease}
+.reward b{font-family:var(--f-scary);font-size:2.6rem;color:var(--pumpkin);line-height:1}
+.q-list{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+
+/* warm-up spinner */
+.pumpkin-btn{border:0;background:none;cursor:pointer;width:150px;height:150px;margin:0 auto;display:block;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.pumpkin-btn.spin{transform:rotate(360deg) scale(1.05)}
+.bubble{min-height:90px;display:grid;place-items:center;text-align:center;font-weight:900;font-size:1.25rem;padding:16px;border-radius:18px;background:var(--panel2);border:1px solid var(--line)}
+
+/* match game */
+.match{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.pic{border:2px solid var(--line);background:var(--panel2);border-radius:16px;aspect-ratio:1;display:grid;place-items:center;cursor:pointer;font-size:clamp(2.2rem,5vw,3.4rem);position:relative;padding:0}
+.pic small{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-family:var(--f-body);font-size:.7rem;font-weight:900;color:var(--slime)}
+.pic.sel{border-color:var(--pumpkin);box-shadow:0 0 16px rgba(255,122,26,.5)}
+.pic.ok{border-color:var(--slime);cursor:default}
+.pic.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.words{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.word{border:2px solid var(--line);background:var(--panel2);border-radius:12px;padding:7px 14px;font-weight:800;cursor:pointer}
+.word.used{opacity:.25;cursor:default;text-decoration:line-through}
+.word.shake{animation:shake .4s;border-color:var(--blood)}
+
+/* mc */
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;counter-reset:it}
+.items > li{counter-increment:it;display:flex;flex-direction:column;gap:8px}
+.items .s::before{content:counter(it) ". ";font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.items .s{font-weight:700}
+.gap{display:inline-block;min-width:5.5em;border-bottom:2px dashed var(--pumpkin2);text-align:center;color:var(--pumpkin2);padding:0 4px}
+.gap.ok{border-color:var(--slime);color:var(--slime);border-bottom-style:solid}
+.gap.no{border-color:var(--blood);color:var(--blood)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:2px solid var(--line);background:var(--panel2);border-radius:12px;padding:6px 14px;cursor:pointer;font-weight:700}
+.opt[aria-pressed="true"]{border-color:var(--pumpkin);background:rgba(255,122,26,.18)}
+.opt.right{border-color:var(--slime);background:rgba(139,224,78,.15)}
+.opt.wrong{border-color:var(--blood);background:rgba(255,77,99,.15)}
+
+/* riddles */
+.riddles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.rid{background:var(--panel2);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line)}
+.rid .q{font-weight:900;font-size:1.08rem}
+.rid .q::before{content:"?";font-family:var(--f-scary);color:var(--pumpkin);font-size:1.8rem;margin-right:8px;vertical-align:-4px}
+
+/* kitchen scene */
+.scene{width:100%;height:auto;display:block;border-radius:16px;background:#1A1029}
+
+/* story typing */
+.tale{font-size:1.12rem;line-height:2.3}
+.tale input{font:inherit;font-weight:800;color:var(--pumpkin2);background:rgba(0,0,0,.3);border:0;border-bottom:2px dashed var(--pumpkin2);border-radius:6px 6px 0 0;width:8.5em;max-width:100%;padding:0 6px;text-align:center}
+.tale input.ok{border-bottom:2px solid var(--slime);color:var(--slime)}
+.tale input.no{border-bottom:2px solid var(--blood);color:var(--blood)}
+.tale i{font-style:normal;color:var(--muted);font-size:.85em}
+
+/* video */
+.screen{position:relative;display:grid;place-items:center;aspect-ratio:16/9;max-width:100%;border-radius:18px;overflow:hidden;text-decoration:none;color:#fff;background:radial-gradient(circle at 70% 30%,#5B2A86,#1A0B2E)}
+.screen::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 75% 25%,rgba(246,231,176,.35) 0 9%,transparent 10%)}
+.screen .pl{position:relative;width:78px;height:78px;border-radius:50%;background:var(--pumpkin);display:grid;place-items:center;box-shadow:0 0 0 10px rgba(255,122,26,.25);transition:transform .2s}
+.screen:hover .pl{transform:scale(1.08)}
+.screen .t{position:absolute;left:14px;bottom:12px;font-family:var(--f-mono);font-size:.74rem;background:rgba(0,0,0,.45);padding:4px 9px;border-radius:7px}
+
+/* final door */
+.final{text-align:center;padding:30px 22px}
+.bigdoor{width:170px;height:230px;margin:0 auto 20px;border-radius:85px 85px 10px 10px;background:linear-gradient(180deg,#4A2D16,#2A180A);border:4px solid #7A5230;position:relative;overflow:hidden;transition:transform 1s ease,box-shadow 1s}
+.bigdoor::before{content:"";position:absolute;inset:16px;border-radius:70px 70px 6px 6px;border:2px solid rgba(255,177,92,.25)}
+.bigdoor .knob{position:absolute;right:26px;top:128px;width:14px;height:14px;border-radius:50%;background:var(--pumpkin2)}
+.bigdoor.open{transform:perspective(600px) rotateY(-70deg);transform-origin:left center;box-shadow:40px 0 80px rgba(255,177,92,.6)}
+.codein{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.codein input{font-family:var(--f-scary);font-size:2rem;letter-spacing:.3em;text-transform:uppercase;text-align:center;width:min(280px,100%);padding:8px 12px;border-radius:14px;border:2px solid var(--pumpkin);background:rgba(0,0,0,.35);color:var(--pumpkin)}
+.escaped{display:none;margin-top:18px}
+.escaped.on{display:block}
+.escaped h2{font-size:clamp(2.6rem,8vw,4.4rem);color:var(--slime);text-shadow:0 0 22px rgba(139,224,78,.5)}
+
+/* quiz (Kahoot-style) */
+.quiz{background:#2B1B47;border-radius:24px;padding:22px;border:1px solid var(--line);min-height:420px;display:flex;flex-direction:column;gap:16px}
+.qz-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-weight:900}
+.qz-top .pts{font-family:var(--f-mono);color:var(--moon)}
+.qz-q{background:#fff;color:#1B1030;border-radius:16px;padding:18px 20px;text-align:center;font-weight:900;font-size:clamp(1.15rem,3vw,1.6rem);min-height:90px;display:grid;place-items:center}
+.qz-q .emo{font-size:3rem;display:block;line-height:1.1}
+.timer{height:12px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--slime),var(--pumpkin));transition:width .1s linear}
+.qz-ans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.qa{border:0;border-radius:14px;padding:16px 16px;display:flex;align-items:center;gap:14px;color:#fff;font-weight:900;font-size:1.08rem;text-align:left;cursor:pointer;min-height:76px;box-shadow:0 5px 0 rgba(0,0,0,.35);transition:transform .1s,opacity .2s}
+.qa:active{transform:translateY(3px)}
+.qa svg{width:30px;height:30px;flex:0 0 auto}
+.qa.c0{background:#E21B3C}.qa.c1{background:#1368CE}.qa.c2{background:#C98A00}.qa.c3{background:#26890C}
+.qa.dim{opacity:.25}
+.qa.win{outline:4px solid #fff;outline-offset:2px}
+.qz-feed{border-radius:16px;padding:22px;text-align:center;font-weight:900;font-size:1.4rem}
+.qz-feed.ok{background:#26890C}.qz-feed.no{background:#E21B3C}
+.qz-feed small{display:block;font-size:1rem;font-weight:700;opacity:.9;margin-top:6px}
+.qz-lobby{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;margin:auto}
+.qz-lobby input{font:inherit;font-weight:900;font-size:1.2rem;text-align:center;padding:10px 14px;border-radius:12px;border:0;width:min(320px,100%);color:#1B1030}
+.qz-final{text-align:center;margin:auto;display:flex;flex-direction:column;gap:12px;align-items:center}
+.qz-final .big{font-family:var(--f-scary);font-size:clamp(3rem,10vw,5rem);color:var(--moon);line-height:1}
+
+/* trick or treat */
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.role{background:var(--panel2);border-radius:18px;padding:18px;border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.role .emo{font-size:2.2rem}
+.phr{display:flex;flex-wrap:wrap;gap:6px}
+.phr span{background:rgba(255,122,26,.15);border:1px solid rgba(255,122,26,.35);border-radius:8px;padding:3px 9px;font-weight:700;font-size:.9rem}
+
+footer{padding-block:70px 46px;color:var(--muted);font-size:.86rem}
+
+@media (max-width:900px){.match{grid-template-columns:repeat(4,minmax(0,1fr))}.roles{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .hero{grid-template-columns:minmax(0,1fr);padding-block:40px 20px}
+  .grid2,.riddles{grid-template-columns:minmax(0,1fr)}
+  .rhead{grid-template-columns:auto minmax(0,1fr)}
+  .rhead .min{grid-column:2;justify-self:start}
+  .card{padding:16px}
+  .slot{width:44px;height:56px;font-size:2rem}
+}
+@media (max-width:460px){.match{grid-template-columns:repeat(3,minmax(0,1fr))}.qz-ans{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.slot.on,.reward.on{animation:none}.bigdoor{transition:none}.pumpkin-btn{transition:none}}
+</style>
+
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="page">
+<header class="wrap hero" id="top">
+  <div>
+    <div class="kicker">Halloween quest · English A2 · 60 min</div>
+    <h1>Escape the Haunted House</h1>
+    <p class="story">It's <b>midnight on 31 October</b>. You came into Mr Grimm's old house for a dare… and the door closed behind you! To get out, go through <b>five rooms</b>. In every room you solve a task and find <b>one letter</b>. Put the five letters together to open the last door.</p>
+    <div class="tags"><span class="tag hot">A2</span><span class="tag">5 rooms</span><span class="tag">riddles · words · grammar · video</span><span class="tag">Pumpkin Quiz</span></div>
+  </div>
+  <div class="lockbox" aria-live="polite">
+    <svg class="padlock" viewBox="0 0 64 64" aria-hidden="true"><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#F6E7B0" stroke-width="5" stroke-linecap="round"/><rect x="12" y="28" width="40" height="30" rx="7" fill="#FF7A1A"/><circle cx="32" cy="41" r="4" fill="#1A0B00"/><rect x="30" y="43" width="4" height="8" rx="2" fill="#1A0B00"/></svg>
+    <div class="kicker">The secret word</div>
+    <div class="slots" id="slots"></div>
+    <p id="lockMsg">0 of 5 letters found</p>
+  </div>
+</header>
+
+<nav class="map" aria-label="Rooms">
+  <div class="wrap" id="map">
+    <a href="#warm"><span class="d"></span>Warm-up</a>
+    <a href="#r1" data-r="1"><span class="d"></span>1 · Gate</a>
+    <a href="#r2" data-r="2"><span class="d"></span>2 · Hall</a>
+    <a href="#r3" data-r="3"><span class="d"></span>3 · Kitchen</a>
+    <a href="#r4" data-r="4"><span class="d"></span>4 · Library</a>
+    <a href="#r5" data-r="5"><span class="d"></span>5 · Attic</a>
+    <a href="#door" class="final"><span class="d"></span>The last door</a>
+    <a href="#quiz" class="final"><span class="d"></span>Pumpkin Quiz</a>
+    <a href="#trick" class="final"><span class="d"></span>Trick or treat</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section class="room" id="warm">
+  <div class="rhead"><div class="door">0</div><div><h2>Before you go in…</h2><p>Click the pumpkin for a question. Answer in full sentences!</p></div><span class="min">5 min</span></div>
+  <div class="grid2">
+    <div class="card stack" style="text-align:center">
+      <button class="pumpkin-btn" type="button" id="pumpkin" aria-label="Get a question">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><path d="M60 22c-3-8 2-14 8-16" stroke="#3E7A23" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="68" rx="28" ry="38" fill="#E8650F"/><ellipse cx="82" cy="68" rx="28" ry="38" fill="#E8650F"/><ellipse cx="60" cy="68" rx="30" ry="42" fill="#FF7A1A"/><path d="M42 58l10-8 6 10z M78 58l-10-8-6 10z" fill="#1A0B00"/><path d="M38 80q22 18 44 0q-6 4-10 2l-4 6-6-5-6 5-4-6q-6 2-14-2z" fill="#1A0B00"/></svg>
+      </button>
+      <div class="bubble" id="bubble">Click the pumpkin!</div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Would you rather…?</span>
+      <ol class="q-list">
+        <li>…be a ghost or a vampire for one day?</li>
+        <li>…eat a spider sweet or a worm sweet?</li>
+        <li>…sleep in a haunted house or in a dark forest?</li>
+        <li>…have a black cat or a bat as a pet?</li>
+        <li>…get 100 sweets or one big pumpkin pie?</li>
+      </ol>
+      <p style="color:var(--muted);font-size:.92rem">Say: <i>I'd rather… because…</i></p>
+    </div>
+  </div>
+</section>
+
+<section class="room" id="r1">
+  <div class="rhead"><div class="door">1</div><div><h2>The Gate</h2><p>The gate is locked with a spell. Match each picture with its word to break it. Click a picture, then click its word.</p></div><span class="min">8 min</span></div>
+  <div class="card">
+    <div class="match" id="match"></div>
+    <div class="words" id="words"></div>
+    <div class="row" style="margin-top:14px"><span class="msg" id="r1msg"></span><button class="btn ghost" type="button" id="r1reset">Start again</button></div>
+    <div class="reward" id="rw1"><b>?</b><span>The gate opens! You found a letter for the secret word.</span></div>
+  </div>
+</section>
+
+<section class="room" id="r2">
+  <div class="rhead"><div class="door">2</div><div><h2>The Hall</h2><p>A ghost blocks the stairs. He lets you pass only if you answer all his riddles!</p></div><span class="min">5 min</span></div>
+  <div class="card">
+    <div class="riddles" id="riddles"></div>
+    <div class="row" style="margin-top:16px"><button class="btn" type="button" id="r2check">Check my answers</button><span class="msg" id="r2msg"></span></div>
+    <div class="reward" id="rw2"><b>?</b><span>The ghost laughs and flies away. Here's your letter!</span></div>
+  </div>
+</section>
+
+<section class="room" id="r3">
+  <div class="rhead"><div class="door">3</div><div><h2>The Kitchen</h2><p>Something is happening in the witch's kitchen right now! Look at the picture and choose the correct form: <b>Present Continuous</b>.</p></div><span class="min">8 min</span></div>
+  <div class="grid2">
+    <div class="card stack">
+      <svg class="scene" viewBox="0 0 400 300" role="img" aria-label="A witch stirring a cauldron, a sleeping cat, two spiders making a web, bats and a dancing ghost">
+        <rect width="400" height="300" fill="#1A1029"/>
+        <circle cx="330" cy="62" r="34" fill="#F6E7B0" opacity=".9"/>
+        <rect x="20" y="230" width="360" height="70" fill="#2A1C42"/>
+        <path d="M40 40 L120 40 L80 90 Z" fill="none" stroke="#B9A8CC" stroke-width="1"/>
+        <g stroke="#B9A8CC" stroke-width="1" fill="none" opacity=".7"><path d="M20 20 L90 90 M20 90 L90 20 M55 10 L55 100 M10 55 L100 55"/><circle cx="55" cy="55" r="16"/><circle cx="55" cy="55" r="32"/></g>
+        <g fill="#0A0612"><circle cx="72" cy="40" r="5"/><circle cx="44" cy="70" r="5"/></g>
+        <g fill="#0A0612"><path d="M250 110 q10 -12 20 0 q10 -12 20 0 q-10 4 -20 14 q-10 -10 -20 -14z"/><path d="M200 70 q8 -10 16 0 q8 -10 16 0 q-8 3 -16 11 q-8 -8 -16 -11z"/></g>
+        <ellipse cx="160" cy="248" rx="70" ry="16" fill="#0A0612"/>
+        <path d="M95 200 q65 70 130 0 z" fill="#0A0612"/>
+        <ellipse cx="160" cy="200" rx="66" ry="14" fill="#8BE04E"/>
+        <g fill="#B8FF7A"><circle cx="140" cy="186" r="7"/><circle cx="170" cy="178" r="9"/><circle cx="188" cy="190" r="5"/></g>
+        <path d="M215 120 L235 210" stroke="#7A5230" stroke-width="6" stroke-linecap="round"/>
+        <path d="M228 96 L262 60 L272 104 Z" fill="#3B1F5C"/><rect x="214" y="100" width="72" height="8" rx="4" fill="#3B1F5C"/>
+        <circle cx="248" cy="124" r="18" fill="#9AD27A"/><path d="M238 150 h28 l14 70 h-56 z" fill="#3B1F5C"/>
+        <g transform="translate(300 214)"><ellipse cx="0" cy="10" rx="34" ry="14" fill="#0A0612"/><circle cx="-26" cy="0" r="12" fill="#0A0612"/><path d="M-34 -10 l4 -10 l5 9 M-22 -10 l4 -10 l3 10" fill="#0A0612"/><text x="-6" y="-14" font-size="14" fill="#B9A8CC" font-family="sans-serif">z z</text></g>
+        <g transform="translate(360 150)" opacity=".9"><path d="M-22 30 q0 -50 22 -50 q22 0 22 50 l-7 -6 l-7 6 l-8 -6 l-7 6 l-8 -6z" fill="#EDE7F6"/><circle cx="-7" cy="-6" r="3" fill="#120B1E"/><circle cx="7" cy="-6" r="3" fill="#120B1E"/><path d="M-30 4 l-10 -8 M30 4 l10 -8" stroke="#EDE7F6" stroke-width="5" stroke-linecap="round"/></g>
+      </svg>
+      <p style="color:var(--muted);font-size:.92rem">Remember: <b>am / is / are + verb-ing</b>. <i>The witch is stirring the soup.</i></p>
+    </div>
+    <div class="card">
+      <ol class="items" id="r3items"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" id="r3check">Check</button><span class="msg" id="r3msg"></span></div>
+      <div class="reward" id="rw3"><b>?</b><span>The witch is busy, so you sneak past her. Letter found!</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="room" id="r4">
+  <div class="rhead"><div class="door">4</div><div><h2>The Library</h2><p>An old TV turns on by itself… Watch the video about the history of Halloween and answer the questions.</p></div><span class="min">10 min</span></div>
+  <div class="grid2">
+    <div class="stack">
+      <a class="screen" href="https://www.youtube.com/watch?v=JAPjYbe1Doc" target="_blank" rel="noopener">
+        <span class="pl"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1A0B00"/></svg></span>
+        <span class="t">YouTube · British Council · The History of Halloween</span>
+      </a>
+      <div class="card stack">
+        <span class="lbl">Before you watch</span>
+        <ol class="q-list">
+          <li>Where do you think Halloween started: in the USA, in Ireland or in Ukraine?</li>
+          <li>Why do people wear scary costumes on Halloween?</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card">
+      <span class="lbl">While you watch</span>
+      <ol class="items" id="r4items" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" id="r4check">Check</button><span class="msg" id="r4msg"></span></div>
+      <div class="reward" id="rw4"><b>?</b><span>The TV turns off and a secret door opens. Letter found!</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="room" id="r5">
+  <div class="rhead"><div class="door">5</div><div><h2>The Attic</h2><p>You find an old diary. Some words are missing! Write the verbs in the <b>Past Simple</b>.</p></div><span class="min">8 min</span></div>
+  <div class="card">
+    <p class="tale" id="tale"></p>
+    <div class="row" style="margin-top:16px"><button class="btn" type="button" id="r5check">Check</button><button class="btn ghost" type="button" id="r5hint">Show irregular verbs</button><span class="msg" id="r5msg"></span></div>
+    <p id="irr" hidden style="margin-top:12px;color:var(--muted)">go → went · be → was/were · hear → heard · run → ran · see → saw · find → found</p>
+    <div class="reward" id="rw5"><b>?</b><span>Behind the diary is the last letter!</span></div>
+  </div>
+</section>
+
+<section class="room" id="door">
+  <div class="rhead"><div class="door">?</div><div><h2>The Last Door</h2><p>Put your five letters together. What's the secret word?</p></div><span class="min">2 min</span></div>
+  <div class="card final">
+    <div class="bigdoor" id="bigdoor"><span class="knob"></span></div>
+    <div class="codein"><label for="code" class="lbl" style="width:100%">Type the secret word</label><input id="code" maxlength="5" autocomplete="off" spellcheck="false"><button class="btn" type="button" id="open">Open the door</button></div>
+    <p class="msg" id="doorMsg" style="margin-top:12px"></p>
+    <div class="escaped" id="escaped"><h2>You escaped!</h2><p style="margin-top:8px">Mr Grimm was just a friendly ghost. He gives everyone <b>CANDY</b>. Now play the Pumpkin Quiz!</p></div>
+  </div>
+</section>
+
+<section class="room" id="quiz">
+  <div class="rhead"><div class="door">★</div><div><h2>Pumpkin Quiz</h2><p>Everyone plays on their own laptop. Answer fast: the quicker you are, the more points you get!</p></div><span class="min">10 min</span></div>
+  <div class="quiz" id="qz"></div>
+</section>
+
+<section class="room" id="trick">
+  <div class="rhead"><div class="door">☾</div><div><h2>Trick or Treat!</h2><p>Work in pairs. One student knocks on the door, the other opens it. Then swap!</p></div><span class="min">6 min</span></div>
+  <div class="roles">
+    <div class="role"><span class="emo">🧛</span><h3>Student A · at the door</h3><p>You are in a costume. Say “Trick or treat!”, say who you are and ask for sweets. Be polite!</p><div class="phr"><span>Trick or treat!</span><span>I'm a… / I'm dressed as…</span><span>Can I have…, please?</span><span>Thank you! Happy Halloween!</span></div></div>
+    <div class="role"><span class="emo">🧙‍♀️</span><h3>Student B · at home</h3><p>Open the door. Ask about the costume. Give a treat, or ask for a trick first: a joke, a song or a scary face!</p><div class="phr"><span>Wow! What are you?</span><span>Who made your costume?</span><span>Here you are!</span><span>Do a trick first!</span></div></div>
+    <div class="role"><span class="emo">🎃</span><h3>Then tell the class</h3><p>Describe your dream Halloween costume.</p><div class="phr"><span>My costume is…</span><span>It's got…</span><span>I can…</span><span>It's scary because…</span></div></div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Homework</span>
+    <p>Draw your own monster and write 6–8 sentences about it: What's its name? What has it got? What can it do? What did it do last Halloween?</p>
+  </div>
+</section>
+</main>
+<footer class="wrap">Halloween quest for English A2 · Video: “The History of Halloween”, LearnEnglish Kids (British Council) on YouTube.</footer>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const WORD="CANDY";
+const QUESTIONS=["What's your favourite Halloween costume?","Do you like scary films? Why or why not?","What are you afraid of?","What sweets do you like?","Do people celebrate Halloween in your town?","What did you do last Halloween?","Can you carve a pumpkin?","Have you got a costume at home? What is it?","Is there a scary place in your town?","What's the scariest animal for you?","Would you go into a haunted house?","What's your favourite autumn food?"];
+const PICS=[["🎃","pumpkin"],["👻","ghost"],["🦇","bat"],["🕷️","spider"],["🧙‍♀️","witch"],["💀","skull"],["🐈‍⬛","black cat"],["🕯️","candle"],["🧹","broom"],["🌕","full moon"],["🍬","sweets"],["🧟","zombie"]];
+const RIDDLES=[
+ ["I have a face but I'm not a person. There's a candle inside me. What am I?",["a jack-o'-lantern","a skull","a ghost"]],
+ ["What room has no doors and no windows?",["a mushroom","a bathroom","a classroom"]],
+ ["Why didn't the skeleton go to the party?",["He had no body to go with.","He was too tired.","He didn't like music."]],
+ ["What do you call a witch at the beach?",["a sand-witch","a beach-witch","a sea-witch"]],
+ ["I fly at night and I sleep upside down. What am I?",["a bat","an owl","a ghost"]],
+ ["What's a ghost's favourite fruit?",["boo-berries","apples","bananas"]]
+];
+const R3=[
+ ["Look! The witch ___ a magic soup.",["is making","makes","make"]],
+ ["The black cat ___ on the floor. Shh!",["is sleeping","sleeping","sleeps"]],
+ ["Two spiders ___ a big web.",["are making","is making","makes"]],
+ ["Listen! The bats ___ in the window.",["are singing","is singing","sings"]],
+ ["___ the ghost dancing? — Yes, he is!",["Is","Are","Does"]],
+ ["The witch ___ a book. She's using a big spoon.",["isn't reading","doesn't reading","aren't reading"]]
+];
+const R4=[
+ ["Halloween comes from an old Celtic festival called…",["Samhain","Christmas","Easter"]],
+ ["People first celebrated it more than ___ years ago.",["2,000","200","20"]],
+ ["People wore scary costumes to…",["scare away spirits","win prizes","get money"]],
+ ["The name Halloween comes from…",["All Hallows' Eve","Hello Evening","Holy Week"]],
+ ["Long ago in England, people went from door to door and got…",["food","toys","flowers"]],
+ ["The first “jack-o'-lanterns” were made from…",["turnips","apples","potatoes"]],
+ ["In America people used pumpkins because they were…",["easier to find and bigger","cheaper and sweeter","orange and lucky"]]
+];
+const TALE=[
+ "Last Halloween, my friends and I ",["go","went"]," to an old house on the hill. It ",["be","was"]," very dark and cold. We ",["open","opened"]," the door and ",["walk","walked"]," inside. Suddenly, we ",["hear","heard"]," a strange noise. Tom ",["scream","screamed"]," and ",["run","ran"]," away! I ",["not / move","didn't move|did not move"],". Then I ",["see","saw"]," a white shape in the corner. It ",["be","was"]," my cat under a sheet! We ",["laugh","laughed"]," all the way home, and I ",["find","found"]," a bag of sweets in my pocket."
+];
+const QUIZ=[
+ ["🎃","What is this?",["a pumpkin","a tomato","an orange","a potato"]],
+ ["🦇","Which animal flies at night and sleeps upside down?",["a bat","a cat","a spider","a frog"]],
+ ["👻","Look! The ghost ___ .",["is dancing","dances","dance","dancing"]],
+ ["🚪","What do children say at the door on Halloween?",["Trick or treat!","Happy New Year!","Good night!","See you later!"]],
+ ["🧙‍♀️","A witch flies on a…",["broom","chair","bike","bed"]],
+ ["🕰️","Past Simple of go:",["went","goed","gone","goes"]],
+ ["📅","When is Halloween?",["31 October","1 January","14 February","25 December"]],
+ ["🍬","Yesterday we ___ lots of sweets.",["ate","eat","eated","eating"]],
+ ["🕯️","A carved pumpkin with a candle inside is a…",["jack-o'-lantern","pumpkin pie","candle cake","ghost lamp"]],
+ ["🌍","Halloween comes from an old festival called…",["Samhain","Diwali","Easter","Carnival"]],
+ ["🕷️","I ___ scared of spiders!",["am","is","are","be"]],
+ ["💀","A skeleton has got lots of…",["bones","feathers","leaves","sweets"]]
+];
+
+/* ============ STATE ============ */
+const KEY="haunted-a2-v1";let st={found:[]};
+try{st=Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* lock */
+const slots=$('slots');[...WORD].forEach((l,i)=>{const s=document.createElement('div');s.className='slot';s.id='slot'+i;s.textContent='';slots.appendChild(s)});
+function award(n){
+  if(!st.found.includes(n)){st.found.push(n);save()}
+  paint();
+  const rw=$('rw'+n);rw.querySelector('b').textContent=WORD[n-1];rw.classList.add('on');
+}
+function paint(){
+  st.found.forEach(n=>{const s=$('slot'+(n-1));if(!s.textContent){s.textContent=WORD[n-1];s.classList.add('on')}
+    const a=document.querySelector(`#map a[data-r="${n}"]`);if(a)a.classList.add('done');$('r'+n).classList.add('done-room');
+    const rw=$('rw'+n);rw.querySelector('b').textContent=WORD[n-1];rw.classList.add('on');});
+  $('lockMsg').textContent=st.found.length===5?'All letters found! Go to the last door.':st.found.length+' of 5 letters found';
+}
+
+/* ============ WARM-UP ============ */
+let qi=-1;const qs=shuffle(QUESTIONS);
+$('pumpkin').addEventListener('click',()=>{const b=$('pumpkin');b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin');qi=(qi+1)%qs.length;$('bubble').textContent=qs[qi]});
+
+/* ============ ROOM 1: match ============ */
+let selPic=null,matched=0;
+function buildMatch(){
+  $('match').innerHTML='';$('words').innerHTML='';selPic=null;matched=0;$('r1msg').textContent='';
+  shuffle(PICS).forEach(([e,w])=>{const b=document.createElement('button');b.type='button';b.className='pic';b.dataset.w=w;b.innerHTML=`<span class="emo">${e}</span>`;b.setAttribute('aria-label','Picture');
+    b.addEventListener('click',()=>{if(b.classList.contains('ok'))return;document.querySelectorAll('.pic').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');selPic=b});
+    $('match').appendChild(b)});
+  shuffle(PICS).forEach(([e,w])=>{const b=document.createElement('button');b.type='button';b.className='word';b.textContent=w;
+    b.addEventListener('click',()=>{if(b.classList.contains('used'))return;
+      if(!selPic){$('r1msg').className='msg no';$('r1msg').textContent='First click a picture!';return}
+      if(selPic.dataset.w===w){selPic.classList.remove('sel');selPic.classList.add('ok');selPic.insertAdjacentHTML('beforeend',`<small>${w}</small>`);b.classList.add('used');selPic=null;matched++;
+        $('r1msg').className='msg ok';$('r1msg').textContent=matched+' / '+PICS.length+' matched';if(matched===PICS.length)award(1)}
+      else{b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');selPic.classList.remove('shake');void selPic.offsetWidth;selPic.classList.add('shake');$('r1msg').className='msg no';$('r1msg').textContent='Not this one. Try again!'}});
+    $('words').appendChild(b)});
+}
+buildMatch();$('r1reset').addEventListener('click',buildMatch);
+
+/* ============ MC engine ============ */
+function buildMC(ol,data){ol.innerHTML='';
+  data.forEach(([s,opts])=>{const li=document.createElement('li');li.dataset.a=opts[0];const has=s.includes('___');const p=s.split('___');
+    li.innerHTML=has?`<span class="s">${p[0]}<span class="gap">?</span>${p[1]}</span><div class="opts"></div>`:`<span class="s">${s}</span><div class="opts"></div>`;
+    const box=li.querySelector('.opts');
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');li.dataset.v=o;const g=li.querySelector('.gap');if(g){g.textContent=o;g.classList.remove('ok','no')}});
+      box.appendChild(b)});
+    ol.appendChild(li)});}
+function checkMC(ol,msg,room,win){let ok=0,n=0;
+  ol.querySelectorAll(':scope > li').forEach(li=>{n++;const good=li.dataset.v===li.dataset.a;if(good)ok++;
+    li.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===li.dataset.v)b.classList.add(good?'right':'wrong')});
+    const g=li.querySelector('.gap');if(g){g.classList.toggle('ok',good);g.classList.toggle('no',!good)}});
+  msg.className='msg '+(ok===n?'ok':'no');msg.textContent=ok===n?win:ok+' / '+n+' correct. Fix the red ones!';
+  if(ok===n)award(room);}
+
+/* ROOM 2 riddles */
+RIDDLES.forEach(([q,opts])=>{const d=document.createElement('div');d.className='rid';d.dataset.a=opts[0];
+  d.innerHTML=`<span class="q">${q}</span><div class="opts"></div>`;const box=d.querySelector('.opts');
+  shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');d.dataset.v=o});box.appendChild(b)});
+  $('riddles').appendChild(d)});
+$('r2check').addEventListener('click',()=>{let ok=0;const all=$('riddles').children;
+  [...all].forEach(d=>{const g=d.dataset.v===d.dataset.a;if(g)ok++;d.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===d.dataset.v)b.classList.add(g?'right':'wrong')})});
+  const m=$('r2msg');m.className='msg '+(ok===all.length?'ok':'no');m.textContent=ok===all.length?'Ha-ha-ha! All correct!':ok+' / '+all.length+'. The ghost says: try again!';if(ok===all.length)award(2)});
+
+/* ROOM 3, 4 */
+buildMC($('r3items'),R3);$('r3check').addEventListener('click',()=>checkMC($('r3items'),$('r3msg'),3,'Perfect! All correct.'));
+buildMC($('r4items'),R4);$('r4check').addEventListener('click',()=>checkMC($('r4items'),$('r4msg'),4,'Great listening!'));
+
+/* ROOM 5 tale */
+(function(){const t=$('tale');let k=0;
+  TALE.forEach(p=>{if(typeof p==='string'){t.append(p)}else{const i=document.createElement('input');i.id='t'+(k++);i.dataset.a=p[1];i.setAttribute('aria-label',p[0]);i.autocomplete='off';i.spellcheck=false;
+    const w=document.createElement('span');w.append(i);const hint=document.createElement('i');hint.textContent=' ('+p[0]+')';w.append(hint);t.append(w);
+    if(st[i.id])i.value=st[i.id];i.addEventListener('input',()=>{st[i.id]=i.value;save();i.classList.remove('ok','no')})}});
+  $('r5check').addEventListener('click',()=>{let ok=0,n=0;t.querySelectorAll('input').forEach(i=>{n++;const v=i.value.trim().toLowerCase().replace(/’/g,"'").replace(/\s+/g,' ');const g=i.dataset.a.split('|').includes(v);if(g)ok++;i.classList.toggle('ok',g);i.classList.toggle('no',!g)});
+    const m=$('r5msg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'Brilliant! The story is complete.':ok+' / '+n+' correct. Check the red words!';if(ok===n)award(5)});
+  $('r5hint').addEventListener('click',()=>{$('irr').hidden=!$('irr').hidden});
+})();
+
+/* FINAL DOOR */
+$('open').addEventListener('click',openDoor);$('code').addEventListener('keydown',e=>{if(e.key==='Enter')openDoor()});
+function openDoor(){const v=$('code').value.trim().toUpperCase();const m=$('doorMsg');
+  if(v===WORD){m.textContent='';$('bigdoor').classList.add('open');$('escaped').classList.add('on');bats(40)}
+  else{m.className='msg no';m.textContent=v?'The door doesn\'t move… Check your letters!':'Type the word first.'}}
+
+/* ============ PUMPKIN QUIZ (Kahoot-style) ============ */
+const SHAPES=['<svg viewBox="0 0 30 30"><path d="M15 3 L28 26 H2 Z" fill="#fff"/></svg>','<svg viewBox="0 0 30 30"><path d="M15 2 L28 15 L15 28 L2 15 Z" fill="#fff"/></svg>','<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="#fff"/></svg>','<svg viewBox="0 0 30 30"><rect x="4" y="4" width="22" height="22" fill="#fff"/></svg>'];
+const LIMIT=20;let qz={i:0,score:0,streak:0,name:'',t:null,left:LIMIT,order:[]};
+function lobby(){const box=$('qz');clearInterval(qz.t);
+  box.innerHTML=`<div class="qz-lobby"><svg width="90" height="90" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="70" rx="44" ry="38" fill="#FF7A1A"/><path d="M60 32c-2-8 2-14 8-16" stroke="#3E7A23" stroke-width="6" fill="none"/><path d="M42 62l10-8 6 10z M78 62l-10-8-6 10z M40 82q20 14 40 0" stroke="#1A0B00" fill="#1A0B00" stroke-width="3"/></svg>
+    <h2 style="font-size:2.6rem;color:var(--pumpkin)">Pumpkin Quiz</h2><p>${QUIZ.length} questions · ${LIMIT} seconds each</p>
+    <label for="qzName" class="lbl">Your name</label><input id="qzName" maxlength="16" placeholder="Nickname"><button class="btn" type="button" id="qzGo">Start!</button></div>`;
+  const n=$('qzName');try{n.value=localStorage.getItem('pq-name')||''}catch(e){}
+  $('qzGo').addEventListener('click',()=>{qz.name=n.value.trim()||'Player';try{localStorage.setItem('pq-name',qz.name)}catch(e){}qz.i=0;qz.score=0;qz.streak=0;qz.order=shuffle(QUIZ);ask()});}
+function ask(){const [e,q,opts]=qz.order[qz.i];const box=$('qz');const order=shuffle(opts);
+  box.innerHTML=`<div class="qz-top"><span>${qz.i+1} / ${qz.order.length}</span><span>${qz.name}</span><span class="pts">${qz.score} pts${qz.streak>1?' · 🔥'+qz.streak:''}</span></div>
+    <div class="timer"><i id="bar"></i></div><div class="qz-q"><div><span class="emo">${e}</span>${q}</div></div>
+    <div class="qz-ans">${order.map((o,k)=>`<button type="button" class="qa c${k}" data-v="${o}">${SHAPES[k]}<span>${o}</span></button>`).join('')}</div>`;
+  qz.left=LIMIT;const start=Date.now();clearInterval(qz.t);
+  qz.t=setInterval(()=>{qz.left=Math.max(0,LIMIT-(Date.now()-start)/1000);$('bar').style.width=(qz.left/LIMIT*100)+'%';if(qz.left<=0){clearInterval(qz.t);answer(null,opts[0])}},100);
+  box.querySelectorAll('.qa').forEach(b=>b.addEventListener('click',()=>{clearInterval(qz.t);answer(b.dataset.v,opts[0])}));}
+function answer(v,right){const good=v===right;const box=$('qz');
+  box.querySelectorAll('.qa').forEach(b=>{b.disabled=true;if(b.dataset.v===right)b.classList.add('win');else b.classList.add('dim')});
+  let pts=0;if(good){qz.streak++;pts=Math.round(500+500*qz.left/LIMIT)+(qz.streak>=3?100:0);qz.score+=pts}else qz.streak=0;
+  const f=document.createElement('div');f.className='qz-feed '+(good?'ok':'no');
+  f.innerHTML=good?`Correct! +${pts}<small>${qz.streak>=3?'Streak bonus! ':''}Total: ${qz.score}</small>`:`${v===null?'Time\'s up!':'Oops!'}<small>The answer is: ${right}</small>`;
+  box.appendChild(f);const nb=document.createElement('button');nb.className='btn';nb.type='button';nb.style.alignSelf='center';nb.textContent=qz.i+1<qz.order.length?'Next question':'See my score';
+  nb.addEventListener('click',()=>{qz.i++;qz.i<qz.order.length?ask():finish()});box.appendChild(nb);nb.focus();}
+function finish(){const box=$('qz');const max=qz.order.length*1100;const p=qz.score/max;
+  const title=p>.75?'Pumpkin King!':p>.5?'Brave Ghost':p>.3?'Little Bat':'Sleepy Zombie';
+  box.innerHTML=`<div class="qz-final"><span class="lbl">${qz.name}, your score</span><div class="big">${qz.score}</div><h2 style="font-size:2.2rem;color:var(--pumpkin)">${title}</h2><p>Tell the class your score! Who is the winner?</p><button class="btn" type="button" id="again">Play again</button></div>`;
+  $('again').addEventListener('click',lobby);bats(20);}
+lobby();
+
+/* ============ SKY: stars, moon, bats ============ */
+const sky=$('sky'),cx=sky.getContext('2d');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W,H,stars=[],flock=[];
+function rs(){const d=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;sky.width=W*d;sky.height=H*d;cx.setTransform(d,0,0,d,0,0);stars=Array.from({length:Math.round(W*H/9000)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.3,p:Math.random()*6}))}
+rs();addEventListener('resize',rs);
+function bat(x,y,s,f){cx.save();cx.translate(x,y);cx.scale(s,s);const w=Math.sin(f)*6;cx.fillStyle='#05020A';cx.beginPath();cx.moveTo(0,0);cx.quadraticCurveTo(-10,-8-w,-22,-2-w);cx.quadraticCurveTo(-16,0,-14,5);cx.quadraticCurveTo(-8,2,-4,6);cx.quadraticCurveTo(0,3,4,6);cx.quadraticCurveTo(8,2,14,5);cx.quadraticCurveTo(16,0,22,-2-w);cx.quadraticCurveTo(10,-8-w,0,0);cx.fill();cx.restore()}
+function bats(n){if(reduce)return;for(let i=0;i<n;i++)flock.push({x:-40-Math.random()*300,y:H*.15+Math.random()*H*.6,v:2+Math.random()*3,s:.7+Math.random()*1.1,f:Math.random()*6,dy:(Math.random()-.5)*.8})}
+let tt=0;
+function frame(){tt+=.016;cx.clearRect(0,0,W,H);
+  const g=cx.createRadialGradient(W*.85,H*.12,0,W*.85,H*.12,Math.max(W,H)*.7);g.addColorStop(0,'rgba(255,122,26,.10)');g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  stars.forEach(s=>{cx.globalAlpha=.35+.35*Math.sin(tt*1.5+s.p);cx.fillStyle='#F6E7B0';cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()});cx.globalAlpha=1;
+  cx.fillStyle='rgba(246,231,176,.9)';cx.beginPath();cx.arc(W*.88,H*.13,Math.min(W,H)*.06,0,7);cx.fill();cx.fillStyle='rgba(18,11,30,.9)';cx.beginPath();cx.arc(W*.88+Math.min(W,H)*.025,H*.13-Math.min(W,H)*.015,Math.min(W,H)*.055,0,7);cx.fill();
+  flock=flock.filter(b=>b.x<W+60);flock.forEach(b=>{b.x+=b.v;b.y+=b.dy+Math.sin(tt*3+b.f)*.6;b.f+=.35;bat(b.x,b.y,b.s,b.f)});
+  if(!reduce&&Math.random()<.003)bats(1+Math.floor(Math.random()*3));
+  if(!reduce)requestAnimationFrame(frame)}
+frame();bats(6);paint();
+</script>
+
+</body>
+</html>
