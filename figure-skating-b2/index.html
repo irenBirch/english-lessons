@@ -103,6 +103,23 @@ section.seg{padding-block:64px 6px;scroll-margin-top:66px}
 .num .tap{position:absolute;top:12px;right:12px;font-family:var(--f-m);font-size:.66rem;color:var(--muted);letter-spacing:.08em}
 .num.on .tap{display:none}
 
+
+/* yes / no */
+.yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;counter-reset:yn}
+.ynq{counter-increment:yn;border-radius:12px;background:var(--ice);border:1.5px solid transparent;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.ynq .t::before{content:counter(yn) ". ";font-family:var(--f-m);font-size:.78rem;color:var(--muted)}
+.ynq .t{font-weight:600}
+.ynq .b{display:flex;gap:6px}
+.ynq .b button{border:1.5px solid var(--rule);background:var(--card);border-radius:999px;padding:5px 14px;font-weight:700;font-size:.88rem;cursor:pointer}
+.ynq .b button:disabled{cursor:default;opacity:.55}
+.ynq .b button.pick{opacity:1}
+.ynq .x{grid-column:1/-1;font-size:.88rem;color:var(--muted)}
+.ynq.ok{border-color:var(--ok)} .ynq.no{border-color:var(--bad)}
+.ynq.ok .b button.pick{background:var(--ok);border-color:var(--ok);color:#fff}
+.ynq.no .b button.pick{background:var(--bad);border-color:var(--bad);color:#fff}
+.ynq .x b{color:var(--ink)}
+@media (max-width:760px){.yn{grid-template-columns:minmax(0,1fr)}}
+
 /* vocabulary */
 .vocab{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .v{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -351,7 +368,15 @@ footer a{color:var(--muted)}
 <section class="seg" id="s1">
   <div class="seg-head"><div class="seg-no">SEG<b>01</b></div><div>
     <h2>Warm-up: Sport or art?</h2>
-    <p>Guess each number before you tap the card. Then discuss the questions with your partner.</p></div></div>
+    <p>Start with a quick Yes-or-No quiz. Then guess each number before you tap the card and discuss the questions with your partner.</p></div></div>
+  <div class="card stack" style="margin-bottom:20px">
+    <div class="row" style="justify-content:space-between">
+      <span class="lbl">Quick quiz · Yes or No?</span>
+      <span class="row"><span class="score" id="ynSc">0 / 0</span><button class="btn alt" type="button" id="ynReset">Reset</button></span>
+    </div>
+    <p class="note">Answer fast, then explain your choice in a full sentence: <i>I think so, because… / I don't think so. As far as I know…</i></p>
+    <div class="yn" id="yn"></div>
+  </div>
   <div class="nums" id="nums"></div>
   <div class="grid2" style="margin-top:20px">
     <div class="card stack">
@@ -958,6 +983,23 @@ const CODES=[
  ["SyTw4",["Sy = synchronised","Tw = twizzles","4 = level 4"],"Ice dance: synchronised twizzles, a set of fast turns on one foot."]
 ];
 
+const YN=[
+ ["Can women compete in trousers?",1,"Yes. Women have been allowed to wear trousers since 2004. Men must wear trousers."],
+ ["Does a quadruple Axel have four rotations?",0,"No. It has four and a half, because the Axel takes off forwards."],
+ ["Has anyone landed a quadruple Axel in competition?",1,"Yes. Ilia Malinin is the only skater who has done it."],
+ ["Can skaters use songs with lyrics?",1,"Yes. Vocal music has been allowed in all disciplines since the 2014–15 season. Think of Madonna or Donna Summer in Milan."],
+ ["Do ice dancers do triple jumps?",0,"No. Ice dance has no big jumps: it's about edges, twizzles, lifts and rhythm."],
+ ["Is the blade of a figure skate completely flat underneath?",0,"No. It has a hollow groove with two edges, inside and outside. That's why skaters talk about edges."],
+ ["Was figure skating ever part of the Summer Olympics?",1,"Yes. It was held at the Summer Games in London in 1908 and in Antwerp in 1920, before the first Winter Olympics in 1924."],
+ ["Is the Lutz named after a person?",1,"Yes. It's named after the Austrian skater Alois Lutz. The Axel and the Salchow are also named after skaters."],
+ ["Had Kazakhstan won Olympic gold in figure skating before 2026?",0,"No. Shaidorov's gold in Milan was the first. Denis Ten won bronze in 2014."],
+ ["Did Kaori Sakamoto ever win individual Olympic gold?",0,"No. She won bronze in 2022 and silver in 2026, plus four world titles."],
+ ["Does a skater lose points for falling?",1,"Yes. A fall costs at least one point, plus a very negative GOE on that element."],
+ ["Is the free skate longer than the short program?",1,"Yes. About four minutes, compared with about two minutes forty seconds."],
+ ["Can the man throw his partner in pairs skating?",1,"Yes. In throw jumps he throws her into the air and she lands alone."],
+ ["Can a skater lose a point if part of the costume falls on the ice?",1,"Yes. A feather or a sequin is fine, but a bigger piece falling off means a deduction."]
+];
+
 /* ============ HELPERS ============ */
 const $=id=>document.getElementById(id);
 const KEY="onedge-v1";let store={};try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
@@ -994,6 +1036,16 @@ $('tabL').addEventListener('click',()=>{show('lesson');goTop()});
 $('tabE').addEventListener('click',()=>{show('elements');goTop()});
 if(location.hash==='#elements')show('elements');
 document.querySelectorAll('#elIndex a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();$(a.getAttribute('href').slice(1)).scrollIntoView({behavior:'smooth'})}));
+
+/* ============ YES / NO ============ */
+function buildYN(){const box=$('yn');box.innerHTML='';let n=0,ok=0;$('ynSc').textContent='0 / 0';
+  YN.forEach(([q,a,x])=>{const d=document.createElement('div');d.className='ynq';
+    d.innerHTML=`<span class="t">${q}</span><span class="b"><button type="button" data-v="1">Yes</button><button type="button" data-v="0">No</button></span><span class="x" hidden></span>`;
+    d.querySelectorAll('.b button').forEach(b=>b.addEventListener('click',()=>{const good=+b.dataset.v===a;n++;if(good)ok++;
+      d.classList.add(good?'ok':'no');b.classList.add('pick');d.querySelectorAll('.b button').forEach(z=>z.disabled=true);
+      const xe=d.querySelector('.x');xe.innerHTML=`<b>${good?'Correct!':'Not quite.'}</b> ${x}`;xe.hidden=false;$('ynSc').textContent=ok+' / '+n;}));
+    box.appendChild(d)});}
+buildYN();$('ynReset').addEventListener('click',buildYN);
 
 /* ============ WARM-UP ============ */
 NUMS.forEach(([n,c,a])=>{const b=document.createElement('button');b.type='button';b.className='num';
