@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Focus 3 · Unit Test 4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: an exam paper on a kitchen counter. Narrow paper column, sticky score bar, exercise blocks with point counters; after "Finish", every gap shows right/wrong and the bar turns into the result (points + mark out of 12). */
+:root{
+  --bg:#EEF1EA; --paper:#FFFFFF; --ink:#1D2420; --muted:#5D6A62; --rule:rgba(29,36,32,.13);
+  --accent:#2F7A4F; --accent-ink:#FFFFFF; --tomato:#D2492F; --butter:#F2C14E; --tint:#E5EEE6; --field:#F6F8F4;
+  --ok:#2F7A4F; --bad:#C8402A;
+  --f-d:"Young Serif",Georgia,serif; --f-b:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif; --f-m:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1411; --paper:#171E1A; --ink:#E7EEE9; --muted:#9AAAA0; --rule:rgba(231,238,233,.13);
+  --accent:#5FBF87; --accent-ink:#0B1A11; --tomato:#FF7A5E; --butter:#F2C14E; --tint:#1F2A23; --field:#1C2520;
+  --ok:#5FBF87; --bad:#FF7A5E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1411; --paper:#171E1A; --ink:#E7EEE9; --muted:#9AAAA0; --rule:rgba(231,238,233,.13);
+  --accent:#5FBF87; --accent-ink:#0B1A11; --tomato:#FF7A5E; --butter:#F2C14E; --tint:#1F2A23; --field:#1C2520;
+  --ok:#5FBF87; --bad:#FF7A5E; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:17px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--paper)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;text-wrap:balance}
+h1{font-family:var(--f-d);font-weight:400;font-size:clamp(2.2rem,6vw,3.4rem);line-height:1.05}
+h2{font-family:var(--f-d);font-weight:400;font-size:1.7rem}
+h3{font-size:1.05rem;font-weight:800}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--butter);outline-offset:2px}
+.mono{font-family:var(--f-m);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase}
+
+header.top{padding-block:44px 22px}
+.kick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.kick span{font-family:var(--f-m);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);color:var(--muted);background:var(--paper)}
+.kick span.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sub{color:var(--muted);margin-top:8px}
+.who{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;margin-top:22px}
+.who label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:700;color:var(--muted)}
+.who input{background:var(--paper);border:1.5px solid var(--rule);border-radius:10px;padding:9px 12px;font-weight:600;min-width:0}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:1px solid var(--rule)}
+.bar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px;flex-wrap:wrap}
+.prog{flex:1;min-width:160px;display:flex;flex-direction:column;gap:4px}
+.prog .t{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);font-weight:700}
+.track{height:8px;border-radius:4px;background:var(--tint);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.btn{border:0;cursor:pointer;font-weight:800;padding:10px 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+.btn.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--rule)}
+
+main{padding-bottom:40px}
+.part{margin-top:42px}
+.part > .mono{color:var(--accent);display:block;margin-bottom:6px}
+.ex{background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;margin-top:16px}
+.ex header{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:14px}
+.ex header h3 b{font-family:var(--f-d);font-weight:400;color:var(--accent);margin-right:8px;font-size:1.25rem}
+.pts{font-family:var(--f-m);font-size:.82rem;color:var(--muted);white-space:nowrap}
+.pts.done{color:var(--accent);font-weight:700}
+.box{display:flex;flex-wrap:wrap;gap:6px 14px;padding:12px 14px;border:1.5px dashed var(--rule);border-radius:12px;margin-bottom:14px;font-weight:700}
+.box span{white-space:nowrap}
+.eg{color:var(--muted);font-size:.95rem;margin-bottom:12px}
+.eg u{color:var(--ink);text-decoration:none;font-weight:800;border-bottom:2px solid var(--butter)}
+ol.q{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px;counter-reset:q}
+ol.q > li{counter-increment:q;display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 6px;line-height:2.1}
+ol.q > li::before{content:counter(q);font-family:var(--f-m);font-weight:700;color:var(--muted);font-size:.85rem;line-height:2.4}
+.gapw{display:inline-flex;align-items:baseline;gap:2px;white-space:nowrap}
+.gapw .pre{font-weight:800}
+input.g,select.g{background:var(--field);border:0;border-bottom:2px solid var(--muted);border-radius:6px 6px 0 0;padding:0 8px;font-weight:700;width:9.5em;max-width:100%;min-width:0;height:1.9em}
+input.g.w{width:13em}
+select.g{width:auto;min-width:8em;cursor:pointer}
+.g.ok{border-bottom-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--field))}
+.g.no{border-bottom-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--field))}
+.fix{display:none;font-family:var(--f-m);font-size:.8rem;color:var(--ok);font-weight:700;margin-left:6px;white-space:normal}
+.show .fix{display:inline}
+.text{background:var(--field);border-radius:12px;padding:16px 18px;line-height:1.95;margin-bottom:16px}
+.text h4{margin:0 0 6px;font-family:var(--f-d);font-weight:400;font-size:1.15rem;text-align:center;letter-spacing:.02em}
+.num{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;border-radius:6px;background:var(--butter);color:#2A2008;font-family:var(--f-m);font-weight:700;font-size:.78rem;padding:0 4px;vertical-align:1px}
+.mc{display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.mc .stem{display:flex;flex-direction:column;gap:2px}
+.mc .stem i{font-style:normal;font-weight:700;color:var(--muted)}
+.ch{display:flex;flex-wrap:wrap;gap:8px}
+.ch label{display:flex;align-items:center;gap:8px;border:1.5px solid var(--rule);border-radius:10px;padding:6px 12px;cursor:pointer;background:var(--field);font-weight:600}
+.ch input{accent-color:var(--accent);width:16px;height:16px}
+.ch label.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--field))}
+.ch label.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--field))}
+.ch label.key{box-shadow:inset 0 0 0 2px var(--ok)}
+.ch b{font-family:var(--f-m);font-size:.78rem;color:var(--muted)}
+
+.result{display:none;margin-top:28px;background:var(--paper);border:1px solid var(--rule);border-radius:18px;padding:24px;gap:22px;grid-template-columns:auto minmax(0,1fr);align-items:center}
+.result.on{display:grid}
+.ring{width:140px;height:140px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .c b{font-family:var(--f-d);font-weight:400;font-size:2.4rem;line-height:1;display:block}
+.ring .c span{font-size:.8rem;color:var(--muted)}
+.rows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 16px;margin-top:12px}
+.rows div{display:flex;justify-content:space-between;font-size:.92rem;border-bottom:1px dashed var(--rule);padding-bottom:4px;font-variant-numeric:tabular-nums}
+.mark{font-family:var(--f-d);font-size:1.6rem}
+.mark em{font-style:normal;color:var(--accent)}
+
+.teacher{margin-top:40px;text-align:center}
+.keybox{display:none;margin-top:16px;text-align:left;background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:20px 22px}
+.keybox.on{display:block}
+.keygrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.keygrid h3{font-size:.9rem;margin-bottom:6px;color:var(--accent)}
+.keygrid ol{margin:0;padding-left:1.4em;font-size:.92rem}
+.note{font-size:.85rem;color:var(--muted);margin-top:12px}
+footer{padding-block:30px 44px;color:var(--muted);font-size:.82rem}
+
+@media (max-width:640px){
+  .who{grid-template-columns:minmax(0,1fr)}
+  .ex{padding:16px}
+  .result{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}
+  .rows,.keygrid{grid-template-columns:minmax(0,1fr)}
+  .rows{width:100%}
+  input.g{width:8em} input.g.w{width:10.5em}
+}
+</style>
+
+</head>
+<body>
+<header class="wrap top">
+  <div class="kick"><span class="on">Focus 3 · 2nd edition</span><span>Unit 4 · Food</span><span>B1 / B1+</span><span>60 points</span></div>
+  <h1>Unit Test 4</h1>
+  <p class="sub">Vocabulary, Grammar and Use of English. Fill in every gap, then press <b>Finish</b> at the bottom of the page.</p>
+  <div class="who">
+    <label for="name">Name<input id="name" autocomplete="off" placeholder="Your name"></label>
+    <label for="class">Class<input id="class" autocomplete="off" placeholder="e.g. 9-A"></label>
+  </div>
+</header>
+
+<div class="bar"><div class="wrap">
+  <div class="prog"><div class="t"><span>Answered</span><span id="cnt">0 / 60</span></div><div class="track"><i id="trk"></i></div></div>
+  <button class="btn" type="button" id="finishTop">Finish</button>
+</div></div>
+
+<main class="wrap" id="test">
+  <section class="part"><span class="mono">Vocabulary</span><h2>Food and cooking</h2>
+    <div class="ex" id="e1"><header><h3><b>1</b>Complete the sentences with the missing words. The first letters are given.</h3><span class="pts" id="p1">/ 10</span></header>
+      <p class="eg">0 A <u>balanced</u> diet that includes protein, vegetables and grains is very important.</p><ol class="q" id="q1"></ol></div>
+    <div class="ex" id="e2"><header><h3><b>2</b>Complete the sentences with the words in the box. There are two extra words.</h3><span class="pts" id="p2">/ 10</span></header>
+      <div class="box"><span>household</span><span>energy</span><span>safety</span><span>hot</span><span>tinned</span><span>stale</span><span>maple</span><span>alarming</span><span>catering</span><span>salty</span><span>unripe</span><span>waste</span></div>
+      <p class="eg">0 My grandmother makes <u>homemade</u> soup with lots of vegetables in it.</p><ol class="q" id="q2"></ol></div>
+  </section>
+
+  <section class="part"><span class="mono">Grammar</span><h2>Future time clauses · Future Continuous · Future Perfect</h2>
+    <div class="ex" id="e3"><header><h3><b>3</b>Complete the sentences with the words in the box. You can use some words more than once.</h3><span class="pts" id="p3">/ 10</span></header>
+      <div class="box"><span>if</span><span>as soon as</span><span>after</span><span>unless</span><span>before</span><span>until</span><span>when</span></div>
+      <p class="eg">0 I can prepare something <u>if</u> you are hungry.</p><ol class="q" id="q3"></ol></div>
+    <div class="ex" id="e4"><header><h3><b>4</b>Complete the sentences with the correct form of the verbs in brackets. Use the Future Continuous or the Future Perfect.</h3><span class="pts" id="p4">/ 10</span></header>
+      <p class="eg">0 You can call me very early tomorrow. I <u>will be having</u> (have) breakfast at six o'clock.</p><ol class="q" id="q4"></ol></div>
+  </section>
+
+  <section class="part"><span class="mono">Use of English</span><h2>Texts and dialogues</h2>
+    <div class="ex" id="e5"><header><h3><b>5</b>Read the texts and choose the correct option.</h3><span class="pts" id="p5">/ 10</span></header>
+      <div class="text"><h4>What are we eating today?</h4><p><b>Friday 3:30 p.m.</b> I had lunch just two hours ago, but I'm so <u style="text-decoration:none;font-weight:800;border-bottom:2px solid var(--butter)">hungry</u> now that I can't think about anything else but food. I can't wait to get home. <span class="num">1</span> I get there, my girlfriend and I will start cooking. My nutritionist has advised me to eat more healthily, so today we're having <span class="num">2</span> rice and fish for supper. Rice is very easy to prepare. You just need to put it in a pan with water and check about forty minutes later to see if it is ready. It's important to make sure that it is not <span class="num">3</span> or hard in the middle, so cook it for a few more minutes if necessary. We're going to eat the fish in a mild sauce along with a simple green salad. It sounds like a healthy, simple meal, <span class="num">4</span>? I hope there isn't much traffic tonight so that, by 6 p.m., we <span class="num">5</span> a perfect homecooked meal.</p></div>
+      <div class="text"><h4>At an Italian restaurant</h4><p>Last Friday my girlfriend and I went to a new Italian restaurant which had opened the week before. We both love Italian <span class="num">6</span>, so we were looking forward to visiting it. When we got there, the restaurant was almost empty, but we still got probably the worst table in the place, right next to the toilets. And I'm sure the waiter forgot all about us, because we waited almost thirty minutes for him to take our <span class="num">7</span>. Then things went from bad to worse. My girlfriend chose a green salad and I decided to try their pizza. When the salad arrived, the spinach was so old it seemed to be <span class="num">8</span>, and my pizza was burnt. We were going to have some tiramisu for dessert <span class="num">9</span> we saw someone else eating it. It looked disgusting. You would think a new restaurant would at least try to serve good food, <span class="num">10</span>? I can tell you that we won't be going back there again, and I'm sure they won't last long unless they improve their cooking!</p></div>
+      <ol class="q" id="q5"></ol></div>
+    <div class="ex" id="e6"><header><h3><b>6</b>Choose the correct option.</h3><span class="pts" id="p6">/ 10</span></header>
+      <p class="eg">0 X: What's your favourite fruit? Y: I like mangoes, but my favourite are <u>grapes</u>.</p><ol class="q" id="q6"></ol></div>
+  </section>
+
+  <div class="row" style="display:flex;gap:10px;justify-content:center;margin-top:32px;flex-wrap:wrap">
+    <button class="btn" type="button" id="finish">Finish and check</button>
+    <button class="btn alt" type="button" id="reset">Start again</button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <div class="ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--tint)" stroke-width="10"/><circle id="arc" cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="276.5"/></svg><div class="c"><div><b id="total">0</b><span>of 60</span></div></div></div>
+    <div>
+      <p class="mono" style="color:var(--muted)" id="rName"></p>
+      <p class="mark">Оцінка: <em id="mark">–</em> / 12</p>
+      <div class="rows" id="rows"></div>
+      <p class="note">Mistakes are marked in red, and the correct answer is shown next to each one.</p>
+    </div>
+  </section>
+
+  <div class="teacher">
+    <button class="btn alt" type="button" id="keyBtn">Teacher: show the answer key</button>
+    <div class="keybox" id="keybox"></div>
+  </div>
+</main>
+<footer class="wrap">Based on Focus 3 Second Edition, Unit Test 4 (Groups A and B combined), © Pearson 2020. Ex. 4 item 10 and Ex. 6 item 10 were added to make 10 items each.</footer>
+
+<script>
+/* ===== DATA (answers: first = model, others = also accepted) ===== */
+const E1=[
+ ["If you get hungry during the afternoon, you can have a healthy ","s"," like nuts or fruit.",["snack"]],
+ ["If you eat ","f"," foods like cakes and ice cream all the time, you will certainly gain some weight.",["fattening"]],
+ ["Our ","m"," salad includes lettuce, cabbage, carrots and tomatoes.",["mixed"]],
+ ["This ","t"," soup is convenient to heat up, but it has far too much salt in it.",["tinned"]],
+ ["That was such a ","h"," meal that I nearly fell asleep afterwards!",["heavy"]],
+ ["Do you buy ","g"," black pepper or do you buy whole peppercorns?",["ground"]],
+ ["I always put ","c"," pepper in my soup because it makes it taste more interesting.",["cayenne"]],
+ ["This restaurant serves a delicious ","t…-c…"," meal including a starter, a main dish and a dessert.",["three-course","three course"],"w"],
+ ["Could you buy a loaf of ","w"," bread, please? It's much tastier than the white sort.",["wholemeal"]],
+ ["The ","s"," salad is small enough that you can eat it with your meal and not get too full.",["side"]]
+];
+const E2=[
+ ["These ","biscuits are disgusting! Someone must have left them out on a plate overnight.",["stale"]],
+ ["The industrial ","coming out of local factories is polluting our rivers.",["waste"]],
+ ["The waiter didn't warn me that the dish was very ",". It was too spicy for me to eat!",["hot"]],
+ ["I've just read some ","statistics about the number of overweight children in this country.",["alarming"]],
+ ["We are trying to reduce our ","waste by buying things with little or no packaging.",["household"]],
+ ["The ","industry is always looking for experienced chefs who can run a busy restaurant.",["catering"]],
+ ["Be careful when cooking with ","tomatoes. They usually contain more salt and sugar than fresh vegetables.",["tinned"]],
+ ["The mangoes are still ",". You shouldn't eat them until next week.",["unripe"]],
+ ["Food ","standards are very strict in most countries because they don't want a lot of people to get seriously ill.",["safety"]],
+ ["I love natural ","syrup that comes straight from the trees.",["maple"]]
+];
+const BOX3=["if","as soon as","after","unless","before","until","when"];
+const E3=[
+ ["Remove the biscuits from the oven ","you can see they're turning brown.",["as soon as","when"]],
+ ["We'll have to cancel the picnic ","the weather improves.",["unless"]],
+ ["You should keep the fruit in the fridge ","you want to eat it right now.",["unless"]],
+ ["Can you do the washing-up ","you go out? I don't want the dirty dishes sitting around all evening.",["before"]],
+ ["Please remember to wash your hands ","you touch the food so you don't get any germs on it.",["before"]],
+ ["You can check your email ","you have finished chopping the vegetables.",["after","when","as soon as"]],
+ ["I always get hungry ","I watch one of those cooking programmes on television.",["when","if"]],
+ ["We can't eat this chicken ","it has cooked all the way through.",["until"]],
+ ["You will learn how to cook this dish ","you pay close attention to all the steps.",["if"]],
+ ["Take the biscuits out of the oven ","they look nice and golden. If you leave them longer, they will burn.",["as soon as","when"]]
+];
+const E4=[
+ ["I ","(finish) cleaning my room in an hour and then I'll call you.",["will have finished"]],
+ ["I've ordered a couple of cookery books but they ","(not / arrive) by Monday.",["won't have arrived"]],
+ ["This time tomorrow, I ","(eat) something delicious.",["will be eating"]],
+ ["What ","(you / do) at nine o'clock tonight?",["will you be doing"]],
+ ["What ","(you / achieve) by the time you are thirty years old?",["will you have achieved"]],
+ ["I promise I ","(finish) by noon and then I'll go to the market.",["will have finished"]],
+ ["You can visit us later today. We ","(not / do) anything special.",["won't be doing"]],
+ ["I'm afraid we ","(not / wait) for you at the airport but Jane will be there.",["won't be waiting"]],
+ ["","(he / write) a cookery book by the end of the year?",["will he have written"]],
+ ["By the time you get home, we ","(cook) dinner, so don't be late!",["will have cooked"]]
+];
+const E5=[
+ ["",["As soon as","Unless","Before"],0],
+ ["",["ground","brown","wholemeal"],1],
+ ["",["rotten","stale","raw"],2],
+ ["",["won't it","isn't it","doesn't it"],2],
+ ["",["will enjoy","will be enjoying","will have enjoyed"],1],
+ ["",["texture","cuisine","consumption"],1],
+ ["",["bill","recipe","order"],2],
+ ["",["ripe","fresh","rotten"],2],
+ ["",["until","after","unless"],0],
+ ["",["didn't you","don't you","wouldn't you"],2]
+];
+const E6=[
+ ["X: Are you going to have a dessert, Mark?","Y: ___ you promise to have one, too.",["As long as","When","Until"],0],
+ ["X: So, does that sauce taste good?","Y: Well, it's a bit ___. I think it needs more salt and pepper.",["bland","sour","bitter"],0],
+ ["X: ___","Y: Well, we have a mushroom stew without meat, and a bean and vegetable dish.",["Do you have any vegetarian dishes?","Can you tell me what the special salad is?","Can I order, please?"],0],
+ ["X: ___","Y: No, but I can ask the chef if you like.",["Can I get a vegetarian dish?","Could you tell me if the chef is a vegetarian?","Do you know if this dish is suitable for vegetarians?"],2],
+ ["X: Why are you in such a hurry?","Y: Because I've got so much homework to do. If nothing disturbs me, I ___ three essays by six o'clock.",["will write","will be writing","will have written"],2],
+ ["X: Do you think I should eat special foods in order to improve my health?","Y: No, you just need to eat a ___ diet. Right now you eat too much meat and hardly any fruit or vegetables.",["balanced","heavy","light"],0],
+ ["X: You seem to spend a lot on your everyday shopping!","Y: I know, but I always buy ___ food because I'm worried about dangerous chemicals in normal products.",["fattening","light","organic"],2],
+ ["X: I have to talk to your teacher tomorrow, Jill.","Y: He doesn't have any classes tomorrow morning. He ___ our tests in the staff room until 11 o'clock, but he'll be free afterwards.",["will mark","will be marking","will have marked"],1],
+ ["X: Do you like cauliflower?","Y: I don't mind it when it's ___, but it smells disgusting after you cook it.",["sour","raw","ripe"],1],
+ ["X: How would you like your steak?","Y: ___, please. I don't like it pink inside.",["Well done","Rare","Ripe"],0]
+];
+
+/* ===== HELPERS ===== */
+const $=id=>document.getElementById(id);
+const KEY="focus3-u4-v1";let st={};try{st=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+function norm(s){s=(s||"").toLowerCase().replace(/[’`´]/g,"'").replace(/[.?!]/g,"").replace(/\s+/g," ").trim();
+  s=s.replace(/\bwon't\b/g,"will not").replace(/(\w)'ll\b/g,"$1 will");return s}
+const L="ABC";
+function bindInput(el,id){if(st[id]!=null)el.value=st[id];el.addEventListener('input',()=>{st[id]=el.value;save();el.classList.remove('ok','no');progress()});el.addEventListener('change',()=>{st[id]=el.value;save();progress()})}
+
+/* Ex1 */
+E1.forEach(([a,pre,b,ans,w],i)=>{const li=document.createElement('li');const id='a1_'+i;
+  li.innerHTML=`<span>${a}<span class="gapw"><span class="pre">${pre.length===1?pre:''}</span><input class="g${w?' w':''}" id="${id}" autocomplete="off" spellcheck="false" placeholder="${pre.length>1?pre:''}" aria-label="Gap ${i+1}"></span><span class="fix">${ans[0]}</span>${b}</span>`;
+  li.dataset.ans=JSON.stringify(ans);li.dataset.pre=pre.length===1?pre:'';$('q1').appendChild(li);bindInput(li.querySelector('input'),id)});
+/* Ex2, Ex4 */
+function textEx(q,data,ex,wide){data.forEach(([a,b,ans],i)=>{const li=document.createElement('li');const id='a'+ex+'_'+i;
+  li.innerHTML=`<span>${a}<input class="g${wide?' w':''}" id="${id}" autocomplete="off" spellcheck="false" aria-label="Gap ${i+1}"><span class="fix">${ans[0].replace(/^will/, a===''?'Will':'will')}</span> ${b}</span>`;
+  li.dataset.ans=JSON.stringify(ans);$(q).appendChild(li);bindInput(li.querySelector('input'),id)})}
+textEx('q2',E2,2,false);textEx('q4',E4,4,true);
+/* Ex3 dropdowns */
+E3.forEach(([a,b,ans],i)=>{const li=document.createElement('li');const id='a3_'+i;
+  li.innerHTML=`<span>${a}<select class="g" id="${id}" aria-label="Gap ${i+1}"><option value="">— choose —</option>${BOX3.map(o=>`<option>${o}</option>`).join('')}</select><span class="fix">${ans[0]}</span> ${b}</span>`;
+  li.dataset.ans=JSON.stringify(ans);$('q3').appendChild(li);bindInput(li.querySelector('select'),id)});
+/* Ex5, Ex6 radios */
+function mcEx(q,items,ex,dialog){items.forEach((it,i)=>{const li=document.createElement('li');const id='a'+ex+'_'+i;
+  const opts=dialog?it[2]:it[1],key=dialog?it[3]:it[2];
+  li.innerHTML=`<div class="mc">${dialog?`<div class="stem"><span>${it[0]}</span><span>${it[1]}</span></div>`:''}<div class="ch">${opts.map((o,k)=>`<label><input type="radio" name="${id}" value="${k}"><b>${L[k]}</b> ${o}</label>`).join('')}</div></div>`;
+  li.dataset.key=key;$(q).appendChild(li);
+  li.querySelectorAll('input').forEach(r=>{if(st[id]===r.value)r.checked=true;r.addEventListener('change',()=>{st[id]=r.value;save();li.querySelectorAll('label').forEach(l=>l.classList.remove('ok','no','key'));progress()})})})}
+mcEx('q5',E5,5,false);mcEx('q6',E6,6,true);
+['name','class'].forEach(k=>{const el=$(k);if(st[k])el.value=st[k];el.addEventListener('input',()=>{st[k]=el.value;save()})});
+
+/* progress */
+function answered(){let n=0;document.querySelectorAll('#test input.g,#test select.g').forEach(e=>{if(e.value.trim())n++});
+  for(let ex=5;ex<=6;ex++)for(let i=0;i<10;i++)if(document.querySelector(`input[name="a${ex}_${i}"]:checked`))n++;return n}
+function progress(){const n=answered();$('cnt').textContent=n+' / 60';$('trk').style.width=(n/60*100)+'%'}
+progress();
+
+/* check */
+function check(){let per={},tot=0;document.body.classList.add('show');
+  [1,2,3,4].forEach(ex=>{let s=0;$('q'+ex).querySelectorAll(':scope > li').forEach(li=>{const el=li.querySelector('.g');const ans=JSON.parse(li.dataset.ans).map(norm);
+      let v=norm(el.value);const pre=li.dataset.pre;let good=ans.includes(v)||(pre&&ans.includes(norm(pre+el.value)));
+      el.classList.toggle('ok',good);el.classList.toggle('no',!good);li.querySelector('.fix').style.display=good?'none':'';if(good)s++});
+    per[ex]=s;tot+=s;$('p'+ex).textContent=s+' / 10';$('p'+ex).classList.add('done')});
+  [5,6].forEach(ex=>{let s=0;$('q'+ex).querySelectorAll(':scope > li').forEach((li,i)=>{const sel=document.querySelector(`input[name="a${ex}_${i}"]:checked`);const key=li.dataset.key;
+      li.querySelectorAll('label').forEach((l,k)=>{l.classList.remove('ok','no','key');if(sel&&+sel.value===k)l.classList.add(String(k)===key?'ok':'no');else if(String(k)===key)l.classList.add('key')});
+      if(sel&&sel.value===key)s++});per[ex]=s;tot+=s;$('p'+ex).textContent=s+' / 10';$('p'+ex).classList.add('done')});
+  $('total').textContent=tot;$('arc').setAttribute('stroke-dashoffset',276.5*(1-tot/60));
+  $('mark').textContent=Math.max(1,Math.round(tot/5));
+  $('rName').textContent=[$('name').value.trim(),$('class').value.trim()].filter(Boolean).join(' · ')||'Result';
+  const names={1:'Ex 1 · Vocabulary',2:'Ex 2 · Vocabulary',3:'Ex 3 · Time clauses',4:'Ex 4 · Future forms',5:'Ex 5 · Texts',6:'Ex 6 · Dialogues'};
+  $('rows').innerHTML=Object.keys(per).map(k=>`<div><span>${names[k]}</span><b>${per[k]} / 10</b></div>`).join('');
+  $('result').classList.add('on');$('result').scrollIntoView({behavior:'smooth',block:'center'});
+  $('finishTop').textContent=tot+' / 60';}
+$('finish').addEventListener('click',check);$('finishTop').addEventListener('click',check);
+$('reset').addEventListener('click',()=>{const keep={name:st.name,class:st.class};st=keep;save();
+  document.querySelectorAll('#test input.g').forEach(e=>{e.value='';e.classList.remove('ok','no')});
+  document.querySelectorAll('#test select.g').forEach(e=>{e.value='';e.classList.remove('ok','no')});
+  document.querySelectorAll('#test input[type=radio]').forEach(r=>r.checked=false);
+  document.querySelectorAll('.ch label').forEach(l=>l.classList.remove('ok','no','key'));
+  document.body.classList.remove('show');document.querySelectorAll('.fix').forEach(f=>f.style.display='');
+  [1,2,3,4,5,6].forEach(ex=>{$('p'+ex).textContent='/ 10';$('p'+ex).classList.remove('done')});
+  $('result').classList.remove('on');$('finishTop').textContent='Finish';progress();window.scrollTo({top:0,behavior:'smooth'})});
+
+/* key */
+(function(){const k=$('keybox');
+  const l1=E1.map(x=>x[3][0]),l2=E2.map(x=>x[2][0]),l3=E3.map(x=>x[2].join(' / ')),l4=E4.map(x=>x[2][0]),l5=E5.map(x=>L[x[2]]+' '+x[1][x[2]]),l6=E6.map(x=>L[x[3]]+' '+x[2][x[3]]);
+  const col=(t,a)=>`<div><h3>${t}</h3><ol>${a.map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
+  k.innerHTML=`<div class="keygrid">${col('1 Vocabulary',l1)}${col('2 Vocabulary',l2)}${col('3 Time clauses',l3)}${col('4 Future forms',l4)}${col('5 Texts',l5)}${col('6 Dialogues',l6)}</div><p class="note">Ex. 3: alternatives after a slash are also accepted. Ex. 4: short and full forms are both accepted (won't / will not, 'll / will).</p>`;
+  $('keyBtn').addEventListener('click',e=>{const o=k.classList.toggle('on');e.currentTarget.textContent=o?'Hide the answer key':'Teacher: show the answer key'});
+})();
+</script>
+
+</body>
+</html>

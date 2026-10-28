@@ -9,5 +9,6 @@ Interactive English lessons with exercises, self-check and grammar notes.
 | On the Edge: figure skating, Milano Cortina 2026 | B2 | `figure-skating-b2/` |
 | Escape the Haunted House (Halloween quest) | A2 | `halloween-a2/` |
 | The Blackwood Manor Mystery (Halloween detective quest) | B1+/B2 | `halloween-b1-b2/` |
+| Focus 3 Unit Test 4 (interactive, auto-check) | B1/B1+ | `focus3-unit4-test/` |
 
 Live site: https://irenbirch.github.io/english-lessons/
