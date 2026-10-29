@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Lesson Mix Vol. 4</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -137,7 +138,7 @@ section.track{padding-block:66px 6px;scroll-margin-top:64px}
 .facade:hover .pl{transform:scale(1.08)}
 .facade .tt{position:absolute;left:16px;bottom:14px;right:16px;text-align:left;font-family:var(--f-m);font-size:1.35rem;text-shadow:0 2px 6px #000}
 .vlink{font-size:.86rem;color:var(--muted);margin-top:8px}
-.playlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:480px;overflow:auto}
+.playlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:620px;overflow:auto}
 .playlist button{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:center}
 .playlist button b{font-family:var(--f-m);font-size:1.4rem;color:var(--orange);grid-row:span 2;font-weight:400}
 .playlist button span{font-weight:700;font-size:.92rem}
@@ -287,7 +288,7 @@ footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
 </section>
 
 <section class="track" id="t4">
-  <div class="th"><div class="no">04</div><div><h2>Now playing</h2><p>Trailers, clips and interviews. Choose a track from the playlist; it plays right here.</p></div><span class="time">15:00</span></div>
+  <div class="th"><div class="no">04</div><div><h2>Now playing</h2><p>Fifteen tracks: trailers, scenes from all three films and interviews with the actors. Choose a track; it plays right here, and its tasks appear below.</p></div><span class="time">15:00</span></div>
   <div class="player">
     <div>
       <div class="screen" id="screen"></div>
@@ -519,7 +520,14 @@ const VIDS=[
  {id:"u3V5KDHRQvk",t:"Official trailer · Vol. 3",s:"Guardians of the Galaxy Vol. 3 (2023)",c:"#FFD23F",tasks:["<b>Before:</b> This is the last film about this team. How do you think it ends?","<b>While:</b> Note the mood, the music and the colours. How is it different from the first trailer?","<b>After:</b> Predict with future forms: <i>By the end of the film, they will have… / Ten years later, Rocket will be…</i>"]},
  {id:"RkdgGn3iY_c",t:"Interview · Chris Pratt & Zoe Saldana",s:"Guardians of the Galaxy Vol. 3",c:"#2E9C5A",tasks:["<b>Before:</b> What do you think actors find hardest about playing the same character for ten years?","<b>While:</b> Note three things they say about their characters or the team.","<b>After:</b> Report what they said: <i>Chris Pratt explained that…</i>"]},
  {id:"PoWl_S2npAQ",t:"Interview · Karen Gillan & Pom Klementieff",s:"Guardians of the Galaxy Vol. 3",c:"#3A6AB0",tasks:["<b>Before:</b> Nebula and Mantis change a lot across the films. How do people change in real life?","<b>While:</b> Which personality words do they use about Nebula and Mantis?","<b>After:</b> Do you agree with them? Use Track 03 words to give your opinion."]},
- {id:"w-5c7HothZg",t:"Interview · Pratt, Bautista & James Gunn",s:"Guardians of the Galaxy (2014)",c:"#B07A3A",tasks:["<b>Before:</b> What questions would you ask the cast of your favourite film?","<b>While:</b> Note one funny moment and one serious answer.","<b>After:</b> Write two questions you'd ask them now, ten years later."]}
+ {id:"w-5c7HothZg",t:"Interview · Pratt, Bautista & James Gunn",s:"Guardians of the Galaxy (2014)",c:"#B07A3A",tasks:["<b>Before:</b> What questions would you ask the cast of your favourite film?","<b>While:</b> Note one funny moment and one serious answer.","<b>After:</b> Write two questions you'd ask them now, ten years later."]},
+ {id:"gO_lFNbE4hk",t:"Clip · Drax & Mantis",s:"Guardians of the Galaxy Vol. 2 (2017)",c:"#8BB84A",tasks:["<b>Before:</b> Is it ever OK to be brutally honest with a friend?","<b>While:</b> Note everything Drax says to Mantis. Is he tactful? How does Mantis react?","<b>After:</b> Rewrite one of Drax's lines so that it's tactful. Then describe Mantis with three words from Track 03."]},
+ {id:"bpJDXtk__To",t:"Clip · Taserface",s:"Guardians of the Galaxy Vol. 2 (2017)",c:"#B07A3A",tasks:["<b>Before:</b> What makes a joke sarcastic?","<b>While:</b> How does Rocket make fun of his enemy? Is he witty, sarcastic or both?","<b>After:</b> Report the conversation: <i>Rocket laughed at… He said that…</i>"]},
+ {id:"YXkSDhf57pc",t:"Clip · Greater meaning",s:"Guardians of the Galaxy Vol. 2 (2017)",c:"#FFD23F",tasks:["<b>Before:</b> Do you think everyone has a “greater meaning” or purpose in life?","<b>While:</b> Note who speaks and what they want. Which words describe their personalities?","<b>After:</b> Predict with future forms: <i>By the end of the film, Peter will have discovered…</i>"]},
+ {id:"ETKypvPrDn8",t:"Clip · Back in your cages",s:"Guardians of the Galaxy Vol. 3 (2023)",c:"#FF3E8A",tasks:["<b>Before:</b> In the last film, Rocket learns about his past. How can our past make us who we are?","<b>While:</b> What is happening? Note three actions with -ing forms.","<b>After:</b> Explain the situation with the Past Perfect Continuous: <i>The animals had been living…</i>"]},
+ {id:"FKqp08tk0n8",t:"Interview · Dave Bautista (Drax)",s:"Guardians of the Galaxy (2014)",c:"#5A6E8A",tasks:["<b>Before:</b> Bautista was a wrestler before he became an actor. What skills from sport could help an actor?","<b>While:</b> Note what he says about Drax: his personality, his look, his humour.","<b>After:</b> Report three things he said with <i>explained, admitted, said</i>."]},
+ {id:"Oo7QQcxQ7FE",t:"Interview · James Gunn & Chris Pratt",s:"Guardians of the Galaxy Vol. 3",c:"#FF8A1E",tasks:["<b>Before:</b> How would you feel after working on the same project for almost ten years?","<b>While:</b> Note what they say about how the characters and the team have changed.","<b>After:</b> <i>By the time they finished the third film, they had been working together for…</i> Finish the idea in your own words."]},
+ {id:"CEuHVH55O8E",t:"Interview · The cast on the new mixtape",s:"Guardians of the Galaxy Vol. 3",c:"#8B5CFF",tasks:["<b>Before:</b> Which song would you put on a mixtape for your best friend?","<b>While:</b> Which songs or kinds of music do they mention? What do they say about them?","<b>After:</b> Present your own three-song mix to the class and explain your choices."]}
 ];
 
 /* ============ HELPERS ============ */
@@ -571,11 +579,19 @@ VOC.forEach(([title,list])=>{const g=document.createElement('div');g.className='
 
 /* ============ VIDEO DECK ============ */
 const scr=$('screen');
-function loadVid(i,autoplay){const v=VIDS[i];
-  scr.innerHTML=`<button class="facade" type="button" style="--c1:${v.c}" aria-label="Play ${v.t}"><span class="pl"><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1A0B00"/></svg></span><span class="tt">${String(i+1).padStart(2,'0')} · ${v.t}</span></button>`;
-  const play=()=>{scr.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1" title="${v.t}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`};
-  scr.querySelector('.facade').addEventListener('click',play);if(autoplay)play();
-  $('vlink').innerHTML=`${v.s} · Doesn't play here? <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">Open it on YouTube</a>`;
+const CAN_EMBED=/github\.io$|^localhost$|^127\./.test(location.hostname)||location.protocol==='file:';
+function loadVid(i,autoplay){const v=VIDS[i];const yt=`https://www.youtube.com/watch?v=${v.id}`;
+  const face=`<span class="pl"><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1A0B00"/></svg></span><span class="tt">${String(i+1).padStart(2,'0')} · ${v.t}</span>`;
+  if(CAN_EMBED){
+    scr.innerHTML=`<button class="facade" type="button" style="--c1:${v.c}" aria-label="Play ${v.t}">${face}</button>`;
+    const play=()=>{const origin=encodeURIComponent(location.origin&&location.origin!=='null'?location.origin:'https://irenbirch.github.io');
+      scr.innerHTML=`<iframe src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="${v.t}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`};
+    scr.querySelector('.facade').addEventListener('click',play);if(autoplay)play();
+    $('vlink').innerHTML=`${v.s} · If the player says “Video unavailable”, the owner doesn't allow embedding: <a href="${yt}" target="_blank" rel="noopener">open it on YouTube</a>.`;
+  }else{
+    scr.innerHTML=`<a class="facade" href="${yt}" target="_blank" rel="noopener" style="--c1:${v.c};text-decoration:none">${face}</a>`;
+    $('vlink').innerHTML=`${v.s} · In this preview the video opens on YouTube. On the class website (irenbirch.github.io) it plays right here.`;
+  }
   $('vtasks').innerHTML=`<span class="lbl">Tasks · ${v.t}</span><ol style="margin-top:8px">${v.tasks.map(t=>`<li>${t}</li>`).join('')}</ol>`;
   document.querySelectorAll('#playlist button').forEach((b,k)=>b.setAttribute('aria-current',k===i?'true':'false'));}
 VIDS.forEach((v,i)=>{const li=document.createElement('li');li.innerHTML=`<button type="button"><b>${String(i+1).padStart(2,'0')}</b><span>${v.t}</span><small>${v.s}</small></button>`;
