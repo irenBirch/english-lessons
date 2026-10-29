@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Lesson Mix Vol. 4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Rubik:ital,wght@0,400;0,500;0,700;0,800;1,500&family=VT323&family=Permanent+Marker&display=swap">
+<style>
+/* Layout: a 1970s mixtape drifting through space. Hero = a cassette with a handwritten label and turning reels over a starfield; the nav is the tracklist (Side A / Side B); each lesson stage is a "track"; the video section is a tape deck with a playlist. Single dark theme by choice. */
+:root{
+  --space:#0B0A1F; --panel:#17143A; --panel2:#221E52; --line:rgba(245,238,220,.13);
+  --ink:#F5EEDC; --muted:#B5ADD6; --orange:#FF8A1E; --magenta:#FF3E8A; --teal:#29D6C3; --yellow:#FFD23F; --violet:#8B5CFF;
+  --ok:#5BE38A; --bad:#FF5A6E;
+  --f-d:"Shrikhand","Cooper Black",Georgia,serif; --f-b:"Rubik",system-ui,sans-serif; --f-m:"VT323",ui-monospace,monospace; --f-h:"Permanent Marker","Comic Sans MS",cursive;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--space);color:var(--ink);font-family:var(--f-b);font-size:17.5px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--space)}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.page{position:relative;z-index:1}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-d);font-weight:400;line-height:1.02;margin:0;text-wrap:balance}
+h3{margin:0;font-weight:800;font-size:1.15rem}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--teal)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.mono{font-family:var(--f-m);font-size:1.15rem;letter-spacing:.04em}
+.stripes{height:14px;background:linear-gradient(var(--yellow) 0 25%,var(--orange) 25% 50%,var(--magenta) 50% 75%,var(--violet) 75%)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:40px;align-items:center;padding-block:56px 40px}
+.kick{font-family:var(--f-m);font-size:1.3rem;color:var(--teal);letter-spacing:.06em}
+.hero h1{font-size:clamp(3.2rem,8vw,6.2rem);background:linear-gradient(180deg,var(--yellow) 10%,var(--orange) 50%,var(--magenta) 90%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #3A1050);margin-top:6px}
+.hero .lede{margin-top:16px;max-width:56ch;color:#DCD4F2}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.tag{font-weight:700;font-size:.8rem;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tag.hot{background:var(--orange);color:#1A0B00;border-color:var(--orange)}
+.cassette{width:100%;max-width:520px;justify-self:center;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6));transform:rotate(-4deg)}
+.cassette svg{width:100%;height:auto;display:block}
+@media (prefers-reduced-motion:no-preference){.reel{animation:spin 4s linear infinite;transform-box:fill-box;transform-origin:center}@keyframes spin{to{transform:rotate(360deg)}}}
+
+/* tracklist nav */
+.deck{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(11,10,31,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.deck .wrap{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-block:9px;scrollbar-width:none}
+.deck .side{flex:0 0 auto;font-family:var(--f-m);font-size:1.1rem;color:var(--yellow);padding:0 6px}
+.deck a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-weight:700;font-size:.86rem;padding:6px 11px;border-radius:8px}
+.deck a b{font-family:var(--f-m);font-size:1.05rem;color:var(--orange);margin-right:5px;font-weight:400}
+.deck a:hover{background:var(--panel2);color:var(--ink)}
+
+/* tracks */
+section.track{padding-block:66px 6px;scroll-margin-top:64px}
+.th{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:24px}
+.no{font-family:var(--f-m);font-size:2.6rem;line-height:1;color:var(--space);background:var(--yellow);border-radius:10px;padding:6px 10px;min-width:64px;text-align:center}
+.th h2{font-size:clamp(2rem,5vw,3rem);color:var(--ink)}
+.th p{color:var(--muted);margin-top:6px;max-width:70ch}
+.time{font-family:var(--f-m);font-size:1.15rem;color:var(--teal);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lbl{font-family:var(--f-m);font-size:1.2rem;letter-spacing:.04em;color:var(--orange)}
+.q-list{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;font-weight:800;padding:10px 20px;border-radius:999px;background:var(--orange);color:#1A0B00;box-shadow:0 4px 0 #8A3F00;transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8A3F00}
+.btn.alt{background:var(--panel2);color:var(--ink);box-shadow:0 4px 0 #0A0920}
+.msg{font-weight:800}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.ua{font-size:.9rem;color:var(--muted);border-left:3px solid var(--magenta);padding-left:10px}
+
+/* timeline warm-up */
+.tline{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.tline::before{content:"";position:absolute;left:0;right:0;top:15px;height:3px;background:linear-gradient(90deg,var(--teal),var(--magenta))}
+.tline div{position:relative;padding-top:34px;font-size:.92rem}
+.tline div::before{content:"";position:absolute;top:8px;left:0;width:17px;height:17px;border-radius:50%;background:var(--space);border:3px solid var(--yellow)}
+.tline b{display:block;font-family:var(--f-m);font-size:1.3rem;color:var(--yellow);font-weight:400}
+
+/* mc */
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;counter-reset:it}
+.items>li{counter-increment:it;display:flex;flex-direction:column;gap:8px}
+.items .s::before{content:counter(it,decimal-leading-zero) " ";font-family:var(--f-m);font-size:1.15rem;color:var(--orange)}
+.gap{display:inline-block;min-width:5.5em;border-bottom:2px dashed var(--teal);text-align:center;color:var(--teal);padding:0 4px;font-weight:700}
+.gap.ok{border-color:var(--ok);color:var(--ok);border-bottom-style:solid}.gap.no{border-color:var(--bad);color:var(--bad)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--panel2);border-radius:10px;padding:6px 13px;cursor:pointer;font-weight:600}
+.opt[aria-pressed="true"]{border-color:var(--orange);background:rgba(255,138,30,.16)}
+.opt.right{border-color:var(--ok);background:rgba(91,227,138,.14)}.opt.wrong{border-color:var(--bad);background:rgba(255,90,110,.14)}
+
+/* heroes */
+.heroes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.hc{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.frame{position:relative;aspect-ratio:4/5;max-width:100%;display:grid;place-items:center;cursor:pointer;background:linear-gradient(160deg,var(--c1),var(--c2));background-size:cover;background-position:center top}
+.frame.has{cursor:default}
+.frame input{position:absolute;width:1px;height:1px;opacity:0}
+.frame .ph{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:rgba(255,255,255,.85);text-align:center;padding:12px}
+.frame .ph svg{width:40px;height:40px}
+.frame.has .ph{display:none}
+.frame .rm{position:absolute;top:8px;right:8px;border:0;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:.74rem;padding:3px 9px;cursor:pointer}
+.frame .nm{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.75));font-family:var(--f-h);font-size:1.25rem;color:#fff}
+.hc .body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.hc p{font-size:.9rem;color:#DCD4F2}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
+.chips span{font-size:.76rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(41,214,195,.13);color:var(--teal)}
+
+/* quiz */
+.pq{display:flex;flex-direction:column;gap:16px}
+.pq fieldset{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0;min-width:0}
+.pq legend{font-weight:800;padding:0 6px}
+.pq .os{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.pq label{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:9px;cursor:pointer;font-size:.92rem}
+.pq label:hover{background:var(--panel2)}
+.pq input{accent-color:var(--orange)}
+.pres{display:none;border-radius:18px;padding:20px;background:linear-gradient(135deg,rgba(255,62,138,.2),rgba(139,92,255,.2));border:1px solid rgba(255,62,138,.4)}
+.pres.on{display:block}
+.pres h3{font-family:var(--f-d);font-weight:400;font-size:2rem;color:var(--yellow)}
+
+/* vocab */
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.vw{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.vw b{font-size:1.02rem;color:var(--yellow)}
+.vw span{font-size:.86rem;color:#DCD4F2}
+.vw i{font-size:.82rem;color:var(--muted)}
+.vgroup{margin-top:22px}
+.vgroup > h3{font-family:var(--f-m);font-weight:400;font-size:1.5rem;color:var(--teal);margin-bottom:10px}
+
+/* video deck */
+.player{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.screen{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:16px;overflow:hidden;background:#000;border:3px solid #2A2560}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.facade{position:absolute;inset:0;display:grid;place-items:center;border:0;padding:0;cursor:pointer;background:radial-gradient(circle at 70% 30%,var(--c1),#0B0A1F 75%);color:#fff;width:100%}
+.facade::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 4px)}
+.facade .pl{position:relative;width:84px;height:84px;border-radius:50%;background:var(--orange);display:grid;place-items:center;box-shadow:0 0 0 12px rgba(255,138,30,.25);transition:transform .2s}
+.facade:hover .pl{transform:scale(1.08)}
+.facade .tt{position:absolute;left:16px;bottom:14px;right:16px;text-align:left;font-family:var(--f-m);font-size:1.35rem;text-shadow:0 2px 6px #000}
+.vlink{font-size:.86rem;color:var(--muted);margin-top:8px}
+.playlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:480px;overflow:auto}
+.playlist button{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:center}
+.playlist button b{font-family:var(--f-m);font-size:1.4rem;color:var(--orange);grid-row:span 2;font-weight:400}
+.playlist button span{font-weight:700;font-size:.92rem}
+.playlist button small{color:var(--muted);font-size:.78rem}
+.playlist button[aria-current="true"]{border-color:var(--orange);background:rgba(255,138,30,.12)}
+.vtasks{margin-top:18px}
+.vtasks ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+
+/* grammar */
+.forms{width:100%;border-collapse:collapse;font-size:.95rem}
+.forms th,.forms td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.forms th{font-family:var(--f-m);font-weight:400;font-size:1.1rem;color:var(--muted)}
+.forms td:first-child{font-weight:800;color:var(--yellow);white-space:nowrap}
+.tbl{overflow-x:auto}
+.fut{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.fut > div{border-radius:16px;padding:16px;border:1px solid var(--line);display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.fut h3{font-family:var(--f-m);font-weight:400;font-size:1.6rem;line-height:1}
+.fut .f{font-family:var(--f-m);font-size:1.15rem;background:var(--space);border-radius:8px;padding:6px 10px}
+.fut em{font-style:normal;font-weight:700}
+.fut div:nth-child(1) h3{color:var(--teal)} .fut div:nth-child(2) h3{color:var(--orange)} .fut div:nth-child(3) h3{color:var(--magenta)}
+.tlsvg{width:100%;height:auto;display:block;margin-top:6px}
+.open{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.open li{display:flex;flex-direction:column;gap:6px}
+.open input{background:var(--panel2);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0;width:100%}
+
+/* homework */
+.hw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:start}
+.sticker{font-family:var(--f-h);font-size:1.5rem;color:var(--space);background:var(--yellow);padding:8px 16px;transform:rotate(-6deg);border-radius:6px}
+.check{display:flex;flex-direction:column;gap:6px}
+.check label{display:flex;gap:10px;align-items:center;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--orange)}
+
+footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
+
+@media (max-width:980px){.heroes{grid-template-columns:repeat(2,minmax(0,1fr))}.vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.player{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .hero{grid-template-columns:minmax(0,1fr);padding-block:40px 24px}
+  .grid2,.fut{grid-template-columns:minmax(0,1fr)}
+  .th{grid-template-columns:auto minmax(0,1fr)}.th .time{grid-column:2}
+  .tline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pq .os{grid-template-columns:minmax(0,1fr)}
+  .hw{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px}
+}
+@media (max-width:440px){.heroes,.vgrid{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="page">
+<div class="stripes" aria-hidden="true"></div>
+<header class="wrap hero" id="top">
+  <div>
+    <div class="kick">Focus 4 · B2 · 90 min</div>
+    <h1>Lesson Mix Vol.&nbsp;4</h1>
+    <p class="lede">A film lesson about a bunch of misfits who become a family. Past Perfect, Past Perfect Continuous and three future forms; personality words, places and film vocabulary; trailers, clips and interviews you can watch right here.</p>
+    <div class="tags"><span class="tag hot">B2</span><span class="tag">Guardians of the Galaxy</span><span class="tag">8 tracks</span><span class="tag">Video inside</span></div>
+  </div>
+  <div class="cassette" aria-hidden="true">
+    <svg viewBox="0 0 520 330">
+      <rect x="6" y="6" width="508" height="318" rx="22" fill="#2B2560" stroke="#120F33" stroke-width="6"/>
+      <rect x="30" y="28" width="460" height="190" rx="12" fill="#F5EEDC"/>
+      <rect x="30" y="28" width="460" height="44" rx="12" fill="#FF8A1E"/><rect x="30" y="58" width="460" height="14" fill="#FF8A1E"/>
+      <rect x="30" y="72" width="460" height="10" fill="#FFD23F"/><rect x="30" y="82" width="460" height="10" fill="#FF3E8A"/>
+      <text x="48" y="60" font-family="VT323,monospace" font-size="28" fill="#1A0B00">SIDE A · 90 MIN · B2</text>
+      <text x="48" y="128" font-family="Permanent Marker,cursive" font-size="34" fill="#2B2560">Lesson Mix Vol. 4</text>
+      <text x="48" y="166" font-family="Permanent Marker,cursive" font-size="20" fill="#8B5CFF">tenses · misfits · space</text>
+      <rect x="120" y="178" width="280" height="96" rx="48" fill="#120F33"/>
+      <g class="reel"><circle cx="168" cy="226" r="34" fill="#F5EEDC"/><circle cx="168" cy="226" r="12" fill="#120F33"/><g fill="#120F33"><rect x="164" y="194" width="8" height="14"/><rect x="164" y="244" width="8" height="14"/><rect x="136" y="222" width="14" height="8"/><rect x="186" y="222" width="14" height="8"/></g></g>
+      <g class="reel"><circle cx="352" cy="226" r="34" fill="#F5EEDC"/><circle cx="352" cy="226" r="12" fill="#120F33"/><g fill="#120F33"><rect x="348" y="194" width="8" height="14"/><rect x="348" y="244" width="8" height="14"/><rect x="320" y="222" width="14" height="8"/><rect x="370" y="222" width="14" height="8"/></g></g>
+      <rect x="214" y="208" width="92" height="36" rx="4" fill="#3B2F7A"/>
+      <path d="M80 324 L110 284 H410 L440 324" fill="#221E52" stroke="#120F33" stroke-width="4"/>
+      <circle cx="150" cy="306" r="7" fill="#120F33"/><circle cx="370" cy="306" r="7" fill="#120F33"/>
+    </svg>
+  </div>
+</header>
+<div class="stripes" aria-hidden="true"></div>
+
+<nav class="deck" aria-label="Tracklist">
+  <div class="wrap">
+    <span class="side">SIDE A</span>
+    <a href="#t1"><b>01</b>Previously on…</a><a href="#t2"><b>02</b>Meet the team</a><a href="#t3"><b>03</b>Personality</a><a href="#t4"><b>04</b>Watch</a>
+    <span class="side">SIDE B</span>
+    <a href="#t5"><b>05</b>Past Perfect Cont.</a><a href="#t6"><b>06</b>Future forms</a><a href="#t7"><b>07</b>Galaxy postcards</a><a href="#t8"><b>08</b>Your mix</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section class="track" id="t1">
+  <div class="th"><div class="no">01</div><div><h2>Previously on…</h2><p>Warm-up. Peter Quill's story begins long before the adventure. Look at the timeline, then review the <b>Past Perfect</b>: the past before the past.</p></div><span class="time">10:00</span></div>
+  <div class="card">
+    <div class="tline">
+      <div><b>1988</b>Peter's mother dies. That night, a spaceship takes him from Earth.</div>
+      <div><b>1988–2014</b>He grows up with space pirates called the Ravagers.</div>
+      <div><b>2014</b>He steals a mysterious orb and ends up in prison with four strangers.</div>
+      <div><b>Later</b>The strangers become the Guardians of the Galaxy.</div>
+    </div>
+    <p class="ua">Past Perfect = <b>had + V3</b>. Використовуємо для дії, яка сталася <b>раніше</b> за іншу дію в минулому: <i>When the Ravagers arrived, his mother <b>had</b> just <b>died</b>.</i></p>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <span class="lbl">Exercise 1 · Past Simple or Past Perfect?</span>
+      <ol class="items" id="g1" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="g1">Check</button><span class="msg" id="g1msg"></span></div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Discuss</span>
+      <ol class="q-list">
+        <li>Have you seen any of the Guardians films? What had you heard about them before you watched?</li>
+        <li>Peter keeps one object from Earth: his mother's mixtape. What object from your childhood would you keep forever? Why?</li>
+        <li>Why do people love stories about “misfits” who become heroes?</li>
+        <li>Think of a time when you had prepared for something, but it went wrong anyway. What happened?</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="track" id="t2">
+  <div class="th"><div class="no">02</div><div><h2>Meet the team</h2><p>Seven very different personalities. Tap a frame to add a picture. Then take the quiz: which Guardian are <i>you</i>?</p></div><span class="time">12:00</span></div>
+  <div class="heroes" id="heroes"></div>
+  <div class="card" style="margin-top:20px">
+    <span class="lbl">Quiz · Which Guardian are you?</span>
+    <form class="pq" id="pq" style="margin-top:12px"></form>
+    <div class="row" style="margin-top:16px"><button class="btn" type="button" id="pqBtn">Show my result</button><span class="msg" id="pqMsg"></span></div>
+    <div class="pres" id="pres" style="margin-top:16px"></div>
+    <p class="ua" style="margin-top:14px">Speaking: Do you agree with your result? Describe yourself using three words from the cards.</p>
+  </div>
+</section>
+
+<section class="track" id="t3">
+  <div class="th"><div class="no">03</div><div><h2>Personality words</h2><p>The words from Focus 4, plus words you need to talk about the film. Learn them, then match them to the Guardians.</p></div><span class="time">15:00</span></div>
+  <div id="vocab"></div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <span class="lbl">Exercise 2 · Who's who?</span>
+      <ol class="items" id="v1" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v1">Check</button><span class="msg" id="v1msg"></span></div>
+    </div>
+    <div class="card">
+      <span class="lbl">Exercise 3 · Film words</span>
+      <ol class="items" id="v2" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v2">Check</button><span class="msg" id="v2msg"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="track" id="t4">
+  <div class="th"><div class="no">04</div><div><h2>Now playing</h2><p>Trailers, clips and interviews. Choose a track from the playlist; it plays right here.</p></div><span class="time">15:00</span></div>
+  <div class="player">
+    <div>
+      <div class="screen" id="screen"></div>
+      <p class="vlink" id="vlink"></p>
+      <div class="card vtasks" id="vtasks"></div>
+    </div>
+    <ul class="playlist" id="playlist"></ul>
+  </div>
+</section>
+
+<section class="track" id="t5">
+  <div class="th"><div class="no">05</div><div><h2>Past Perfect Continuous</h2><p>How long had something been happening before a moment in the past?</p></div><span class="time">12:00</span></div>
+  <div class="grid2">
+    <div class="card stack">
+      <span class="lbl">The rule</span>
+      <p><b>had been + verb-ing</b></p>
+      <ul class="q-list">
+        <li><b>Duration up to a past moment:</b> <i>By 2014, Peter <b>had been travelling</b> with the Ravagers for over twenty years.</i></li>
+        <li><b>The cause of a past situation:</b> <i>Rocket was exhausted. He <b>had been working</b> on the ship all night.</i></li>
+      </ul>
+      <div class="tbl"><table class="forms">
+        <thead><tr><th></th><th>Past Perfect Simple</th><th>Past Perfect Continuous</th></tr></thead>
+        <tbody>
+          <tr><td>Focus</td><td>result, completed action, how many</td><td>the activity, how long</td></tr>
+          <tr><td>Example</td><td>Drax <b>had defeated</b> five enemies.</td><td>Drax <b>had been fighting</b> for hours.</td></tr>
+          <tr><td>State verbs</td><td>He <b>had known</b> her for years. ✓</td><td><s>He had been knowing her</s> ✗</td></tr>
+        </tbody>
+      </table></div>
+      <p class="ua">Маркери: for, since, how long, all day/night, by the time, when. Дієслова стану (know, like, believe, own) не вживаються в Continuous.</p>
+    </div>
+    <div class="card">
+      <span class="lbl">Exercise 4 · Choose the best form</span>
+      <ol class="items" id="g2" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="g2">Check</button><span class="msg" id="g2msg"></span></div>
+    </div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Speaking · Why were they like that?</span>
+    <p>Explain each situation with the Past Perfect Continuous. Example: <i>Peter's Walkman batteries were dead → He had been listening to his mixtape all day.</i></p>
+    <ul class="q-list">
+      <li>Groot was covered in leaves and dirt.</li><li>Gamora was out of breath.</li><li>Rocket's paws were black with oil.</li><li>Drax had a huge smile on his face.</li><li>Mantis looked very sleepy.</li><li>Your best friend was in a terrible mood yesterday.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="track" id="t6">
+  <div class="th"><div class="no">06</div><div><h2>Future forms</h2><p>Grammar Focus, Focus 4: three ways to look at the future from a fixed point in time.</p></div><span class="time">15:00</span></div>
+  <div class="fut">
+    <div><h3>Future Continuous</h3><span class="f">will be + -ing</span><p>An action <b>in progress</b> at a time in the future. Also for future events that are fixed or expected.</p><p><em>At 11 a.m. tomorrow, the Guardians will be flying to Knowhere.</em></p></div>
+    <div><h3>Future Perfect Simple</h3><span class="f">will have + V3</span><p>An action that <b>will be completed before</b> a certain time in the future.</p><p><em>By 11 a.m. tomorrow, they will have landed.</em></p></div>
+    <div><h3>Future Perfect Continuous</h3><span class="f">will have been + -ing</span><p><b>How long</b> an action will have been in progress before a certain time in the future.</p><p><em>By 11 a.m. tomorrow, they will have been flying for six hours.</em></p></div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <svg class="tlsvg" viewBox="0 0 900 170" role="img" aria-label="Timeline: from 5 a.m. the ship is flying; at 11 a.m. it is still flying (Future Continuous), it has landed before 11 a.m. in the other case (Future Perfect), and by 11 a.m. it has been flying for six hours (Future Perfect Continuous).">
+      <line x1="30" y1="120" x2="870" y2="120" stroke="#B5ADD6" stroke-width="2"/>
+      <polygon points="870,114 884,120 870,126" fill="#B5ADD6"/>
+      <text x="60" y="150" font-family="VT323,monospace" font-size="22" fill="#B5ADD6">NOW</text>
+      <line x1="560" y1="20" x2="560" y2="135" stroke="#FFD23F" stroke-width="2" stroke-dasharray="6 6"/>
+      <text x="540" y="155" font-family="VT323,monospace" font-size="22" fill="#FFD23F">11 A.M. TOMORROW</text>
+      <rect x="500" y="22" width="140" height="14" rx="7" fill="#29D6C3"/><text x="650" y="34" font-family="Rubik,sans-serif" font-size="15" fill="#29D6C3">will be flying (in progress)</text>
+      <circle cx="470" cy="64" r="8" fill="#FF8A1E"/><path d="M480 64 H548" stroke="#FF8A1E" stroke-width="2"/><polygon points="548,58 558,64 548,70" fill="#FF8A1E"/><text x="250" y="69" font-family="Rubik,sans-serif" font-size="15" fill="#FF8A1E">will have landed (done before)</text>
+      <rect x="200" y="98" width="360" height="10" rx="5" fill="#FF3E8A"/><text x="200" y="92" font-family="Rubik,sans-serif" font-size="15" fill="#FF3E8A">will have been flying for 6 hours</text>
+    </svg>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <span class="lbl">Exercise 5 · Choose the correct form</span>
+      <ol class="items" id="g3" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="g3">Check</button><span class="msg" id="g3msg"></span></div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Exercise 6 · Your future, your sentences</span>
+      <ul class="open" id="g4"></ul>
+      <p class="ua">Обговоріть у парах і поставте одне одному питання: <i>What will you be doing…? How long will you have been…?</i></p>
+    </div>
+  </div>
+</section>
+
+<section class="track" id="t7">
+  <div class="th"><div class="no">07</div><div><h2>Postcards from the galaxy</h2><p>Words for describing places, from the Focus 4 text about Pontevedra. Use them to describe the planets the Guardians visit, and your own town.</p></div><span class="time">8:00</span></div>
+  <div class="grid2">
+    <div class="card">
+      <span class="lbl">Exercise 7 · Complete the postcards</span>
+      <ol class="items" id="v3" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v3">Check</button><span class="msg" id="v3msg"></span></div>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Write a postcard</span>
+      <p>You've just arrived on a new planet. Write a postcard to a friend (60–80 words). Use at least five words from this track and one future form: <i>By the time you read this, I'll have…</i></p>
+      <p class="ua">Then describe your own town: is it bustling or quiet? Quaint or urban? What would you change to make it better, as the mayor of Pontevedra did?</p>
+    </div>
+  </div>
+</section>
+
+<section class="track" id="t8">
+  <div class="th"><div class="no">08</div><div><h2>Your mix &amp; homework</h2><p>Every Guardian has a song. What's on yours?</p></div><span class="time">8:00</span></div>
+  <div class="grid2">
+    <div class="card stack">
+      <span class="lbl">Speaking · Your Lesson Mix</span>
+      <ol class="q-list">
+        <li>Choose three songs that tell the story of your life so far. Explain each one: <i>I'd been feeling… when I first heard it.</i></li>
+        <li>The Guardians are a “found family”. Can friends be as important as family? Why?</li>
+        <li>Which Guardian would you like as a friend, and which one would drive you crazy?</li>
+        <li>Predict: Where will you be living in ten years? What will you have achieved?</li>
+      </ol>
+    </div>
+    <div class="card hw">
+      <span class="sticker">HOMEWORK</span>
+      <div class="stack">
+        <h3>A letter from the future</h3>
+        <p>It's 2036. Write a letter to your present self (180–220 words): what you'll be doing at that moment, what you'll have achieved, and how long you'll have been doing your favourite things.</p>
+        <div class="check">
+          <label><input type="checkbox" id="hw1"> Future Continuous, Future Perfect and Future Perfect Continuous</label>
+          <label><input type="checkbox" id="hw2"> one sentence in the Past Perfect Continuous about your past</label>
+          <label><input type="checkbox" id="hw3"> 6 personality words from Track 03</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="wrap">English B2 film lesson for Focus 4. Videos are official trailers, clips and interviews on YouTube. Pictures added to the frames stay in your browser only.</footer>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const G1=[
+ ["When the Ravagers arrived, Peter's mother ___ just died.",["had","has","was"]],
+ ["Before he met Gamora, Peter ___ never worked in a team.",["had","has","did"]],
+ ["They escaped from prison after Rocket ___ a plan.",["had made","has made","was making"]],
+ ["Drax wanted revenge because Ronan ___ his family.",["had killed","has killed","was killing"]],
+ ["Peter finally opened the present his mother ___ him years before.",["had given","has given","gives"]],
+ ["As soon as Groot saw the danger, he ___ his friends.",["protected","had protected","has protected"]]
+];
+const HEROES=[
+ {k:"quill",n:"Star-Lord",r:"Peter Quill",d:"Taken from Earth as a boy and raised by space pirates. The team's leader, who never goes anywhere without his 1970s music.",t:["witty","spontaneous","larger than life","full of himself"],c:["#FF8A1E","#7A2A12"]},
+ {k:"gamora",n:"Gamora",r:"",d:"A highly skilled warrior trying to escape a dark past and do the right thing.",t:["level-headed","strong-willed","fair-minded","thorough"],c:["#2E9C5A","#0E2A1A"]},
+ {k:"drax",n:"Drax",r:"",d:"A powerful fighter who takes everything literally and always says exactly what he thinks.",t:["daring","good-natured","not very tactful","kind-hearted"],c:["#5A6E8A","#141C2B"]},
+ {k:"rocket",n:"Rocket",r:"",d:"A genius pilot and engineer with a sharp tongue and a painful past.",t:["short-tempered","insecure","thinks outside the box","moody"],c:["#B07A3A","#2A1A0A"]},
+ {k:"groot",n:"Groot",r:"",d:"A tree-like being who can only say three words, but always protects his friends.",t:["kind-hearted","affectionate","humble","good-natured"],c:["#6B8A3A","#1A2410"]},
+ {k:"mantis",n:"Mantis",r:"",d:"An empath who can feel other people's emotions just by touching them.",t:["perceptive","sensitive to others' needs","trusting","self-conscious"],c:["#8BB84A","#22300E"]},
+ {k:"nebula",n:"Nebula",r:"",d:"Gamora's sister. Part cyborg, very hard on herself, slowly learning to trust others.",t:["self-critical","insecure","strong-willed","a loner"],c:["#3A6AB0","#0E1A2E"]},
+ {k:"yondu",n:"Yondu",r:"",d:"Leader of the Ravagers, who kidnapped young Peter and became a kind of father to him.",t:["short-tempered","daring","moody","kind-hearted underneath"],c:["#2A7AB0","#0A1A2A"]}
+];
+const PQ=[
+ ["At a party, you…",["dance and tell jokes all night","watch everyone from a quiet corner","eat everything on the table","complain about the music","hug everyone you meet","notice who is feeling sad"]],
+ ["Your friends say you're…",["witty","level-headed","honest","clever","kind-hearted","perceptive"]],
+ ["A problem appears. You…",["improvise","make a careful plan","attack it head-on","build a crazy gadget","protect your friends first","ask how everyone feels"]],
+ ["Your worst habit is…",["being full of yourself","being too serious","saying things without thinking","losing your temper","repeating yourself","being too shy"]],
+ ["Your perfect free day:",["listening to old music","training hard","sleeping, then eating","taking machines apart","being in nature","meeting new people"]],
+ ["Your motto:",["“Let's just wing it!”","“Think first, act second.”","“I always tell the truth.”","“I'm the smartest one here.”","“We are family.”","“Feelings matter.”"]]
+];
+const PRES=[
+ ["Star-Lord","You're the life and soul of the party: witty, spontaneous and a bit larger than life. Just be careful not to be full of yourself!"],
+ ["Gamora","You're level-headed and strong-willed. You plan things thoroughly and you're fair-minded, so people trust your decisions."],
+ ["Drax","You're daring and good-natured, and you always say what you think. Maybe try to be a little more tactful sometimes!"],
+ ["Rocket","You think outside the box and you're brilliant at solving problems, but you can be short-tempered and moody."],
+ ["Groot","You're kind-hearted, affectionate and humble. You make people feel at ease, and you'd do anything for your friends."],
+ ["Mantis","You're perceptive and sensitive to the needs of others. You can be a little self-conscious, but people love your warmth."]
+];
+const VOC=[
+ ["Personality · Focus 4",[
+  ["kind-hearted","kind and caring towards others"],["sensitive to the needs of others","noticing what other people need"],["trusting","believing that people are honest and good"],["laid-back","relaxed, not easily worried"],["tactful","careful not to upset people"],["make people feel at ease","help people feel relaxed"],["affectionate","showing love and warmth"],["good-natured","kind, friendly and patient"],["think outside the box","have original, creative ideas"],["daring","brave, ready to take risks"],["perceptive","quick to notice and understand things"],["intellectual","interested in ideas and serious thinking"],["have a love of learning","enjoy discovering new things"],["thorough","careful about every detail"],["strong-willed","determined to do what you want"],["level-headed","calm and sensible, even in a crisis"],["insecure","not confident about yourself"],["humble","not thinking you're better than others"],["self-conscious","worried about what others think of you"],["self-critical","too hard on yourself"],["a loner","sb who prefers to be alone"],["fair-minded","treating everyone equally and fairly"],["the life and soul of the party","the person who makes a party fun"],["witty","clever and funny with words"],["spontaneous","doing things without planning"],["larger than life","more exciting and colourful than most people"],["moody","with moods that change quickly"],["short-tempered","getting angry very easily"],["self-centred","thinking only about yourself"],["full of yourself","too proud of yourself"]]],
+ ["Places · Focus 4",[
+  ["rolling hills","gentle hills that go on and on"],["picturesque","pretty, like a picture"],["vibrant","full of energy and life"],["bustling","busy and full of people"],["quaint","attractive in an old-fashioned way"],["urban","connected with towns and cities"],["medieval","from the Middle Ages"],["pedestrian zone","an area where cars aren't allowed"],["on-street parking","parking at the side of the road"],["underground car park","a car park below the ground"],["shabby","old and in bad condition"],["noise pollution","harmful or annoying levels of noise"]]],
+ ["Film words",[
+  ["an outlaw","a criminal who lives outside the law"],["a bounty hunter","sb who catches criminals for money"],["a misfit","sb who doesn't fit in with others"],["an unlikely hero","sb you wouldn't expect to be a hero"],["team up (with)","join together to do something"],["betray","be disloyal to sb who trusts you"],["a found family","friends who become your family"],["sacrifice","give up something important for others"],["hold a grudge","stay angry about sth for a long time"],["sarcastic","saying the opposite of what you mean to mock sb"],["loyal","always supporting your friends"],["redemption","being saved from your past mistakes"]]]
+];
+const V1=[
+ ["Peter never plans anything. He does whatever feels right at the moment: he's very ___.",["spontaneous","thorough","humble"]],
+ ["Rocket loses his temper over the smallest things. He's ___.",["short-tempered","laid-back","trusting"]],
+ ["Groot cares about everyone and would never hurt anybody. He's ___.",["kind-hearted","self-centred","moody"]],
+ ["Drax says exactly what he thinks, even when it hurts people. He isn't very ___.",["tactful","daring","witty"]],
+ ["Gamora stays calm and makes sensible decisions in a crisis. She's ___.",["level-headed","insecure","spontaneous"]],
+ ["Mantis immediately understands how others are feeling. She's very ___.",["perceptive","self-critical","shabby"]],
+ ["Nebula often feels she isn't good enough. She's quite ___.",["insecure","full of herself","laid-back"]],
+ ["Peter loves being the centre of attention: he's the life and ___ of the party.",["soul","heart","star"]],
+ ["Rocket thinks he's the smartest being in the galaxy. He can be really full of ___.",["himself","pride","ego"]],
+ ["Groot never boasts about saving everyone. He's very ___.",["humble","vibrant","witty"]]
+];
+const V2=[
+ ["Nobody expected these five criminals to save the galaxy. They were ___ heroes.",["unlikely","loyal","sarcastic"]],
+ ["Rocket and Groot earned money by catching criminals. They were bounty ___.",["hunters","outlaws","misfits"]],
+ ["None of them fitted in anywhere. They were a group of ___.",["misfits","loners","heroes"]],
+ ["To survive, the five strangers had to ___ up.",["team","make","give"]],
+ ["Peter never forgave Yondu. He ___ a grudge for years.",["held","kept","had"]],
+ ["Groot was ready to ___ himself to save his friends.",["sacrifice","betray","redeem"]],
+ ["Gamora refused to ___ her friends, even when it was dangerous.",["betray","sacrifice","team"]],
+ ["They're not related, but they're a family: a ___ family.",["found","real","lost"]]
+];
+const G2=[
+ ["By 2014, Peter ___ with the Ravagers for over twenty years.",["had been travelling","had travelled","was travelling"]],
+ ["Rocket was exhausted because he ___ on the ship all night.",["had been working","had worked","was working"]],
+ ["Gamora's eyes were red. She ___.",["had been crying","had cried","cried"]],
+ ["They ___ for hours when they finally found the orb.",["had been searching","searched","were searching"]],
+ ["By the end of the fight, Drax ___ five enemies.",["had defeated","had been defeating","was defeating"]],
+ ["Peter's tape was almost broken: he ___ to it again and again.",["had been listening","listened","was listening"]],
+ ["Mantis ___ Ego for years before she met the Guardians.",["had known","had been knowing","was knowing"]],
+ ["Groot was covered in dirt because he ___ in the garden.",["had been digging","had dug","dug"]]
+];
+const G3=[
+ ["This time next week, the Guardians ___ through space to a new planet.",["will be flying","will have flown","will have been flying"]],
+ ["By the end of the mission, they ___ the galaxy again.",["will have saved","will be saving","will have been saving"]],
+ ["By next summer, Peter ___ the team for ten years.",["will have been leading","will be leading","is leading"]],
+ ["Don't call Rocket at 8 p.m. He ___ the engine then.",["will be repairing","will have repaired","will have been repairing"]],
+ ["By the time you arrive, Groot ___ all the snacks!",["will have eaten","will be eating","will have been eating"]],
+ ["At midnight, we ___ for six hours non-stop.",["will have been travelling","will be travelling","will travel"]],
+ ["What ___ tomorrow afternoon? I need to borrow your ship.",["will you be doing","will you have done","will you have been doing"]],
+ ["By 2030, Mantis ___ over a hundred planets.",["will have visited","will be visiting","will have been visiting"]]
+];
+const G4=["This time next year, I'll be…","By the end of this school year, I'll have…","By 2030, I'll have been…","At 8 p.m. on Saturday, I'll be…","By the time I'm 30, I'll have…"];
+const V3=[
+ ["Xandar's capital is full of people, shops and traffic: it's a ___ city.",["bustling","quaint","medieval"]],
+ ["Knowhere looks old, dirty and broken. It's quite ___.",["shabby","picturesque","vibrant"]],
+ ["The planet's surface was covered in gentle green rolling ___.",["hills","zones","fields"]],
+ ["Spaceships aren't allowed in the old town. It's a pedestrian ___.",["zone","area","park"]],
+ ["Ships fly over the houses all night. The city has a serious problem with noise ___.",["pollution","traffic","parking"]],
+ ["The castle was built 800 years ago. It's ___.",["medieval","urban","vibrant"]],
+ ["The market was full of colour, music and life: the atmosphere was ___.",["vibrant","shabby","quaint"]],
+ ["We left the ship in an underground car ___ outside the city.",["park","zone","street"]],
+ ["The tiny old village with its little crooked houses was really ___.",["quaint","bustling","urban"]],
+ ["The view of the twin moons was so ___ that we took hundreds of photos.",["picturesque","shabby","short-tempered"]]
+];
+const VIDS=[
+ {id:"d96cjJhvlMA",t:"Official trailer",s:"Guardians of the Galaxy (2014)",c:"#FF8A1E",tasks:["<b>Before:</b> What makes someone an unlikely hero?","<b>While:</b> How is each character introduced? Note one personality word for each.","<b>After:</b> What had each of them done before they ended up in prison? Use the Past Perfect."]},
+ {id:"XC8qrH3Zwog",t:"Clip · 12 percent of a plan",s:"Guardians of the Galaxy (2014)",c:"#29D6C3",tasks:["<b>Before:</b> Would you follow a leader with only part of a plan?","<b>While:</b> Who wants to go ahead and who doesn't? Which personality words fit each of them?","<b>After:</b> Tell your partner about a plan that went wrong: <i>We had been planning it for weeks when…</i>"]},
+ {id:"NSJe0wIv718",t:"Clip · Prison break",s:"Guardians of the Galaxy (2014)",c:"#FF3E8A",tasks:["<b>Before:</b> How would you escape from a high-security prison in space?","<b>While:</b> Who thinks outside the box? Who is daring? Who is spontaneous?","<b>After:</b> Retell the escape using the Past Perfect and the Past Perfect Continuous."]},
+ {id:"D-Kv58mCH68",t:"Clip · Meeting Drax",s:"Guardians of the Galaxy (2014)",c:"#8B5CFF",tasks:["<b>Before:</b> What's more important: honesty or tact?","<b>While:</b> How does Drax speak? Is he tactful? Note his reactions.","<b>After:</b> Describe Drax in four words from Track 03."]},
+ {id:"u3V5KDHRQvk",t:"Official trailer · Vol. 3",s:"Guardians of the Galaxy Vol. 3 (2023)",c:"#FFD23F",tasks:["<b>Before:</b> This is the last film about this team. How do you think it ends?","<b>While:</b> Note the mood, the music and the colours. How is it different from the first trailer?","<b>After:</b> Predict with future forms: <i>By the end of the film, they will have… / Ten years later, Rocket will be…</i>"]},
+ {id:"RkdgGn3iY_c",t:"Interview · Chris Pratt & Zoe Saldana",s:"Guardians of the Galaxy Vol. 3",c:"#2E9C5A",tasks:["<b>Before:</b> What do you think actors find hardest about playing the same character for ten years?","<b>While:</b> Note three things they say about their characters or the team.","<b>After:</b> Report what they said: <i>Chris Pratt explained that…</i>"]},
+ {id:"PoWl_S2npAQ",t:"Interview · Karen Gillan & Pom Klementieff",s:"Guardians of the Galaxy Vol. 3",c:"#3A6AB0",tasks:["<b>Before:</b> Nebula and Mantis change a lot across the films. How do people change in real life?","<b>While:</b> Which personality words do they use about Nebula and Mantis?","<b>After:</b> Do you agree with them? Use Track 03 words to give your opinion."]},
+ {id:"w-5c7HothZg",t:"Interview · Pratt, Bautista & James Gunn",s:"Guardians of the Galaxy (2014)",c:"#B07A3A",tasks:["<b>Before:</b> What questions would you ask the cast of your favourite film?","<b>While:</b> Note one funny moment and one serious answer.","<b>After:</b> Write two questions you'd ask them now, ten years later."]}
+];
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id);
+const KEY="gotg-b2-v1";let st={};try{st=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function buildMC(id,data){const ol=$(id);
+  data.forEach(([s,opts])=>{const li=document.createElement('li');li.dataset.a=opts[0];const p=s.split('___');
+    li.innerHTML=`<span class="s">${p[0]}<span class="gap">?</span>${p[1]||''}</span><div class="opts"></div>`;const box=li.querySelector('.opts');
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');li.dataset.v=o;const g=li.querySelector('.gap');g.textContent=o;g.classList.remove('ok','no')});
+      box.appendChild(b)});ol.appendChild(li)})}
+[['g1',G1],['v1',V1],['v2',V2],['g2',G2],['g3',G3],['v3',V3]].forEach(([i,d])=>buildMC(i,d));
+document.querySelectorAll('[data-check]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.check;let ok=0,n=0;
+  $(id).querySelectorAll(':scope > li').forEach(li=>{n++;const g=li.dataset.v===li.dataset.a;if(g)ok++;
+    li.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===li.dataset.v)b.classList.add(g?'right':'wrong')});
+    const gp=li.querySelector('.gap');gp.classList.toggle('ok',g);gp.classList.toggle('no',!g)});
+  const m=$(id+'msg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'Awesome! All correct.':ok+' / '+n+' correct. Try the red ones again.'}));
+
+/* ============ HEROES with photo frames ============ */
+const cam='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function shrink(file,cb){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,800/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};im.src=fr.result};fr.readAsDataURL(file)}
+HEROES.forEach(h=>{const a=document.createElement('article');a.className='hc';
+  a.innerHTML=`<label class="frame" for="ph-${h.k}" style="--c1:${h.c[0]};--c2:${h.c[1]}"><input type="file" accept="image/*" id="ph-${h.k}"><span class="ph">${cam}Add a picture</span><span class="nm">${h.n}</span></label>
+    <div class="body">${h.r?`<span class="mono" style="color:var(--muted)">${h.r}</span>`:''}<p>${h.d}</p><div class="chips">${h.t.map(x=>`<span>${x}</span>`).join('')}</div></div>`;
+  const fr=a.querySelector('.frame'),inp=a.querySelector('input'),key='gotg-ph-'+h.k;
+  const rm=document.createElement('button');rm.type='button';rm.className='rm';rm.textContent='Remove';rm.hidden=true;fr.appendChild(rm);
+  const set=u=>{fr.style.backgroundImage=u?`url("${u}")`:'';fr.classList.toggle('has',!!u);rm.hidden=!u};
+  try{const u=localStorage.getItem(key);if(u)set(u)}catch(e){}
+  fr.addEventListener('click',e=>{if(fr.classList.contains('has')&&e.target!==rm)e.preventDefault()});
+  inp.addEventListener('change',()=>{const f=inp.files[0];if(!f)return;shrink(f,u=>{set(u);try{localStorage.setItem(key,u)}catch(e){}inp.value=''})});
+  rm.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();set(null);try{localStorage.removeItem(key)}catch(err){}});
+  fr.addEventListener('dragover',e=>e.preventDefault());
+  fr.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))shrink(f,u=>{set(u);try{localStorage.setItem(key,u)}catch(err){}})});
+  $('heroes').appendChild(a)});
+
+/* ============ PERSONALITY QUIZ ============ */
+PQ.forEach(([q,opts],i)=>{const fs=document.createElement('fieldset');fs.innerHTML=`<legend>${i+1}. ${q}</legend><div class="os">${shuffle(opts.map((o,k)=>[o,k])).map(([o,k])=>`<label><input type="radio" name="pq${i}" value="${k}"> ${o}</label>`).join('')}</div>`;$('pq').appendChild(fs)});
+$('pq').addEventListener('submit',e=>e.preventDefault());
+$('pqBtn').addEventListener('click',()=>{const score=[0,0,0,0,0,0];let n=0;PQ.forEach((_,i)=>{const r=document.querySelector(`input[name="pq${i}"]:checked`);if(r){score[+r.value]++;n++}});
+  const m=$('pqMsg');if(n<PQ.length){m.className='msg no';m.textContent='Answer all six questions first.';return}m.textContent='';
+  const best=score.indexOf(Math.max(...score));const [name,txt]=PRES[best];
+  $('pres').innerHTML=`<span class="lbl">Your result</span><h3>You're ${name}!</h3><p style="margin-top:6px">${txt}</p>`;$('pres').classList.add('on')});
+
+/* ============ VOCAB CARDS ============ */
+VOC.forEach(([title,list])=>{const g=document.createElement('div');g.className='vgroup';
+  g.innerHTML=`<h3>${title} · ${list.length}</h3><div class="vgrid">${list.map(([w,d])=>`<div class="vw"><b>${w}</b><span>${d}</span></div>`).join('')}</div>`;$('vocab').appendChild(g)});
+
+/* ============ VIDEO DECK ============ */
+const scr=$('screen');
+function loadVid(i,autoplay){const v=VIDS[i];
+  scr.innerHTML=`<button class="facade" type="button" style="--c1:${v.c}" aria-label="Play ${v.t}"><span class="pl"><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1A0B00"/></svg></span><span class="tt">${String(i+1).padStart(2,'0')} · ${v.t}</span></button>`;
+  const play=()=>{scr.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1" title="${v.t}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`};
+  scr.querySelector('.facade').addEventListener('click',play);if(autoplay)play();
+  $('vlink').innerHTML=`${v.s} · Doesn't play here? <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">Open it on YouTube</a>`;
+  $('vtasks').innerHTML=`<span class="lbl">Tasks · ${v.t}</span><ol style="margin-top:8px">${v.tasks.map(t=>`<li>${t}</li>`).join('')}</ol>`;
+  document.querySelectorAll('#playlist button').forEach((b,k)=>b.setAttribute('aria-current',k===i?'true':'false'));}
+VIDS.forEach((v,i)=>{const li=document.createElement('li');li.innerHTML=`<button type="button"><b>${String(i+1).padStart(2,'0')}</b><span>${v.t}</span><small>${v.s}</small></button>`;
+  li.querySelector('button').addEventListener('click',()=>loadVid(i,true));$('playlist').appendChild(li)});
+loadVid(0,false);
+
+/* ============ OPEN SENTENCES / HOMEWORK ============ */
+G4.forEach((p,i)=>{const li=document.createElement('li');li.innerHTML=`<label for="o${i}">${p}</label><input id="o${i}" autocomplete="off">`;const inp=li.querySelector('input');if(st['o'+i])inp.value=st['o'+i];inp.addEventListener('input',()=>{st['o'+i]=inp.value;save()});$('g4').appendChild(li)});
+['hw1','hw2','hw3'].forEach(id=>{const c=$(id);c.checked=!!st[id];c.addEventListener('change',()=>{st[id]=c.checked;save()})});
+
+/* ============ STARFIELD ============ */
+(function(){const cv=$('stars'),cx=cv.getContext('2d');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let W,H,S=[];
+  function rs(){const d=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+    S=Array.from({length:Math.round(W*H/5000)},()=>({x:Math.random()*W,y:Math.random()*H,z:Math.random()*.9+.1,c:['#F5EEDC','#29D6C3','#FF3E8A','#FFD23F'][Math.random()<.85?0:1+Math.floor(Math.random()*3)]}))}
+  rs();addEventListener('resize',rs);
+  function draw(){cx.clearRect(0,0,W,H);
+    const g=cx.createRadialGradient(W*.8,H*.2,0,W*.8,H*.2,Math.max(W,H)*.7);g.addColorStop(0,'rgba(139,92,255,.16)');g.addColorStop(.5,'rgba(255,62,138,.05)');g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+    S.forEach(s=>{if(!reduce){s.x-=s.z*.35;if(s.x<0){s.x=W;s.y=Math.random()*H}}cx.globalAlpha=.35+s.z*.6;cx.fillStyle=s.c;cx.fillRect(s.x,s.y,s.z*2,s.z*2)});cx.globalAlpha=1;
+    if(!reduce)requestAnimationFrame(draw)}
+  draw()})();
+</script>
+
+</body>
+</html>
