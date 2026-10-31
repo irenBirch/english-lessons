@@ -210,6 +210,7 @@ footer{padding-block:70px 46px;color:var(--muted);font-size:.86rem}
     <div class="kicker">The secret word</div>
     <div class="slots" id="slots"></div>
     <p id="lockMsg">0 of 5 letters found</p>
+    <button class="btn ghost" type="button" id="restart" style="margin-top:14px">Start again</button>
   </div>
 </header>
 
@@ -224,6 +225,7 @@ footer{padding-block:70px 46px;color:var(--muted);font-size:.86rem}
     <a href="#door" class="final"><span class="d"></span>The last door</a>
     <a href="#quiz" class="final"><span class="d"></span>Pumpkin Quiz</a>
     <a href="#trick" class="final"><span class="d"></span>Trick or treat</a>
+    <a href="#top" id="restart2" style="color:var(--blood)"><span class="d"></span>Start again</a>
   </div>
 </nav>
 
@@ -549,6 +551,16 @@ function frame(){tt+=.016;cx.clearRect(0,0,W,H);
   flock=flock.filter(b=>b.x<W+60);flock.forEach(b=>{b.x+=b.v;b.y+=b.dy+Math.sin(tt*3+b.f)*.6;b.f+=.35;bat(b.x,b.y,b.s,b.f)});
   if(!reduce&&Math.random()<.003)bats(1+Math.floor(Math.random()*3));
   if(!reduce)requestAnimationFrame(frame)}
+/* ============ START AGAIN ============ */
+(function(){let armed=null;
+  function ask(btn,label){if(armed===btn){
+      try{localStorage.removeItem(KEY)}catch(e){}
+      location.hash='';location.reload();return}
+    armed=btn;const old=label;btn.textContent='Sure? Click again to restart';
+    setTimeout(()=>{if(armed===btn){armed=null;btn.textContent=old}},4000)}
+  $('restart').addEventListener('click',()=>ask($('restart'),'Start again'));
+  $('restart2').addEventListener('click',e=>{e.preventDefault();ask($('restart2'),'Start again')});
+})();
 frame();bats(6);paint();
 </script>
 
