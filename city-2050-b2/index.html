@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>City 2050</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: a city planner's studio in 2050. Hero = an original illustrated skyline (green towers, drones) that switches day/night with the theme; sections are "blocks" on the city map; the listening is a podcast player; the finale is a buildable city grid. */
+:root{
+  --sky:#E9F3F2; --card:#FFFFFF; --ink:#10222B; --muted:#4F6670; --rule:rgba(16,34,43,.12); --tint:#DDEDEA;
+  --coral:#FF6B4A; --green:#22A565; --sun:#FFC23C; --blue:#2F7FE0; --violet:#7A5AF8;
+  --bld:#2D4A57; --bld2:#3E6472; --win:#FFE59A; --hill:#BFE3D2;
+  --ok:#1E9A5C; --bad:#D64A33;
+  --f-d:"Syne","Arial Black",system-ui,sans-serif; --f-b:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-m:"Space Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --sky:#0C1A22; --card:#13252F; --ink:#E8F2F1; --muted:#9DB4BC; --rule:rgba(232,242,241,.12); --tint:#1B3340;
+  --coral:#FF8466; --green:#3CCB83; --sun:#FFD15C; --blue:#6EA8F5; --violet:#A28BFF;
+  --bld:#1E3A47; --bld2:#28505F; --win:#FFD15C; --hill:#174034;
+  --ok:#3CCB83; --bad:#FF7A61; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#0C1A22; --card:#13252F; --ink:#E8F2F1; --muted:#9DB4BC; --rule:rgba(232,242,241,.12); --tint:#1B3340;
+  --coral:#FF8466; --green:#3CCB83; --sun:#FFD15C; --blue:#6EA8F5; --violet:#A28BFF;
+  --bld:#1E3A47; --bld2:#28505F; --win:#FFD15C; --hill:#174034;
+  --ok:#3CCB83; --bad:#FF7A61; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-b);font-size:17.5px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--sky)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-d);font-weight:800;line-height:1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h3{margin:0;font-weight:800;font-size:1.12rem}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+.m{font-family:var(--f-m);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* hero */
+.hero{padding-block:46px 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:end}
+.hero .m{color:var(--coral)}
+.hero h1{font-size:clamp(3.4rem,10vw,7rem);margin-top:8px}
+.hero h1 span{color:var(--green)}
+.hero .lede{margin-top:14px;max-width:52ch;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 28px}
+.tag{font-weight:800;font-size:.8rem;padding:5px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--card)}
+.tag.hot{background:var(--coral);color:#fff;border-color:var(--coral)}
+.skyline{width:100%;height:auto;display:block}
+@media (prefers-reduced-motion:no-preference){
+  .drone{animation:fly 9s ease-in-out infinite}.drone.d2{animation-duration:12s;animation-delay:-4s}
+  @keyframes fly{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-12px)}}
+  .blink{animation:bl 3s steps(2) infinite}@keyframes bl{50%{opacity:.35}}
+}
+.ground{height:18px;background:var(--green)}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--card);border-bottom:1px solid var(--rule)}
+.nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:9px;scrollbar-width:none}
+.nav a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-weight:800;font-size:.86rem;padding:6px 11px;border-radius:8px}
+.nav a b{font-family:var(--f-m);color:var(--coral);margin-right:5px}
+.nav a:hover{background:var(--tint);color:var(--ink)}
+
+/* blocks */
+section.blk{padding-block:64px 6px;scroll-margin-top:60px}
+.bh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:24px}
+.pin{width:58px;height:58px;border-radius:16px 16px 16px 4px;display:grid;place-items:center;font-family:var(--f-d);font-size:1.6rem;color:#fff;background:var(--c,var(--blue))}
+.bh h2{font-size:clamp(2rem,5vw,3rem)}
+.bh p{color:var(--muted);margin-top:6px;max-width:70ch}
+.time{font-family:var(--f-m);font-size:.82rem;color:var(--muted);white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:20px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lbl{font-family:var(--f-m);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);font-weight:700}
+.q-list{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;font-weight:800;padding:10px 20px;border-radius:999px;background:var(--ink);color:var(--sky)}
+.btn.c{background:var(--coral);color:#fff}
+.btn.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--rule)}
+.msg{font-weight:800}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.ua{font-size:.9rem;color:var(--muted);border-left:3px solid var(--sun);padding-left:10px}
+
+/* warm-up pairs */
+.pairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;counter-reset:pp}
+.pair{counter-increment:pp;background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.pair::before{content:"In ten years' time… " counter(pp);font-family:var(--f-m);font-size:.72rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.pair button{border:1.5px solid var(--rule);background:var(--sky);border-radius:12px;padding:9px 12px;text-align:left;cursor:pointer;font-weight:700}
+.pair button[aria-pressed="true"]{border-color:var(--green);background:color-mix(in srgb,var(--green) 14%,var(--card))}
+.pair button em{font-style:normal;color:var(--blue)}
+
+/* vocab cards */
+.vcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.vc{background:var(--card);border:1px solid var(--rule);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.vc .art{background:var(--tint);aspect-ratio:4/3;display:grid;place-items:center;max-width:100%}
+.vc .art svg{width:82%;height:auto}
+.vc .body{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.vc b{font-family:var(--f-d);font-size:1.05rem}
+.vc span{font-size:.86rem;color:var(--muted)}
+.vc .say{align-self:flex-start;border:0;background:var(--tint);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:800;cursor:pointer;margin-top:4px}
+.review{display:flex;flex-wrap:wrap;gap:6px}
+.review span{font-size:.86rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--tint)}
+
+/* mc */
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;counter-reset:it}
+.items>li{counter-increment:it;display:flex;flex-direction:column;gap:8px}
+.items .s::before{content:counter(it) ". ";font-family:var(--f-m);font-size:.8rem;color:var(--muted)}
+.gap{display:inline-block;min-width:5.5em;border-bottom:2px dashed var(--blue);text-align:center;color:var(--blue);padding:0 4px;font-weight:800}
+.gap.ok{border-color:var(--ok);color:var(--ok);border-bottom-style:solid}.gap.no{border-color:var(--bad);color:var(--bad)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--rule);background:var(--sky);border-radius:10px;padding:6px 13px;cursor:pointer;font-weight:700}
+.opt[aria-pressed="true"]{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,var(--card))}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--card))}.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--card))}
+
+/* listening */
+.pod{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.deck{background:var(--ink);color:var(--sky);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.deck .ttl{font-family:var(--f-d);font-size:1.6rem;line-height:1.05}
+.deck .who{display:flex;gap:10px;flex-wrap:wrap}
+.deck .who span{font-size:.82rem;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1)}
+.wave{display:flex;align-items:center;gap:3px;height:46px}
+.wave i{flex:1;background:var(--sun);border-radius:2px;height:20%;opacity:.5;transition:height .15s}
+.deck.on .wave i{opacity:1}
+.ctrls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ctrls .btn{background:var(--sun);color:#1A1400}
+.ctrls .btn.alt{background:transparent;color:var(--sky);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+.ctrls label{font-size:.82rem;display:flex;gap:6px;align-items:center}
+.ctrls select{background:transparent;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:3px 6px;color:var(--sky)}
+.ctrls select option{color:#10222B}
+.now{font-size:.9rem;min-height:2.8em;color:#CFE3E1}
+.tick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tick label{display:flex;gap:9px;align-items:center;padding:8px 10px;border-radius:10px;border:1.5px solid var(--rule);cursor:pointer;font-weight:700}
+.tick input{width:17px;height:17px;accent-color:var(--green)}
+.tick label.ok{border-color:var(--ok)}.tick label.no{border-color:var(--bad)}
+.tfng{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tfng li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;background:var(--sky);border:1.5px solid transparent}
+.tfng li.ok{border-color:var(--ok)}.tfng li.no{border-color:var(--bad)}
+.tog{display:flex;border:1.5px solid var(--rule);border-radius:9px;overflow:hidden}
+.tog button{border:0;background:var(--card);padding:4px 11px;cursor:pointer;font-family:var(--f-m);font-weight:700;font-size:.8rem}
+.tog button+button{border-left:1.5px solid var(--rule)}
+.tog button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.script{display:flex;flex-direction:column;gap:10px}
+.script p{padding:8px 12px;border-radius:10px;cursor:pointer}
+.script p b{color:var(--coral)}
+.script p.cur{background:color-mix(in srgb,var(--sun) 28%,transparent)}
+.script mark{background:color-mix(in srgb,var(--green) 26%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.script u{text-decoration:none;border-bottom:2px solid var(--violet)}
+
+/* grammar */
+.fut{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.fut>div{border-radius:18px;padding:16px;background:var(--card);border:1px solid var(--rule);border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px}
+.fut h3{font-family:var(--f-d);font-size:1.3rem;color:var(--c)}
+.fut .f{font-family:var(--f-m);font-size:.86rem;background:var(--sky);border-radius:8px;padding:6px 10px}
+.fut em{font-style:normal;font-weight:800}
+.fut small{color:var(--muted)}
+.tex{display:flex;flex-wrap:wrap;gap:6px}
+.tex span{font-family:var(--f-m);font-size:.8rem;padding:4px 9px;border-radius:7px;background:var(--tint)}
+.story{line-height:2.3;font-size:1.04rem}
+.story input{background:var(--sky);border:0;border-bottom:2px solid var(--muted);border-radius:6px 6px 0 0;padding:0 8px;width:12.5em;max-width:100%;font-weight:800;height:1.9em}
+.story input.ok{border-bottom-color:var(--ok);color:var(--ok)}.story input.no{border-bottom-color:var(--bad);color:var(--bad)}
+.story i{font-style:normal;color:var(--muted);font-size:.9em}
+.story .fix{font-family:var(--f-m);font-size:.78rem;color:var(--ok)}
+.polite{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;counter-reset:pq}
+.polite li{counter-increment:pq;background:var(--sky);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.polite li>span::before{content:counter(pq) ". ";font-family:var(--f-m);color:var(--muted)}
+.polite input{background:var(--card);border:1.5px solid var(--rule);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
+.polite .model{font-weight:800;color:var(--ok)}
+
+/* city builder */
+.builder{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+.palette{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.palette button{border:1.5px solid var(--rule);background:var(--card);border-radius:12px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.74rem;font-weight:800;text-align:center;line-height:1.15}
+.palette button svg{width:38px;height:38px}
+.palette button[aria-pressed="true"]{border-color:var(--coral);box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 25%,transparent)}
+.map{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;background:var(--hill);padding:8px;border-radius:16px}
+.tile{aspect-ratio:1;max-width:100%;border:0;border-radius:8px;background:color-mix(in srgb,var(--card) 70%,var(--hill));cursor:pointer;display:grid;place-items:center;padding:2px}
+.tile svg{width:100%;height:100%}
+.tile:hover{outline:2px solid var(--coral)}
+.counts{display:flex;flex-wrap:wrap;gap:6px}
+.counts span{font-size:.8rem;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--tint)}
+.gen{display:flex;flex-direction:column;gap:6px;font-weight:700}
+.gen p{padding:8px 12px;border-radius:10px;background:var(--sky)}
+
+footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
+
+@media (max-width:980px){.vcards{grid-template-columns:repeat(2,minmax(0,1fr))}.fut{grid-template-columns:minmax(0,1fr)}.builder{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .grid2,.pod,.pairs{grid-template-columns:minmax(0,1fr)}
+  .bh{grid-template-columns:auto minmax(0,1fr)}.bh .time{grid-column:2}
+  .tick{grid-template-columns:minmax(0,1fr)}
+  .card{padding:16px}
+}
+@media (max-width:440px){.vcards{grid-template-columns:minmax(0,1fr)}.palette{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+
+</head>
+<body>
+<header class="wrap hero" id="top">
+  <div>
+    <div class="m">Focus 4 · Unit 3 Living spaces · B2 · 90 min</div>
+    <h1>City <span>2050</span></h1>
+    <p class="lede">Where will you be living in 2050? A lesson about the homes and cities of the future: Future Continuous, Future Perfect and Future Perfect Continuous, new living-space collocations, a podcast to listen to and a city you build yourself.</p>
+    <div class="tags"><span class="tag hot">B2</span><span class="tag">3 future forms</span><span class="tag">Listening</span><span class="tag">City builder</span></div>
+  </div>
+  <svg class="skyline" viewBox="0 0 640 330" role="img" aria-label="An illustrated city of the future with green tower blocks, a multi-storey car park turned into a garden, houses in a residential area and delivery drones">
+    <circle cx="540" cy="70" r="38" fill="var(--sun)"/>
+    <path d="M0 270 Q120 220 240 260 T480 250 T640 255 V330 H0Z" fill="var(--hill)"/>
+    <g class="drone"><rect x="150" y="52" width="26" height="6" rx="3" fill="var(--ink)"/><path d="M146 50 h10 M170 50 h10" stroke="var(--ink)" stroke-width="3"/><rect x="157" y="58" width="12" height="9" rx="2" fill="var(--coral)"/></g>
+    <g class="drone d2"><rect x="380" y="34" width="22" height="5" rx="3" fill="var(--ink)"/><path d="M376 32 h9 M397 32 h9" stroke="var(--ink)" stroke-width="3"/><rect x="386" y="39" width="10" height="8" rx="2" fill="var(--blue)"/></g>
+    <rect x="60" y="120" width="70" height="190" rx="6" fill="var(--bld)"/>
+    <g fill="var(--green)"><circle cx="72" cy="128" r="10"/><circle cx="92" cy="122" r="12"/><circle cx="116" cy="128" r="10"/></g>
+    <g fill="var(--win)"><rect x="72" y="150" width="12" height="12" rx="2"/><rect x="104" y="150" width="12" height="12" rx="2" class="blink"/><rect x="72" y="180" width="12" height="12" rx="2"/><rect x="104" y="180" width="12" height="12" rx="2"/><rect x="72" y="210" width="12" height="12" rx="2" class="blink"/><rect x="104" y="210" width="12" height="12" rx="2"/><rect x="72" y="240" width="12" height="12" rx="2"/><rect x="104" y="240" width="12" height="12" rx="2"/></g>
+    <path d="M150 310 V90 L190 60 L230 90 V310Z" fill="var(--bld2)"/>
+    <g fill="var(--green)"><rect x="150" y="130" width="80" height="8"/><rect x="150" y="190" width="80" height="8"/><rect x="150" y="250" width="80" height="8"/></g>
+    <g fill="var(--win)"><rect x="164" y="100" width="10" height="16" rx="2"/><rect x="186" y="100" width="10" height="16" rx="2" class="blink"/><rect x="208" y="100" width="10" height="16" rx="2"/><rect x="164" y="152" width="10" height="16" rx="2"/><rect x="186" y="152" width="10" height="16" rx="2"/><rect x="208" y="152" width="10" height="16" rx="2" class="blink"/><rect x="164" y="212" width="10" height="16" rx="2"/><rect x="186" y="212" width="10" height="16" rx="2"/><rect x="208" y="212" width="10" height="16" rx="2"/></g>
+    <rect x="250" y="190" width="110" height="120" rx="4" fill="var(--bld)"/>
+    <g fill="var(--sky)" opacity=".85"><rect x="258" y="202" width="94" height="18"/><rect x="258" y="232" width="94" height="18"/><rect x="258" y="262" width="94" height="18"/></g>
+    <g fill="var(--green)"><circle cx="270" cy="216" r="7"/><circle cx="290" cy="214" r="9"/><circle cx="330" cy="216" r="7"/><circle cx="280" cy="246" r="8"/><circle cx="320" cy="244" r="9"/><circle cx="300" cy="276" r="8"/></g>
+    <text x="305" y="300" text-anchor="middle" font-family="Space Mono,monospace" font-size="10" fill="var(--sun)">P → PARK</text>
+    <path d="M380 310 V140 Q380 120 400 120 H440 Q460 120 460 140 V310Z" fill="var(--bld2)"/>
+    <g fill="var(--win)"><rect x="392" y="140" width="56" height="8" rx="3"/><rect x="392" y="170" width="56" height="8" rx="3" class="blink"/><rect x="392" y="200" width="56" height="8" rx="3"/><rect x="392" y="230" width="56" height="8" rx="3"/><rect x="392" y="260" width="56" height="8" rx="3"/></g>
+    <g><path d="M480 310 V262 L505 242 L530 262 V310Z" fill="var(--coral)"/><path d="M540 310 V266 L562 248 L584 266 V310Z" fill="var(--sun)"/><path d="M594 310 V262 L616 244 L638 262 V310Z" fill="var(--blue)"/>
+      <g fill="var(--sky)"><rect x="498" y="280" width="14" height="14"/><rect x="555" y="282" width="14" height="14"/><rect x="609" y="280" width="14" height="14"/></g></g>
+    <g fill="var(--green)"><circle cx="472" cy="300" r="12"/><circle cx="536" cy="304" r="9"/><circle cx="590" cy="304" r="9"/></g>
+    <rect x="0" y="310" width="640" height="20" fill="var(--green)"/>
+  </svg>
+</header>
+<div class="ground" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Lesson blocks">
+  <div class="wrap">
+    <a href="#b1"><b>01</b>Warm-up</a><a href="#b2"><b>02</b>Living spaces</a><a href="#b3"><b>03</b>Listening</a><a href="#b4"><b>04</b>Future forms</a><a href="#b5"><b>05</b>Practice</a><a href="#b6"><b>06</b>Build your city</a><a href="#b7"><b>07</b>Speaking &amp; homework</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section class="blk" id="b1">
+  <div class="bh"><div class="pin" style="--c:var(--coral)">01</div><div><h2>Warm-up: your future self</h2><p>For each pair, choose the sentence that's more likely to be true for you. Then explain your choice to a partner.</p></div><span class="time">8 min</span></div>
+  <div class="pairs" id="pairs"></div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Would you rather…</span>
+    <ol class="q-list">
+      <li>…live on the 40th floor of a tower block in the city centre, or in a quiet house in a residential area?</li>
+      <li>…share a big flat with friends, or live alone in a small self-contained flat?</li>
+      <li>…have a robot that does all your domestic chores, or a garden where you grow your own food?</li>
+      <li>…have a second home by the sea, or one in the mountains?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="blk" id="b2">
+  <div class="bh"><div class="pin" style="--c:var(--green)">02</div><div><h2>Living spaces</h2><p>Eight collocations from Focus 4. Look at the pictures, press <b>Listen</b> to hear each one, then do the exercise. You'll hear all of them in the podcast.</p></div><span class="time">12 min</span></div>
+  <div class="vcards" id="vcards"></div>
+  <div class="card stack" style="margin-top:16px">
+    <span class="lbl">Review · places words from earlier lessons</span>
+    <div class="review"><span>bustling</span><span>vibrant</span><span>quaint</span><span>picturesque</span><span>shabby</span><span>urban</span><span>medieval</span><span>rolling hills</span><span>pedestrian zone</span><span>on-street parking</span><span>underground car park</span><span>noise pollution</span></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card"><span class="lbl">Exercise 1 · Complete the collocations</span><ol class="items" id="v1" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v1">Check</button><span class="msg" id="v1msg"></span></div></div>
+    <div class="card"><span class="lbl">Exercise 2 · Old words, new city</span><ol class="items" id="v2" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v2">Check</button><span class="msg" id="v2msg"></span></div></div>
+  </div>
+</section>
+
+<section class="blk" id="b3">
+  <div class="bh"><div class="pin" style="--c:var(--violet)">03</div><div><h2>Listening: the Future Homes podcast</h2><p>Leo, 14, interviews Dr Amara Reed, an urban planner, about the homes we'll be living in. Listen twice: first for the words, then for the details.</p></div><span class="time">15 min</span></div>
+  <div class="pod">
+    <div class="stack">
+      <div class="deck" id="deck">
+        <span class="m" style="color:var(--sun)">Episode 12 · Future Homes</span>
+        <span class="ttl">“Where will we be living in 2050?”</span>
+        <div class="who"><span>Leo · host</span><span>Dr Amara Reed · urban planner</span></div>
+        <div class="wave" id="wave" aria-hidden="true"></div>
+        <p class="now" id="now" aria-live="polite">Press Play to listen.</p>
+        <div class="ctrls">
+          <button class="btn" type="button" id="play">Play</button>
+          <button class="btn alt" type="button" id="stop">Stop</button>
+          <label for="rate">Speed <select id="rate"><option value="0.8">slow</option><option value="0.95" selected>normal</option><option value="1.1">fast</option></select></label>
+        </div>
+      </div>
+      <p class="ua" id="ttsNote">The audio is read by your browser's built-in voices. If you can't hear anything, check the volume or open the page in Chrome, Edge or Safari.</p>
+      <div class="card stack">
+        <span class="lbl">Before you listen</span>
+        <ol class="q-list"><li>What do you think homes will look like in 2050? Bigger or smaller? Higher or lower?</li><li>Which domestic chores would you love a robot to do for you?</li></ol>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card stack">
+        <span class="lbl">Task 1 · Tick the phrases you hear</span>
+        <div class="tick" id="tick"></div>
+        <div class="row"><button class="btn" type="button" id="tickCheck">Check</button><span class="msg" id="tickMsg"></span></div>
+      </div>
+      <div class="card stack">
+        <span class="lbl">Task 2 · True or false?</span>
+        <ul class="tfng" id="tf"></ul>
+        <div class="row"><button class="btn" type="button" id="tfCheck">Check</button><span class="msg" id="tfMsg"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <div class="row" style="justify-content:space-between"><span class="lbl">Task 3 · The transcript</span><button class="btn alt" type="button" id="showScript">Show the transcript</button></div>
+    <div class="script" id="script" hidden></div>
+    <p class="ua">After listening: find every future form in the transcript (underlined) and say which of the three it is. Click a line to hear it again.</p>
+  </div>
+</section>
+
+<section class="blk" id="b4">
+  <div class="bh"><div class="pin" style="--c:var(--blue)">04</div><div><h2>Future forms</h2><p>Three ways to look at the future from a fixed point in time.</p></div><span class="time">15 min</span></div>
+  <div class="fut">
+    <div style="--c:var(--blue)"><h3>Future Continuous</h3><span class="f">will be + -ing</span>
+      <p>1. An action <b>in progress</b> at a time in the future.<br><em>This time next year, we'll be living in a tower block.</em></p>
+      <p>2. Planned or routine future events.<br><em>I'll be going to the shops after school anyway.</em></p>
+      <p>3. <b>Polite questions</b> about plans.<br><em>Will you be using the car tomorrow?</em></p></div>
+    <div style="--c:var(--coral)"><h3>Future Perfect Simple</h3><span class="f">will have + V3</span>
+      <p>An action that will be <b>completed before</b> a certain time in the future.</p>
+      <p><em>By 2030, the city will have closed the old car parks.</em></p>
+      <p><em>They won't have finished the housing development by June.</em></p></div>
+    <div style="--c:var(--green)"><h3>Future Perfect Continuous</h3><span class="f">will have been + -ing</span>
+      <p><b>How long</b> an action will have been in progress before a certain time in the future.</p>
+      <p><em>By next summer, we'll have been living here for ten years.</em></p>
+      <p><em>How long will you have been studying English by then?</em></p></div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Time expressions</span>
+    <div class="tex"><span>this time tomorrow / next week</span><span>at 6 p.m. tomorrow</span><span>by 2030 / next month / next year</span><span>by then</span><span>by the time…</span><span>in two days' / ten years' time</span><span>for ten years (with Future Perfect Continuous)</span></div>
+    <p class="ua">Після <b>by the time</b> вживаємо Present Simple, а не will: <i>By the time I <b>finish</b> school, they'll have built the new metro.</i> Ввічливе питання: <i>Will you be staying in tonight?</i> звучить м'якше, ніж <i>Are you going to stay in tonight?</i></p>
+  </div>
+</section>
+
+<section class="blk" id="b5">
+  <div class="bh"><div class="pin" style="--c:var(--sun)">05</div><div><h2>Practice</h2><p>Choose, write and make it polite.</p></div><span class="time">20 min</span></div>
+  <div class="grid2">
+    <div class="card"><span class="lbl">Exercise 3 · Choose the correct form</span><ol class="items" id="g1" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="g1">Check</button><span class="msg" id="g1msg"></span></div></div>
+    <div class="card stack"><span class="lbl">Exercise 4 · The big move</span>
+      <p class="ua" style="margin:0">Complete the story with the Future Continuous, Future Perfect Simple or Future Perfect Continuous.</p>
+      <div class="story" id="story"></div>
+      <div class="row"><button class="btn" type="button" id="storyCheck">Check</button><span class="msg" id="storyMsg"></span></div>
+      <p class="ua">Would you like to move into a tower block like the Kovalenkos? Why or why not?</p></div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Exercise 5 · Make it polite</span>
+    <p>Rewrite the questions with the Future Continuous to make them more polite. Then ask and answer them with a partner.</p>
+    <ol class="polite" id="polite"></ol>
+  </div>
+</section>
+
+<section class="blk" id="b6">
+  <div class="bh"><div class="pin" style="--c:var(--coral)">06</div><div><h2>Build your city</h2><p>You're the city planner. Choose a building, then click on the map to place it. When you're happy, present your city of 2050 using all three future forms.</p></div><span class="time">12 min</span></div>
+  <div class="builder">
+    <div class="stack">
+      <div class="map" id="map" aria-label="City map, 8 by 6 tiles"></div>
+      <div class="row"><button class="btn alt" type="button" id="clearMap">Clear the map</button><button class="btn alt" type="button" id="randMap">Surprise me</button></div>
+    </div>
+    <div class="stack">
+      <div class="card stack"><span class="lbl">Buildings</span><div class="palette" id="palette"></div></div>
+      <div class="card stack"><span class="lbl">Your city in numbers</span><div class="counts" id="counts"></div><div class="gen" id="gen"></div>
+        <p class="ua">Now continue in your own words: what will people be doing there? What will the city have achieved by 2050? How long will you have been living there?</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="b7">
+  <div class="bh"><div class="pin" style="--c:var(--violet)">07</div><div><h2>Speaking &amp; homework</h2><p>Debate the city of the future, then write about your life in it.</p></div><span class="time">8 min</span></div>
+  <div class="grid2">
+    <div class="card stack"><span class="lbl">Debate</span>
+      <ol class="q-list">
+        <li>Tower blocks or houses: which is better for families? For teenagers?</li>
+        <li>Should all cars be banned from city centres by 2040?</li>
+        <li>Is it fair that some people have a second home while others can't afford one?</li>
+        <li>Robots will be doing our domestic chores. Will that make us lazier, or give us more time for better things?</li>
+      </ol></div>
+    <div class="card stack"><span class="lbl">Homework</span>
+      <h3>A blog post from 2040</h3>
+      <p>It's 2040. Write a blog post (150–180 words) about your home and your city: where you'll be living, what you'll have done by then, and how long you'll have been living there.</p>
+      <ul class="q-list" style="list-style:square"><li>all three future forms</li><li>at least 5 living-space collocations</li><li>2 words from the places list</li><li>one polite question to your readers</li></ul></div>
+  </div>
+</section>
+</main>
+<footer class="wrap">English B2 lesson for Focus 4, Unit 3 “Living spaces”. All texts, the podcast and the illustrations were made for this lesson. The podcast is read aloud by your browser's voices.</footer>
+
+<script>
+/* ============ ICONS (original illustrations) ============ */
+const IC={
+ chore:`<svg viewBox="0 0 120 90"><rect x="18" y="58" width="34" height="26" rx="4" fill="var(--blue)"/><path d="M18 58 h34" stroke="var(--ink)" stroke-width="3"/><path d="M70 12 L60 70" stroke="var(--bld2)" stroke-width="5" stroke-linecap="round"/><path d="M48 70 h26 l4 14 h-34z" fill="var(--sun)"/><g fill="var(--sky)"><circle cx="34" cy="52" r="5"/><circle cx="44" cy="48" r="4"/><circle cx="26" cy="47" r="3"/></g><path d="M86 76 q6 -6 12 0 q6 -6 12 0" stroke="var(--blue)" stroke-width="3" fill="none"/></svg>`,
+ appliance:`<svg viewBox="0 0 120 90"><rect x="34" y="8" width="52" height="76" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/><path d="M34 24 h52" stroke="var(--ink)" stroke-width="3"/><circle cx="44" cy="16" r="3" fill="var(--coral)"/><circle cx="54" cy="16" r="3" fill="var(--green)"/><circle cx="60" cy="54" r="20" fill="var(--blue)" opacity=".35" stroke="var(--ink)" stroke-width="3"/><path d="M48 56 q6 -8 12 0 q6 8 12 0" stroke="var(--ink)" stroke-width="2.5" fill="none"/><path d="M92 14 q8 6 0 12 M98 10 q12 9 0 20" stroke="var(--coral)" stroke-width="2.5" fill="none"/></svg>`,
+ development:`<svg viewBox="0 0 120 90"><path d="M8 84 h104" stroke="var(--ink)" stroke-width="3"/><g fill="var(--coral)"><path d="M14 84 v-22 l12 -10 l12 10 v22z"/></g><g fill="var(--sun)"><path d="M42 84 v-22 l12 -10 l12 10 v22z"/></g><path d="M70 84 v-22 l12 -10 l12 10 v22z" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 3"/><path d="M100 84 V14 M100 18 H66 M74 18 v14" stroke="var(--ink)" stroke-width="3"/><rect x="70" y="32" width="8" height="6" fill="var(--sun)"/></svg>`,
+ carpark:`<svg viewBox="0 0 120 90"><rect x="16" y="10" width="88" height="74" rx="4" fill="var(--bld)"/><g fill="var(--tint)"><rect x="22" y="18" width="76" height="14"/><rect x="22" y="40" width="76" height="14"/><rect x="22" y="62" width="76" height="14"/></g><g><rect x="28" y="22" width="16" height="9" rx="3" fill="var(--coral)"/><rect x="64" y="44" width="16" height="9" rx="3" fill="var(--blue)"/><rect x="40" y="66" width="16" height="9" rx="3" fill="var(--sun)"/><rect x="76" y="22" width="16" height="9" rx="3" fill="var(--green)"/></g><circle cx="104" cy="12" r="10" fill="var(--blue)"/><text x="104" y="16" text-anchor="middle" font-family="Space Mono,monospace" font-weight="700" font-size="12" fill="#fff">P</text></svg>`,
+ residential:`<svg viewBox="0 0 120 90"><path d="M4 84 h112" stroke="var(--green)" stroke-width="5"/><path d="M14 84 v-26 l16 -14 l16 14 v26z" fill="var(--coral)"/><path d="M54 84 v-30 l18 -16 l18 16 v30z" fill="var(--sun)"/><g fill="var(--card)"><rect x="24" y="64" width="10" height="10"/><rect x="66" y="60" width="12" height="12"/></g><g fill="var(--green)"><circle cx="102" cy="64" r="12"/><circle cx="48" cy="74" r="7"/></g><path d="M102 76 v8" stroke="var(--bld2)" stroke-width="4"/></svg>`,
+ second:`<svg viewBox="0 0 120 90"><path d="M0 84 L34 30 L58 60 L80 26 L120 84Z" fill="var(--bld2)"/><path d="M80 26 L72 38 L80 34 L88 38Z" fill="var(--card)"/><path d="M40 84 v-18 l14 -12 l14 12 v18z" fill="var(--coral)"/><rect x="50" y="70" width="8" height="14" fill="var(--ink)"/><circle cx="98" cy="20" r="8" fill="var(--sun)"/></svg>`,
+ selfcontained:`<svg viewBox="0 0 120 90"><rect x="12" y="10" width="96" height="72" rx="4" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/><path d="M60 10 v40 M12 50 h60 M84 50 v32" stroke="var(--ink)" stroke-width="3"/><rect x="18" y="16" width="22" height="14" rx="3" fill="var(--blue)"/><rect x="66" y="16" width="36" height="8" rx="2" fill="var(--sun)"/><circle cx="96" cy="66" r="7" fill="var(--blue)" opacity=".5"/><rect x="20" y="58" width="24" height="16" rx="3" fill="var(--coral)"/><text x="36" y="44" font-family="Space Mono,monospace" font-size="8" fill="var(--muted)">BED</text><text x="70" y="44" font-family="Space Mono,monospace" font-size="8" fill="var(--muted)">KITCHEN</text><text x="88" y="78" font-family="Space Mono,monospace" font-size="7" fill="var(--muted)">BATH</text></svg>`,
+ tower:`<svg viewBox="0 0 120 90"><rect x="40" y="4" width="40" height="82" rx="3" fill="var(--bld)"/><g fill="var(--win)">${Array.from({length:7},(_,r)=>`<rect x="46" y="${10+r*11}" width="8" height="6" rx="1"/><rect x="66" y="${10+r*11}" width="8" height="6" rx="1"/>`).join('')}</g><rect x="18" y="40" width="20" height="46" fill="var(--bld2)"/><rect x="82" y="30" width="22" height="56" fill="var(--bld2)"/></svg>`,
+ park:`<svg viewBox="0 0 120 90"><rect x="6" y="20" width="108" height="64" rx="10" fill="var(--hill)"/><g fill="var(--green)"><circle cx="34" cy="46" r="14"/><circle cx="80" cy="40" r="16"/><circle cx="60" cy="66" r="10"/></g><path d="M8 74 Q60 50 112 74" stroke="var(--sun)" stroke-width="4" fill="none"/></svg>`,
+ pedestrian:`<svg viewBox="0 0 120 90"><rect x="6" y="20" width="108" height="64" rx="8" fill="var(--tint)"/><g fill="var(--sun)"><circle cx="40" cy="38" r="6"/><circle cx="76" cy="44" r="6"/></g><path d="M40 44 v18 M40 50 l-8 6 M40 50 l8 6 M40 62 l-6 12 M40 62 l6 12 M76 50 v18 M76 56 l-8 6 M76 56 l8 6 M76 68 l-6 10 M76 68 l6 10" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="30" r="9" fill="none" stroke="var(--coral)" stroke-width="3"/><path d="M93 37 L107 23" stroke="var(--coral)" stroke-width="3"/></svg>`,
+ school:`<svg viewBox="0 0 120 90"><path d="M14 84 v-40 l46 -26 l46 26 v40z" fill="var(--violet)"/><rect x="50" y="56" width="20" height="28" fill="var(--card)"/><g fill="var(--win)"><rect x="24" y="52" width="14" height="12"/><rect x="82" y="52" width="14" height="12"/></g><circle cx="60" cy="38" r="7" fill="var(--card)"/></svg>`,
+ solar:`<svg viewBox="0 0 120 90"><circle cx="96" cy="18" r="10" fill="var(--sun)"/><g fill="var(--blue)" stroke="var(--ink)" stroke-width="2"><path d="M8 80 L24 52 H56 L40 80Z"/><path d="M56 80 L72 52 H104 L88 80Z"/></g><path d="M24 66 H50 M72 66 H98" stroke="var(--card)" stroke-width="2"/></svg>`
+};
+
+/* ============ DATA ============ */
+const PAIRS=[
+ ["I'll <em>be living</em> in a tower block.","I'll <em>be living</em> in a house with a garden."],
+ ["I'll <em>have moved</em> to another country.","I <em>won't have moved</em> from my hometown."],
+ ["I'll <em>have been studying</em> at university for two years.","I'll <em>have been working</em> for two years."],
+ ["Robots <em>will be doing</em> my domestic chores.","I'll still <em>be doing</em> all my chores myself."]
+];
+const COLLO=[
+ ["domestic chore","chore","a job you do at home: cleaning, washing up, ironing"],
+ ["household appliance","appliance","a machine at home: a fridge, a washing machine"],
+ ["housing development","development","a group of new houses or flats built together"],
+ ["multi-storey car park","carpark","a building with several floors for parking cars"],
+ ["residential area","residential","a part of town where people live, not work"],
+ ["second home","second","a house you own as well as your main home"],
+ ["self-contained flat","selfcontained","a flat with its own kitchen, bathroom and door"],
+ ["tower block","tower","a very tall building with many flats"]
+];
+const V1=[
+ ["Washing up and ironing are my least favourite domestic ___.",["chores","appliances","areas"]],
+ ["Our new fridge is the smartest household ___ we've ever had.",["appliance","chore","block"]],
+ ["They're building a huge housing ___ on the edge of town: 500 new homes!",["development","area","block"]],
+ ["I left the car on the 5th floor of the multi-___ car park.",["storey","level","floor"]],
+ ["It's a quiet residential ___ with lots of parks and no factories.",["area","zone","block"]],
+ ["My grandparents live in the city, but they have a ___ home by the sea.",["second","holiday","double"]],
+ ["My sister rents a self-___ flat, so she doesn't have to share a kitchen.",["contained","made","owned"]],
+ ["We live on the 22nd floor of a ___ block.",["tower","storey","flat"]]
+];
+const V2=[
+ ["In 2050, the city centre will be a pedestrian ___: no cars allowed.",["zone","area","park"]],
+ ["The old factory looks ___ now, but it will have become a modern art centre by 2030.",["shabby","vibrant","quaint"]],
+ ["Thanks to electric cars, noise ___ will have fallen a lot by 2040.",["pollution","parking","traffic"]],
+ ["The market square will be ___ with people from all over the world.",["bustling","medieval","rolling"]],
+ ["The town is famous for its ___ old streets with tiny cafés.",["quaint","urban","shabby"]]
+];
+const SCRIPT=[
+ ["L","Hi, and welcome to Future Homes, the podcast where teenagers ask experts about the cities we'll be living in. I'm Leo, and today I'm talking to Doctor Amara Reed, an urban planner. Amara, what will a typical home look like in 2050?"],
+ ["A","Well, I think a lot of young people will be living in self-contained flats. That's a small flat with its own kitchen and bathroom. And many of those flats will be in tall, green tower blocks, with gardens on every floor."],
+ ["L","Gardens in a tower block? Cool. And what about cars? Will there still be multi-storey car parks?"],
+ ["A","Far fewer. By 2050, most cities will have banned private cars from the centre. So we'll have turned lots of old multi-storey car parks into sports centres, cafés and even homes."],
+ ["L","OK, my favourite question. I hate domestic chores. Please tell me I won't be doing the washing-up in the future."],
+ ["A","Good news, Leo! Robots will be doing most of our domestic chores. And our household appliances will be talking to each other. Your fridge will order milk before you've even noticed it's empty."],
+ ["L","And where will families be living?"],
+ ["A","Mostly in quiet residential areas near parks and schools. There's a huge housing development near my city right now. They started building it in 2025, so by 2035 the builders will have been working on it for ten years!"],
+ ["L","Will people still have a second home, like a cottage in the countryside?"],
+ ["A","Some will. But I think more people will be sharing homes instead. And by the time you're thirty, you might have lived in three different countries."],
+ ["L","Last question. Where will you be living in 2050?"],
+ ["A","Probably on the top floor of a tower block, watching drones deliver my pizza!"],
+ ["L","Ha! Thank you, Amara. That's all for today. See you next week on Future Homes!"]
+];
+const TICK=["domestic chores","household appliances","housing development","multi-storey car parks","residential areas","second home","self-contained flats","tower blocks","detached house","shopping centre"];
+const TICKOK=new Set(TICK.slice(0,8));
+const TF=[
+ ["Amara thinks many young people will live in self-contained flats.","T"],
+ ["She says there will be more multi-storey car parks in 2050.","F"],
+ ["Robots will be doing most domestic chores.","T"],
+ ["The housing development near her city has already been finished.","F"],
+ ["By 2035, the builders will have been working on it for ten years.","T"],
+ ["Amara says nobody will have a second home in 2050.","F"],
+ ["Amara would like to live in a house in the countryside.","F"]
+];
+const G1=[
+ ["This time next year, we ___ in a brand-new tower block.",["will be living","will have lived","will have been living"]],
+ ["By 2030, the city ___ all the old car parks.",["will have closed","will be closing","will have been closing"]],
+ ["By June, my parents ___ for a new flat for two years!",["will have been looking","will be looking","will have looked"]],
+ ["Don't call me at five. I ___ my room then.",["will be cleaning","will have cleaned","will have been cleaning"]],
+ ["___ the car tomorrow? I'd like to borrow it.",["Will you be using","Will you have used","Will you have been using"]],
+ ["By the time you get home, the robot ___ the floors.",["will have vacuumed","will be vacuuming","will have been vacuuming"]],
+ ["In ten years' time, people ___ to school by flying taxi.",["will be travelling","will have travelled","will have been travelling"]],
+ ["By 2040, they ___ on this housing development for fifteen years.",["will have been working","will be working","will work"]],
+ ["I'm sure we ___ to a residential area by the time I start university.",["will have moved","will be moving","will have been moving"]],
+ ["By the end of the month, I ___ in this self-contained flat for exactly a year.",["will have been living","will be living","will live"]]
+];
+const STORY=["In a few weeks' time, the Kovalenko family ",["move","will be moving|'ll be moving"]," into a self-contained flat on the 20th floor of a new tower block. “By the time we move, we ",["live","will have been living|'ll have been living"]," with my grandparents for almost a year,” says Sofia, 14. “It's been fun, but I can't wait to have my own room!” Her dad is more worried: “By the end of the first week, I'm sure we ",["not / unpack","won't have unpacked|will not have unpacked"]," everything.” The family has big plans. “This time next month, I ",["decorate","will be decorating|'ll be decorating"]," my room,” Sofia says, “and by the summer, I ",["make","will have made|'ll have made"]," friends with everyone in the building.” Her little brother, Max, is excited about the smart household appliances: “The robot ",["do","will be doing|'ll be doing"]," all the domestic chores, so we ",["not / argue","won't be arguing|will not be arguing"]," about the washing-up any more!” And by next autumn, the family ",["save","will have saved|'ll have saved"]," enough money to buy a second home in the mountains. At least, that's the plan."];
+const POLITE=[
+ ["Are you going to the city centre after school?","Will you be going to the city centre after school?"],
+ ["Are you using your bike tomorrow?","Will you be using your bike tomorrow?"],
+ ["When do you plan to visit your second home?","When will you be visiting your second home?"],
+ ["Who are you going to invite to your new flat?","Who will you be inviting to your new flat?"],
+ ["Are you moving to a residential area next year?","Will you be moving to a residential area next year?"],
+ ["Do you think you'll leave your hometown before you're 25?","Will you be leaving your hometown before you're 25?"]
+];
+const BUILD=[["tower","tower block"],["residential","houses"],["selfcontained","flats"],["park","park"],["pedestrian","pedestrian zone"],["carpark","car park"],["development","building site"],["school","school"],["solar","solar farm"]];
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id);
+const KEY="city2050-v1";let st={};try{st=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>(s||'').toLowerCase().replace(/[’`]/g,"'").replace(/[?.!]/g,'').replace(/\s+/g,' ').trim();
+function buildMC(id,data){const ol=$(id);
+  data.forEach(([s,opts])=>{const li=document.createElement('li');li.dataset.a=opts[0];const p=s.split('___');
+    li.innerHTML=`<span class="s">${p[0]}<span class="gap">?</span>${p[1]||''}</span><div class="opts"></div>`;const box=li.querySelector('.opts');
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');li.dataset.v=o;const g=li.querySelector('.gap');g.textContent=o;g.classList.remove('ok','no')});
+      box.appendChild(b)});ol.appendChild(li)})}
+[['v1',V1],['v2',V2],['g1',G1]].forEach(([i,d])=>buildMC(i,d));
+document.querySelectorAll('[data-check]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.check;let ok=0,n=0;
+  $(id).querySelectorAll(':scope > li').forEach(li=>{n++;const g=li.dataset.v===li.dataset.a;if(g)ok++;
+    li.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===li.dataset.v)b.classList.add(g?'right':'wrong')});
+    const gp=li.querySelector('.gap');gp.classList.toggle('ok',g);gp.classList.toggle('no',!g)});
+  const m=$(id+'msg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'Great planning! All correct.':ok+' / '+n+' correct. Try the red ones again.'}));
+
+/* ============ SPEECH ============ */
+const synth=window.speechSynthesis;let voices=[];
+function loadVoices(){try{voices=synth?synth.getVoices().filter(v=>/^en/i.test(v.lang)):[]}catch(e){voices=[]}}
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices}else{$('ttsNote').textContent='Your browser can’t read the audio aloud. Use the transcript in Task 3 and read it in pairs instead.'}
+function pickVoice(kind){if(!voices.length)return null;
+  const fem=/female|samantha|victoria|karen|moira|tessa|serena|zira|aria|jenny|libby|sonia|hazel|susan|fiona|google uk english female|google us english/i;
+  const mal=/male|daniel|alex|fred|oliver|arthur|guy|ryan|george|thomas|david|mark|google uk english male/i;
+  const gb=voices.filter(v=>/en-GB/i.test(v.lang)),us=voices.filter(v=>/en-US/i.test(v.lang));
+  if(kind==='A')return voices.find(v=>fem.test(v.name)&&!/male/i.test(v.name.replace(/female/i,'')))||gb[0]||voices[0];
+  return voices.find(v=>mal.test(v.name)&&!/female/i.test(v.name))||us[0]||voices[voices.length-1];}
+function say(text,who,onend){if(!synth)return;const u=new SpeechSynthesisUtterance(text);const v=pickVoice(who);if(v){u.voice=v;u.lang=v.lang}else u.lang='en-GB';
+  u.rate=+$('rate').value;u.pitch=who==='L'?1.15:1;u.onend=onend;u.onerror=onend;synth.speak(u);return u}
+$('vcards').innerHTML='';
+COLLO.forEach(([w,ic,d])=>{const c=document.createElement('article');c.className='vc';
+  c.innerHTML=`<div class="art">${IC[ic]}</div><div class="body"><b>${w}</b><span>${d}</span><button class="say" type="button">Listen</button></div>`;
+  c.querySelector('.say').addEventListener('click',()=>{if(synth){synth.cancel();say(w,'A')}});$('vcards').appendChild(c)});
+
+/* podcast */
+const wave=$('wave');for(let i=0;i<48;i++){const s=document.createElement('i');wave.appendChild(s)}
+let playing=false,line=0,wt=null;
+function animate(on){clearInterval(wt);const bars=wave.querySelectorAll('i');if(!on){bars.forEach(b=>b.style.height='20%');return}wt=setInterval(()=>bars.forEach(b=>b.style.height=(15+Math.random()*85)+'%'),140)}
+function playFrom(i){if(!synth)return;synth.cancel();playing=true;line=i;$('deck').classList.add('on');$('play').textContent='Pause';animate(true);next()}
+function next(){if(!playing)return;if(line>=SCRIPT.length){stop();$('now').textContent='The end. Now do Tasks 1 and 2.';return}
+  const [who,txt]=SCRIPT[line];$('now').textContent=(who==='L'?'Leo: ':'Amara: ')+'…';
+  document.querySelectorAll('#script p').forEach((p,k)=>p.classList.toggle('cur',k===line));
+  say(txt,who,()=>{line++;next()})}
+function stop(){playing=false;if(synth)synth.cancel();$('deck').classList.remove('on');$('play').textContent='Play';animate(false);document.querySelectorAll('#script p').forEach(p=>p.classList.remove('cur'))}
+$('play').addEventListener('click',()=>{if(!synth)return;
+  if(playing&&!synth.paused){synth.pause();$('play').textContent='Resume';animate(false);return}
+  if(playing&&synth.paused){synth.resume();$('play').textContent='Pause';animate(true);return}
+  playFrom(line>=SCRIPT.length?0:line)});
+$('stop').addEventListener('click',()=>{stop();line=0;$('now').textContent='Press Play to listen.'});
+
+/* transcript */
+const FUT=/((?:will|won't|'ll)(?: (?:you|families))? (?:have been \w+ing|have (?:banned|turned)|be \w+ing))/g;
+const COL=/(self-contained flats?|tower blocks?|multi-storey car parks?|domestic chores|household appliances|residential areas|housing development|second home)/g;
+SCRIPT.forEach(([who,txt],i)=>{const p=document.createElement('p');p.innerHTML=`<b>${who==='L'?'Leo':'Amara'}:</b> `+txt.replace(COL,'<mark>$1</mark>').replace(FUT,'<u>$1</u>');
+  p.title='Click to hear this line';p.addEventListener('click',()=>{if(!synth)return;stop();line=i;playing=true;$('deck').classList.add('on');animate(true);
+    document.querySelectorAll('#script p').forEach((q,k)=>q.classList.toggle('cur',k===i));say(txt,who,()=>stop())});$('script').appendChild(p)});
+$('showScript').addEventListener('click',e=>{const s=$('script');s.hidden=!s.hidden;e.currentTarget.textContent=s.hidden?'Show the transcript':'Hide the transcript'});
+
+/* tasks */
+shuffle(TICK).forEach((t,i)=>{const l=document.createElement('label');l.innerHTML=`<input type="checkbox" id="tk${i}" value="${t}"> ${t}`;$('tick').appendChild(l)});
+$('tickCheck').addEventListener('click',()=>{let ok=0;$('tick').querySelectorAll('label').forEach(l=>{const c=l.querySelector('input');const should=TICKOK.has(c.value);const g=c.checked===should;if(g)ok++;l.classList.toggle('ok',g&&should);l.classList.toggle('no',!g)});
+  const m=$('tickMsg');m.className='msg '+(ok===TICK.length?'ok':'no');m.textContent=ok===TICK.length?'All correct: 8 phrases, 2 traps!':ok+' / '+TICK.length+' correct. Listen again!'});
+TF.forEach(([s,a],i)=>{const li=document.createElement('li');li.dataset.a=a;li.innerHTML=`<span>${i+1}. ${s}</span><div class="tog"><button type="button" aria-pressed="false" data-v="T">T</button><button type="button" aria-pressed="false" data-v="F">F</button></div>`;
+  li.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{li.querySelectorAll('button').forEach(z=>z.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');li.dataset.v=b.dataset.v;li.classList.remove('ok','no')}));$('tf').appendChild(li)});
+$('tfCheck').addEventListener('click',()=>{let ok=0;$('tf').querySelectorAll('li').forEach(li=>{const g=li.dataset.v===li.dataset.a;if(g)ok++;li.classList.toggle('ok',g);li.classList.toggle('no',!g)});
+  const m=$('tfMsg');m.className='msg '+(ok===TF.length?'ok':'no');m.textContent=ok+' / '+TF.length});
+
+/* warm-up pairs */
+PAIRS.forEach((pr,i)=>{const d=document.createElement('div');d.className='pair';
+  pr.forEach((t,k)=>{const b=document.createElement('button');b.type='button';b.innerHTML=(k?'b ':'a ')+t;b.setAttribute('aria-pressed',st['p'+i]===k?'true':'false');
+    b.addEventListener('click',()=>{d.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');st['p'+i]=k;save()});d.appendChild(b)});
+  $('pairs').appendChild(d)});
+
+/* story */
+(function(){const box=$('story');let k=0;STORY.forEach(p=>{if(typeof p==='string'){box.append(p);return}
+  const i=document.createElement('input');i.id='s'+k;i.autocomplete='off';i.spellcheck=false;i.setAttribute('aria-label',p[0]);i.dataset.a=p[1];
+  const w=document.createElement('span');w.append(i);const h=document.createElement('i');h.textContent=' ('+p[0]+') ';w.append(h);
+  const f=document.createElement('span');f.className='fix';f.hidden=true;f.textContent=p[1].split('|')[0]+' ';w.append(f);box.append(w);
+  if(st[i.id])i.value=st[i.id];i.addEventListener('input',()=>{st[i.id]=i.value;save();i.classList.remove('ok','no')});k++});
+  $('storyCheck').addEventListener('click',()=>{let ok=0,n=0;box.querySelectorAll('input').forEach(i=>{n++;const g=i.dataset.a.split('|').map(norm).includes(norm(i.value));if(g)ok++;
+    i.classList.toggle('ok',g);i.classList.toggle('no',!g);i.parentElement.querySelector('.fix').hidden=g});
+    const m=$('storyMsg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'Perfect! All correct.':ok+' / '+n+' correct. The right forms are shown in green.'})})();
+
+/* polite */
+POLITE.forEach(([q,a],i)=>{const li=document.createElement('li');
+  li.innerHTML=`<span>${q}</span><input id="pl${i}" placeholder="Will you be…?" autocomplete="off"><div class="row"><button class="btn alt" type="button" style="padding:6px 14px;font-size:.88rem">Show model</button><span class="model" hidden>${a}</span></div>`;
+  const inp=li.querySelector('input');if(st['pl'+i])inp.value=st['pl'+i];inp.addEventListener('input',()=>{st['pl'+i]=inp.value;save()});
+  li.querySelector('button').addEventListener('click',e=>{const m=li.querySelector('.model');m.hidden=!m.hidden;e.currentTarget.textContent=m.hidden?'Show model':'Hide model'});$('polite').appendChild(li)});
+
+/* ============ CITY BUILDER ============ */
+const COLS=8,ROWS=6;let grid=st.grid&&st.grid.length===COLS*ROWS?st.grid:Array(COLS*ROWS).fill(null);let tool='tower';
+BUILD.forEach(([k,n])=>{const b=document.createElement('button');b.type='button';b.innerHTML=`${IC[k]}<span>${n}</span>`;b.setAttribute('aria-pressed',k===tool?'true':'false');b.dataset.k=k;
+  b.addEventListener('click',()=>{tool=k;$('palette').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'))});$('palette').appendChild(b)});
+(function(){const b=document.createElement('button');b.type='button';b.innerHTML='<svg viewBox="0 0 120 90"><path d="M30 20 L90 70 M90 20 L30 70" stroke="var(--bad)" stroke-width="8" stroke-linecap="round"/></svg><span>eraser</span>';b.dataset.k='';
+  b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{tool=null;$('palette').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'))});$('palette').appendChild(b)})();
+function drawMap(){const m=$('map');m.innerHTML='';grid.forEach((v,i)=>{const t=document.createElement('button');t.type='button';t.className='tile';t.setAttribute('aria-label',v?BUILD.find(b=>b[0]===v)[1]:'empty plot');
+  t.innerHTML=v?IC[v]:'';t.addEventListener('click',()=>{grid[i]=tool;st.grid=grid;save();drawMap()});m.appendChild(t)});describe()}
+function describe(){const c={};grid.forEach(v=>{if(v)c[v]=(c[v]||0)+1});
+  $('counts').innerHTML=BUILD.filter(([k])=>c[k]).map(([k,n])=>`<span>${c[k]} × ${n}</span>`).join('')||'<span>Empty map: start building!</span>';
+  const g=[],n=k=>c[k]||0,pl=(x,s,p)=>x===1?`one ${s}`:`${x} ${p}`;
+  if(n('tower')||n('selfcontained'))g.push(`By 2050, we will have built ${[n('tower')?pl(n('tower'),'tower block','tower blocks'):'',n('selfcontained')?pl(n('selfcontained'),'block of self-contained flats','blocks of self-contained flats'):''].filter(Boolean).join(' and ')}.`);
+  if(n('residential'))g.push(`Families will be living in ${n('residential')>2?'a big':'a small'} residential area with ${pl(n('residential'),'street','streets')} of houses.`);
+  if(n('pedestrian'))g.push(`The centre will have become a pedestrian zone, so people will be walking and cycling instead of driving.`);
+  if(n('carpark'))g.push(`There will still be ${pl(n('carpark'),'multi-storey car park','multi-storey car parks')}, but by 2060 we will have turned ${n('carpark')>1?'them':'it'} into something better.`);
+  if(n('park'))g.push(`Children will be playing in ${pl(n('park'),'green park','green parks')} every afternoon.`);
+  if(n('development'))g.push(`By 2055, the builders will have been working on the new housing development for five years.`);
+  if(n('school'))g.push(`This time next year, students will be studying in ${pl(n('school'),'new school','new schools')}.`);
+  if(n('solar'))g.push(`By 2040, the city will have been using only solar energy for ten years.`);
+  $('gen').innerHTML=g.length?g.map(s=>`<p>${s}</p>`).join(''):'<p>Place some buildings, and example sentences about your city will appear here.</p>';}
+$('clearMap').addEventListener('click',()=>{grid=Array(COLS*ROWS).fill(null);st.grid=grid;save();drawMap()});
+$('randMap').addEventListener('click',()=>{const keys=BUILD.map(b=>b[0]);grid=grid.map(()=>Math.random()<.55?keys[Math.floor(Math.random()*keys.length)]:null);st.grid=grid;save();drawMap()});
+drawMap();
+</script>
+
+</body>
+</html>
