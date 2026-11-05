@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Stick the Landing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: an Olympic gymnastics arena at night. Hero = chalk-dust flight paths over the floor and a scoreboard; each stage is a "rotation" on an apparatus; results and exercises read like score panels. Single dark theme by choice. */
+:root{
+  --arena:#0B1426; --panel:#13213B; --panel2:#1B2C4C; --line:rgba(243,241,234,.13);
+  --chalk:#F3F1EA; --muted:#AEB9CC; --gold:#E8B931; --silver:#B9C2CF; --bronze:#C98A4E; --coral:#FF5E5B; --sky:#4FB3FF; --mint:#4BD6A4;
+  --ok:#4BD6A4; --bad:#FF5E5B;
+  --f-d:"Big Shoulders Display","Arial Narrow",Impact,sans-serif; --f-b:"Golos Text",system-ui,sans-serif; --f-m:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--arena);color:var(--chalk);font-family:var(--f-b);font-size:17.5px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--arena)}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-d);font-weight:900;text-transform:uppercase;line-height:.92;margin:0;letter-spacing:.01em;text-wrap:balance}
+h3{margin:0;font-weight:800;font-size:1.12rem}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+a{color:var(--sky)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.m{font-family:var(--f-m);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:36px;align-items:end;padding-block:64px 44px}
+.hero .m{color:var(--gold)}
+.hero h1{font-size:clamp(3.6rem,11vw,8rem);margin-top:10px}
+.hero h1 span{color:var(--gold);display:block}
+.hero .lede{margin-top:16px;max-width:56ch;color:#D6DEEA}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.tag{font-weight:700;font-size:.8rem;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:rgba(11,20,38,.6)}
+.tag.hot{background:var(--gold);color:#1B1400;border-color:var(--gold)}
+.board{background:#050A14;border:2px solid #22324F;border-radius:12px;padding:16px 18px;font-family:var(--f-m);box-shadow:0 20px 40px -18px #000}
+.board .top{display:flex;justify-content:space-between;color:var(--gold);font-size:.72rem;letter-spacing:.12em;margin-bottom:10px}
+.board .nm{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:.04em}
+.board .ct{color:var(--muted);font-size:.8rem}
+.board .row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.board .cell{background:#0E1830;border-radius:8px;padding:8px;text-align:center}
+.board .cell b{display:block;font-size:1.7rem;color:var(--gold);font-variant-numeric:tabular-nums}
+.board .cell.s b{color:var(--silver)} .board .cell.b b{color:var(--bronze)}
+.board .cell span{font-size:.62rem;letter-spacing:.1em;color:var(--muted)}
+.board .foot{margin-top:10px;font-size:.72rem;color:var(--muted)}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(11,20,38,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:9px;scrollbar-width:none}
+.nav a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-weight:700;font-size:.86rem;padding:6px 11px;border-radius:8px}
+.nav a b{font-family:var(--f-m);color:var(--gold);margin-right:6px;font-size:.78rem}
+.nav a:hover{background:var(--panel2);color:var(--chalk)}
+
+/* sections */
+section.rot{padding-block:68px 6px;scroll-margin-top:62px}
+.rh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:24px}
+.badge{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-d);font-weight:900;font-size:1.9rem;background:radial-gradient(circle at 35% 30%,#FFE58A,var(--gold) 55%,#9A7414);color:#2A1E00;box-shadow:0 0 0 4px rgba(232,185,49,.2)}
+.rh h2{font-size:clamp(2.2rem,5.6vw,3.4rem)}
+.rh p{color:var(--muted);margin-top:6px;max-width:70ch}
+.time{font-family:var(--f-m);font-size:.85rem;color:var(--mint);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lbl{font-family:var(--f-m);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.q-list{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:0;cursor:pointer;font-weight:800;padding:10px 20px;border-radius:999px;background:var(--gold);color:#1B1400}
+.btn:hover{filter:brightness(1.08)}
+.btn.alt{background:var(--panel2);color:var(--chalk)}
+.msg{font-weight:800}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.ua{font-size:.9rem;color:var(--muted);border-left:3px solid var(--coral);padding-left:10px}
+
+/* timeline */
+.tl{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:13px;height:3px;background:linear-gradient(90deg,var(--sky),var(--gold),var(--coral))}
+.tl div{position:relative;padding-top:32px;font-size:.86rem}
+.tl div::before{content:"";position:absolute;top:6px;left:0;width:17px;height:17px;border-radius:50%;background:var(--arena);border:3px solid var(--gold)}
+.tl b{display:block;font-family:var(--f-d);font-size:1.5rem;color:var(--gold);line-height:1}
+
+/* yes/no */
+.yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;counter-reset:yn}
+.ynq{counter-increment:yn;border-radius:12px;background:var(--panel2);border:1.5px solid transparent;padding:11px 13px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.ynq .t::before{content:counter(yn) ". ";font-family:var(--f-m);font-size:.78rem;color:var(--muted)}
+.ynq .t{font-weight:600}
+.ynq .b{display:flex;gap:6px}
+.ynq .b button{border:1.5px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 13px;font-weight:700;font-size:.86rem;cursor:pointer}
+.ynq .b button:disabled{cursor:default;opacity:.5}
+.ynq .x{grid-column:1/-1;font-size:.87rem;color:var(--muted)}
+.ynq.ok{border-color:var(--ok)}.ynq.no{border-color:var(--bad)}
+.ynq.ok .pick{background:var(--ok);color:#06231A;opacity:1}.ynq.no .pick{background:var(--bad);color:#fff;opacity:1}
+
+/* athletes */
+.ath{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.ac{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.frame{position:relative;aspect-ratio:4/5;max-width:100%;display:grid;place-items:center;cursor:pointer;background:linear-gradient(160deg,var(--c1),#0B1426);background-size:cover;background-position:center top}
+.frame.has{cursor:default}
+.frame input{position:absolute;width:1px;height:1px;opacity:0}
+.frame .ph{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:rgba(255,255,255,.85);text-align:center;padding:12px}
+.frame .ph svg{width:40px;height:40px}
+.frame.has .ph{display:none}
+.frame .rm{position:absolute;top:8px;right:8px;border:0;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:.74rem;padding:3px 9px;cursor:pointer}
+.frame .fl{position:absolute;left:10px;top:10px;font-family:var(--f-m);font-size:.7rem;font-weight:700;background:var(--chalk);color:var(--arena);padding:2px 7px;border-radius:5px}
+.frame .nm{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--f-d);font-weight:900;font-size:1.5rem;text-transform:uppercase;color:#fff;line-height:1}
+.ac .body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ac p{font-size:.88rem;color:#D6DEEA}
+.ac .med{display:flex;gap:6px;flex-wrap:wrap}
+.ac .med span{font-family:var(--f-m);font-size:.7rem;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
+.chips span{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(79,179,255,.13);color:var(--sky)}
+
+/* vocab */
+.vgroup{margin-top:22px}
+.vgroup>h3{font-family:var(--f-d);font-weight:900;text-transform:uppercase;font-size:1.6rem;color:var(--sky);margin-bottom:10px;letter-spacing:.02em}
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.vw{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.vw b{color:var(--gold)}
+.vw span{font-size:.86rem;color:#D6DEEA}
+
+/* mc */
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;counter-reset:it}
+.items>li{counter-increment:it;display:flex;flex-direction:column;gap:8px}
+.items .s::before{content:counter(it,decimal-leading-zero) "  ";font-family:var(--f-m);font-size:.8rem;color:var(--gold)}
+.gap{display:inline-block;min-width:5.5em;border-bottom:2px dashed var(--sky);text-align:center;color:var(--sky);padding:0 4px;font-weight:700}
+.gap.ok{border-color:var(--ok);color:var(--ok);border-bottom-style:solid}.gap.no{border-color:var(--bad);color:var(--bad)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--panel2);border-radius:10px;padding:6px 13px;cursor:pointer;font-weight:600}
+.opt[aria-pressed="true"]{border-color:var(--gold);background:rgba(232,185,49,.15)}
+.opt.right{border-color:var(--ok);background:rgba(75,214,164,.14)}.opt.wrong{border-color:var(--bad);background:rgba(255,94,91,.14)}
+.typed li{line-height:2.2}
+.typed input{background:var(--panel2);border:0;border-bottom:2px solid var(--muted);border-radius:6px 6px 0 0;padding:0 8px;width:13em;max-width:100%;font-weight:700;height:1.9em}
+.typed input.ok{border-bottom-color:var(--ok);color:var(--ok)}.typed input.no{border-bottom-color:var(--bad);color:var(--bad)}
+.typed .fix{font-family:var(--f-m);font-size:.8rem;color:var(--ok);margin-left:6px}
+
+/* reading */
+.article{display:flex;flex-direction:column;gap:14px;font-size:1.03rem;line-height:1.8;max-width:66ch}
+.article h3{font-family:var(--f-d);font-weight:900;text-transform:uppercase;font-size:2.2rem;color:var(--gold);line-height:1}
+.article .k{font-family:var(--f-m);font-size:.74rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.article mark{background:rgba(232,185,49,.28);color:inherit;border-radius:3px;padding:0 2px}
+.tfng{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tfng li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;background:var(--panel2);border:1.5px solid transparent}
+.tfng li.ok{border-color:var(--ok)}.tfng li.no{border-color:var(--bad)}
+.tog{display:flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden}
+.tog button{border:0;background:var(--panel);padding:4px 9px;cursor:pointer;font-family:var(--f-m);font-size:.78rem;font-weight:700}
+.tog button+button{border-left:1.5px solid var(--line)}
+.tog button[aria-pressed="true"]{background:var(--gold);color:#1B1400}
+
+/* grammar */
+.perf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.pf{border-radius:16px;padding:16px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:8px}
+.pf h3{font-family:var(--f-d);font-weight:900;text-transform:uppercase;font-size:1.7rem;line-height:1}
+.pf .f{font-family:var(--f-m);font-size:.9rem;background:var(--arena);border-radius:8px;padding:6px 10px}
+.pf em{font-style:normal;font-weight:700}
+.pf small{color:var(--muted);font-size:.85rem}
+.pf:nth-child(1) h3{color:var(--sky)}.pf:nth-child(2) h3{color:var(--mint)}.pf:nth-child(3) h3{color:var(--gold)}.pf:nth-child(4) h3{color:var(--coral)}
+.tlsvg{width:100%;height:auto;display:block}
+.tbl{overflow-x:auto}
+
+/* video */
+.player{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.screen{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:16px;overflow:hidden;background:#000;border:2px solid #22324F}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.facade{position:absolute;inset:0;display:grid;place-items:center;border:0;padding:0;cursor:pointer;background:radial-gradient(circle at 70% 30%,var(--c1),#050A14 75%);color:#fff;width:100%}
+.facade .pl{position:relative;width:84px;height:84px;border-radius:50%;background:var(--gold);display:grid;place-items:center;box-shadow:0 0 0 12px rgba(232,185,49,.22);transition:transform .2s}
+.facade:hover .pl{transform:scale(1.08)}
+.facade .tt{position:absolute;left:16px;bottom:14px;right:16px;text-align:left;font-family:var(--f-d);font-weight:900;text-transform:uppercase;font-size:1.6rem;line-height:1;text-shadow:0 2px 6px #000}
+.vlink{font-size:.86rem;color:var(--muted);margin-top:8px}
+.playlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:560px;overflow:auto}
+.playlist button{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;align-items:center}
+.playlist button b{font-family:var(--f-d);font-weight:900;font-size:1.6rem;color:var(--gold);grid-row:span 2}
+.playlist button span{font-weight:700;font-size:.92rem}
+.playlist button small{color:var(--muted);font-size:.78rem}
+.playlist button[aria-current="true"]{border-color:var(--gold);background:rgba(232,185,49,.1)}
+.vtasks{margin-top:18px}
+.vtasks ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+
+/* homework */
+.check{display:flex;flex-direction:column;gap:6px}
+.check label{display:flex;gap:10px;align-items:center;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--gold)}
+
+footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
+
+@media (max-width:980px){.ath{grid-template-columns:repeat(2,minmax(0,1fr))}.vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.player{grid-template-columns:minmax(0,1fr)}.tl{grid-template-columns:repeat(4,minmax(0,1fr))}.tl::before{display:none}}
+@media (max-width:760px){
+  .hero .wrap{grid-template-columns:minmax(0,1fr);padding-block:44px 30px}
+  .grid2,.perf,.yn{grid-template-columns:minmax(0,1fr)}
+  .rh{grid-template-columns:auto minmax(0,1fr)}.rh .time{grid-column:2}
+  .tl{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{padding:16px}
+}
+@media (max-width:440px){.ath,.vgrid{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+</head>
+<body>
+<header class="hero" id="top">
+  <canvas id="chalk" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="m">Focus 4 · B2 · Olympic gymnastics · 90 min</div>
+      <h1>Stick the <span>Landing</span></h1>
+      <p class="lede">A lesson about Olympic gymnastics and the most decorated gymnast in history, Simone Biles. The four perfect tenses, personality and place words from Focus 4, gymnastics vocabulary, a reading and videos you can watch right here.</p>
+      <div class="tags"><span class="tag hot">B2</span><span class="tag">Present &amp; Past Perfect (Continuous)</span><span class="tag">7 rotations</span><span class="tag">Video inside</span></div>
+    </div>
+    <div class="board" aria-label="Olympic medals of Simone Biles">
+      <div class="top"><span>OLYMPIC MEDALS</span><span>2016 · 2020 · 2024</span></div>
+      <div class="nm">BILES Simone</div><div class="ct">USA · artistic gymnastics</div>
+      <div class="row">
+        <div class="cell"><b>7</b><span>GOLD</span></div>
+        <div class="cell s"><b>2</b><span>SILVER</span></div>
+        <div class="cell b"><b>2</b><span>BRONZE</span></div>
+      </div>
+      <div class="foot">She has won 11 Olympic medals. Has she finished? She hasn't decided yet.</div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Lesson stages">
+  <div class="wrap">
+    <a href="#r1"><b>01</b>Warm-up</a><a href="#r2"><b>02</b>The athletes</a><a href="#r3"><b>03</b>Words</a><a href="#r4"><b>04</b>Reading</a><a href="#r5"><b>05</b>The four perfects</a><a href="#r6"><b>06</b>Watch</a><a href="#r7"><b>07</b>Speaking &amp; homework</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section class="rot" id="r1">
+  <div class="rh"><div class="badge">1</div><div><h2>Warm-up</h2><p>Simone Biles' career in seven moments. Then a quick Yes-or-No quiz: answer, then explain in a full sentence.</p></div><span class="time">10 min</span></div>
+  <div class="card">
+    <div class="tl">
+      <div><b>2003</b>Starts gymnastics at the age of six.</div>
+      <div><b>2013</b>Wins her first world all-around title.</div>
+      <div><b>2016</b>Rio: four Olympic golds and a bronze.</div>
+      <div><b>2021</b>Tokyo: the “twisties”. She withdraws from several finals.</div>
+      <div><b>2023</b>Returns and wins the world all-around title again.</div>
+      <div><b>2024</b>Paris: three golds and a silver.</div>
+      <div><b>2026</b>Still deciding about LA 2028.</div>
+    </div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <div class="row" style="justify-content:space-between"><span class="lbl">Quick quiz · Yes or No?</span><span class="row"><span class="msg ok" id="ynSc">0 / 0</span><button class="btn alt" type="button" id="ynReset">Reset</button></span></div>
+    <div class="yn" id="yn"></div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Discuss</span>
+    <ol class="q-list">
+      <li>Have you ever done gymnastics or another sport seriously? How long have you been doing it / did you do it?</li>
+      <li>Which Olympic sport have you always wanted to try? Why?</li>
+      <li>Is it brave or weak to withdraw from a competition for mental health reasons?</li>
+      <li>What do you think Biles had been feeling before she decided to come back?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="rot" id="r2">
+  <div class="rh"><div class="badge">2</div><div><h2>The athletes</h2><p>Eight Olympic gymnasts, two of them from Ukraine. Tap a frame to add a photo. Which personality words from Focus 4 fit each athlete?</p></div><span class="time">10 min</span></div>
+  <div class="ath" id="ath"></div>
+  <p class="ua" style="margin-top:16px">Speaking: Choose one athlete and introduce them to your partner using the Present Perfect: <i>She has won… She has been competing since…</i></p>
+</section>
+
+<section class="rot" id="r3">
+  <div class="rh"><div class="badge">3</div><div><h2>Words</h2><p>Personality and place words from Focus 4, plus the gymnastics words you need to talk about the Olympics.</p></div><span class="time">20 min</span></div>
+  <div id="vocab"></div>
+  <div class="grid2" style="margin-top:22px">
+    <div class="card"><span class="lbl">Exercise 1 · Personality of a champion</span><ol class="items" id="v1" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v1">Check</button><span class="msg" id="v1msg"></span></div></div>
+    <div class="card"><span class="lbl">Exercise 2 · Gymnastics words</span><ol class="items" id="v2" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v2">Check</button><span class="msg" id="v2msg"></span></div></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card"><span class="lbl">Exercise 3 · A postcard from Paris 2024</span><ol class="items" id="v3" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="v3">Check</button><span class="msg" id="v3msg"></span></div></div>
+    <div class="card stack"><span class="lbl">Speaking</span>
+      <ol class="q-list">
+        <li>Describe Simone Biles with four words from the list. Give a reason for each.</li>
+        <li>Which personality traits does an Olympic champion need? Which can be dangerous?</li>
+        <li>Describe your town using five place words. Has it changed in the last ten years?</li>
+        <li>Would you like your town to become a pedestrian zone, like Pontevedra? Why or why not?</li>
+      </ol></div>
+  </div>
+</section>
+
+<section class="rot" id="r4">
+  <div class="rh"><div class="badge">4</div><div><h2>Reading</h2><p>Read about Biles' comeback. Then decide: True, False or Not Given. Finally, highlight the perfect tenses in the text.</p></div><span class="time">15 min</span></div>
+  <div class="grid2">
+    <article class="card"><div class="article" id="art">
+      <span class="k">Reading · about 380 words</span>
+      <h3>The comeback</h3>
+      <p>Simone Biles has been doing gymnastics since she was six years old, and she has collected more medals than any other gymnast in history. She has won eleven Olympic medals, seven of them gold, and several skills in the sport have been named after her.</p>
+      <p>Yet her most famous Olympic moment was not a victory. When she arrived in Tokyo in 2021, she had been training for the Games for five years and was expected to win almost everything. But during the team final something frightening happened: in the air, she suddenly lost track of where she was. Gymnasts call this “the twisties”. In a sport where one wrong landing can cause a serious injury, Biles decided to withdraw from several finals. Some people criticised her, but many others praised her for putting her mental health first. She still went home with two medals, a team silver and a bronze on the beam.</p>
+      <p>For a long time, nobody knew if she would compete again. She had been working quietly with a therapist when, in 2023, she returned and won the world all-around title once more. At the Paris 2024 Olympics she won gold with the team, in the all-around and on vault, and silver on the floor behind Brazil's Rebeca Andrade. On the podium, Biles and her teammate Jordan Chiles bowed down to Andrade, a gesture of respect that went around the world.</p>
+      <p>Since Paris, Biles has been thinking about the 2028 Games in Los Angeles. She will be 31 by then, and she and her husband, NFL player Jonathan Owens, would like to start a family. “I don't necessarily have to make it just yet,” she has said about her decision.</p>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn alt" type="button" id="hunt">Highlight the perfect tenses</button></div></article>
+    <div class="card stack">
+      <span class="lbl">True · False · Not Given</span>
+      <ul class="tfng" id="tfng"></ul>
+      <div class="row"><button class="btn" type="button" id="tfCheck">Check</button><span class="msg" id="tfMsg"></span></div>
+      <p class="ua">Grammar hunt: find one example of each perfect tense in the text. Why is each tense used there?</p>
+    </div>
+  </div>
+</section>
+
+<section class="rot" id="r5">
+  <div class="rh"><div class="badge">5</div><div><h2>The four perfects</h2><p>The main grammar of the lesson. Present Perfect and Present Perfect Continuous connect the past with <b>now</b>; Past Perfect and Past Perfect Continuous connect it with <b>a moment in the past</b>.</p></div><span class="time">20 min</span></div>
+  <div class="perf">
+    <div class="pf"><h3>Present Perfect</h3><span class="f">have / has + V3</span><p>Experience, result or a finished action whose time isn't important. <b>How many / how much.</b></p><p><em>Biles has won eleven Olympic medals.</em></p><small>ever, never, already, yet, just, so far, three times</small></div>
+    <div class="pf"><h3>Present Perfect Continuous</h3><span class="f">have / has been + -ing</span><p>An activity that started in the past and is still going on, or has just stopped with a visible result. <b>How long.</b></p><p><em>She has been doing gymnastics since 2003.</em></p><small>for, since, how long, all day, lately, recently</small></div>
+    <div class="pf"><h3>Past Perfect</h3><span class="f">had + V3</span><p>An action completed <b>before</b> another moment in the past.</p><p><em>By the time she arrived in Paris, she had already won seven Olympic medals.</em></p><small>before, after, by the time, already, when</small></div>
+    <div class="pf"><h3>Past Perfect Continuous</h3><span class="f">had been + -ing</span><p>An activity in progress <b>up to</b> a moment in the past; often explains a past situation.</p><p><em>When she arrived in Tokyo, she had been training for five years.</em></p><small>for, since, how long, all day + a past moment</small></div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <span class="lbl">Where is the reference point?</span>
+    <svg class="tlsvg" viewBox="0 0 900 190" role="img" aria-label="Timeline: Present perfect forms look back from now; past perfect forms look back from a moment in the past.">
+      <line x1="20" y1="150" x2="880" y2="150" stroke="#AEB9CC" stroke-width="2"/><polygon points="880,144 894,150 880,156" fill="#AEB9CC"/>
+      <line x1="430" y1="20" x2="430" y2="165" stroke="#E8B931" stroke-width="2" stroke-dasharray="6 6"/><text x="400" y="182" font-family="JetBrains Mono,monospace" font-size="14" fill="#E8B931">TOKYO 2021</text>
+      <line x1="790" y1="20" x2="790" y2="165" stroke="#4FB3FF" stroke-width="2" stroke-dasharray="6 6"/><text x="772" y="182" font-family="JetBrains Mono,monospace" font-size="14" fill="#4FB3FF">NOW</text>
+      <rect x="90" y="96" width="340" height="12" rx="6" fill="#FF5E5B"/><text x="90" y="88" font-family="Golos Text,sans-serif" font-size="15" fill="#FF5E5B">had been training (up to Tokyo)</text>
+      <circle cx="300" cy="64" r="8" fill="#E8B931"/><path d="M310 64 H418" stroke="#E8B931" stroke-width="2"/><polygon points="418,58 428,64 418,70" fill="#E8B931"/><text x="90" y="69" font-family="Golos Text,sans-serif" font-size="15" fill="#E8B931">had won (before Tokyo)</text>
+      <rect x="60" y="122" width="730" height="10" rx="5" fill="#4BD6A4"/><text x="460" y="116" font-family="Golos Text,sans-serif" font-size="15" fill="#4BD6A4">has been doing gymnastics (still now)</text>
+      <circle cx="620" cy="44" r="8" fill="#4FB3FF"/><path d="M630 44 H778" stroke="#4FB3FF" stroke-width="2"/><polygon points="778,38 788,44 778,50" fill="#4FB3FF"/><text x="560" y="24" font-family="Golos Text,sans-serif" font-size="15" fill="#4FB3FF">has won 11 medals (result now)</text>
+    </svg>
+    <p class="ua" style="margin-top:10px">Пастки: з точним часом у минулому (in 2016, last year, ago) вживаємо Past Simple, а не Present Perfect. Дієслова стану (know, like, believe, have = мати) у Continuous не вживаються: <i>She has known her coach for years</i>.</p>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card"><span class="lbl">Exercise 4 · Choose the best form</span><ol class="items" id="g1" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" data-check="g1">Check</button><span class="msg" id="g1msg"></span></div></div>
+    <div class="card"><span class="lbl">Exercise 5 · Open the brackets</span><ol class="items typed" id="g2" style="margin-top:12px"></ol>
+      <div class="row" style="margin-top:16px"><button class="btn" type="button" id="g2check">Check</button><span class="msg" id="g2msg"></span></div></div>
+  </div>
+  <div class="card stack" style="margin-top:20px">
+    <span class="lbl">Speaking · Find someone who…</span>
+    <p>Walk around (or work in pairs) and ask questions. Use the right perfect tense and ask one follow-up question.</p>
+    <ul class="q-list">
+      <li>…has been learning English for more than five years.</li><li>…has ever watched an Olympic event live.</li><li>…had already decided on a career by the age of twelve.</li><li>…had been training for something for months before a big event.</li><li>…has been feeling tired lately. Why?</li><li>…has never broken a bone.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="rot" id="r6">
+  <div class="rh"><div class="badge">6</div><div><h2>Watch</h2><p>Routines from Paris 2024 and interviews about the twisties and mental health. Choose a video; it plays here, and its tasks appear below.</p></div><span class="time">15 min</span></div>
+  <div class="player">
+    <div><div class="screen" id="screen"></div><p class="vlink" id="vlink"></p><div class="card vtasks" id="vtasks"></div></div>
+    <ul class="playlist" id="playlist"></ul>
+  </div>
+</section>
+
+<section class="rot" id="r7">
+  <div class="rh"><div class="badge">7</div><div><h2>Speaking &amp; homework</h2><p>Press conference role-play, then write it up at home.</p></div><span class="time">10 min</span></div>
+  <div class="grid2">
+    <div class="card stack">
+      <span class="lbl">Role-play · After the final</span>
+      <p><b>Student A</b> is an Olympic gymnast who has just won a medal. <b>Student B</b> is a journalist.</p>
+      <ul class="q-list">
+        <li>How long have you been preparing for this moment?</li><li>What had you been thinking just before your routine?</li><li>Have you ever thought about giving up?</li><li>What had you achieved before these Games?</li><li>What's the hardest thing you've ever had to do in your career?</li>
+      </ul>
+      <p class="ua">Athlete: answer with personality words, e.g. <i>I'm quite self-critical, so…</i></p>
+    </div>
+    <div class="card stack">
+      <span class="lbl">Homework</span>
+      <h3>An athlete profile</h3>
+      <p>Write a profile (180–220 words) of an athlete you admire for a sports magazine: their career so far, the moment that changed everything, and what kind of person they are.</p>
+      <div class="check">
+        <label><input type="checkbox" id="hw1"> all four perfect tenses</label>
+        <label><input type="checkbox" id="hw2"> 6 personality words from Focus 4</label>
+        <label><input type="checkbox" id="hw3"> 3 place words (where they live or compete)</label>
+        <label><input type="checkbox" id="hw4"> one quote from the athlete</label>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="wrap">English B2 lesson for Focus 4. Facts as of November 2026. Videos are hosted on YouTube. Photos added to the frames stay in your browser only.</footer>
+
+<script>
+/* ============ DATA ============ */
+const YN=[
+ ["Has Simone Biles won more Olympic medals than any other gymnast in history?",0,"Not quite: she has 11, but Larisa Latynina won 18. Biles has the most world and Olympic medals combined, which makes her the most decorated gymnast ever."],
+ ["Did Biles win a medal in Tokyo even after the twisties?",1,"Yes. She won team silver and a bronze on the beam."],
+ ["Is the balance beam about 10 cm wide?",1,"Yes, it's 10 cm wide and 5 metres long."],
+ ["Do men compete on the balance beam?",0,"No. Men have six apparatus (floor, pommel horse, rings, vault, parallel bars, horizontal bar); women have four (vault, uneven bars, beam, floor)."],
+ ["Has a Ukrainian gymnast ever won Olympic gold?",1,"Yes. Oleg Verniaiev won gold on the parallel bars in Rio 2016, and Ukraine has had many champions before him."],
+ ["Did Biles win the floor final in Paris?",0,"No. Rebeca Andrade of Brazil won it; Biles took silver."],
+ ["Are some gymnastics skills named after the athletes who first performed them?",1,"Yes. Several skills are called “the Biles”."],
+ ["Has Biles announced that she'll compete at LA 2028?",0,"No. As of autumn 2026 she hasn't decided yet."]
+];
+const ATH=[
+ {k:"biles",n:"Simone Biles",c:"USA",col:"#1D4E89",d:"The most decorated gymnast in history. Withdrew from finals in Tokyo, then came back to win three golds in Paris.",m:["11 Olympic medals","7 gold"],t:["strong-willed","daring","self-critical","larger than life"]},
+ {k:"andrade",n:"Rebeca Andrade",c:"BRA",col:"#1E7A4A",d:"Brazil's greatest gymnast. Came back after three serious knee operations and beat Biles on the floor in Paris.",m:["Paris 2024: floor gold","Tokyo 2020: vault gold"],t:["level-headed","humble","good-natured","strong-willed"]},
+ {k:"lee",n:"Suni Lee",c:"USA",col:"#7A2A4A",d:"Tokyo 2020 all-around champion. Returned to win two bronze medals and team gold in Paris after a serious kidney illness.",m:["Tokyo 2020: all-around gold","Paris 2024: 3 medals"],t:["thorough","self-conscious","strong-willed","humble"]},
+ {k:"nemour",n:"Kaylia Nemour",c:"ALG",col:"#2A6A4A",d:"Won Algeria's first ever Olympic gymnastics medal: gold on the uneven bars in Paris, at 17.",m:["Paris 2024: bars gold"],t:["daring","perceptive","laid-back","strong-willed"]},
+ {k:"kovtun",n:"Illia Kovtun",c:"UKR",col:"#1F5AA6",d:"Ukraine's rising star. Won silver on the parallel bars in Paris while the war was going on at home.",m:["Paris 2024: parallel bars silver"],t:["thorough","level-headed","daring","humble"]},
+ {k:"verniaiev",n:"Oleg Verniaiev",c:"UKR",col:"#C9A227",d:"Olympic champion on the parallel bars and all-around silver medallist in Rio 2016.",m:["Rio 2016: gold + silver"],t:["strong-willed","fair-minded","daring","self-critical"]},
+ {k:"oka",n:"Shinnosuke Oka",c:"JPN",col:"#A62A2A",d:"The star of the men's competition in Paris: all-around and horizontal bar champion, plus team gold.",m:["Paris 2024: 3 gold, 1 bronze"],t:["level-headed","thorough","humble","perceptive"]},
+ {k:"damato",n:"Alice D'Amato",c:"ITA",col:"#2A5A8A",d:"Won the balance beam in Paris: Italy's first ever Olympic gold in women's gymnastics.",m:["Paris 2024: beam gold"],t:["level-headed","daring","good-natured","strong-willed"]}
+];
+const VOC=[
+ ["Personality · Focus 4",[["kind-hearted","kind and caring"],["sensitive to the needs of others","noticing what others need"],["trusting","believing people are honest"],["laid-back","relaxed, not easily worried"],["tactful","careful not to upset people"],["make people feel at ease","help people relax"],["affectionate","showing love and warmth"],["good-natured","kind, friendly and patient"],["think outside the box","have original ideas"],["daring","brave, ready to take risks"],["perceptive","quick to notice and understand"],["intellectual","interested in serious ideas"],["have a love of learning","enjoy discovering new things"],["thorough","careful about every detail"],["strong-willed","determined to do what you want"],["level-headed","calm and sensible in a crisis"],["insecure","not confident about yourself"],["humble","not thinking you're better than others"],["self-conscious","worried about what others think"],["self-critical","too hard on yourself"],["a loner","sb who prefers to be alone"],["fair-minded","treating everyone fairly"],["the life and soul of the party","the person who makes a party fun"],["witty","clever and funny with words"],["spontaneous","doing things without planning"],["larger than life","more exciting than most people"],["moody","with moods that change quickly"],["short-tempered","getting angry very easily"],["self-centred","thinking only about yourself"],["full of yourself","too proud of yourself"]]],
+ ["Places · Focus 4",[["rolling hills","gentle hills that go on and on"],["picturesque","pretty, like a picture"],["vibrant","full of energy and life"],["bustling","busy and full of people"],["quaint","attractive in an old-fashioned way"],["urban","connected with towns and cities"],["medieval","from the Middle Ages"],["pedestrian zone","an area with no cars"],["on-street parking","parking at the side of the road"],["underground car park","a car park below ground"],["shabby","old and in bad condition"],["noise pollution","harmful or annoying noise"]]],
+ ["Gymnastics",[["apparatus","the equipment: vault, bars, beam, floor…"],["vault","run, jump off a springboard, fly over a table"],["uneven bars","two bars at different heights"],["balance beam","a 10 cm wide beam, 5 m long"],["floor exercise","a routine to music on a 12 × 12 m mat"],["routine","a planned set of moves"],["somersault","a full turn of the body in the air"],["twist","a turn around the body's long axis"],["dismount","the last move, getting off the apparatus"],["stick the landing","land perfectly, without moving your feet"],["the all-around","a competition on every apparatus"],["the twisties","losing your sense of where you are in the air"]]]
+];
+const V1=[
+ ["Biles never gives up and always does what she has decided to do. She's ___.",["strong-willed","laid-back","self-centred"]],
+ ["Andrade stays calm and sensible, even in an Olympic final. She's ___.",["level-headed","moody","insecure"]],
+ ["Biles is very hard on herself after even a tiny mistake. She's ___.",["self-critical","full of herself","trusting"]],
+ ["After winning gold, Andrade didn't boast at all. She's ___.",["humble","witty","short-tempered"]],
+ ["A good coach notices at once when something is wrong. Coaches need to be ___.",["perceptive","spontaneous","shabby"]],
+ ["Nemour tries risky new elements nobody has done before. She's ___.",["daring","self-conscious","a loner"]],
+ ["A good judge treats every gymnast in the same way. Judges must be ___.",["fair-minded","moody","affectionate"]],
+ ["Some teammates are so relaxed that nothing worries them. They're ___.",["laid-back","thorough","insecure"]],
+ ["Before her comeback, Lee worried about what people thought of her. She felt ___.",["self-conscious","larger than life","witty"]],
+ ["She checks every detail of her routine again and again. She's very ___.",["thorough","spontaneous","tactful"]]
+];
+const V2=[
+ ["She landed without moving her feet at all. She stuck the ___.",["landing","dismount","routine"]],
+ ["Men compete on six pieces of ___; women compete on four.",["apparatus","routine","twist"]],
+ ["Biles lost her sense of where she was in the air. She had the ___.",["twisties","somersaults","all-around"]],
+ ["The ___ is only 10 cm wide, so one small mistake means a fall.",["balance beam","floor","vault"]],
+ ["The last move of a routine is called the ___.",["dismount","twist","landing"]],
+ ["The ___ champion is the best gymnast on all the apparatus together.",["all-around","floor","beam"]],
+ ["Her floor ___ lasted about ninety seconds and was full of difficult jumps.",["routine","apparatus","dismount"]],
+ ["A triple-double is a double ___ with three twists.",["somersault","beam","landing"]]
+];
+const V3=[
+ ["The streets around the arena were ___, full of fans from all over the world.",["bustling","rolling","shabby"]],
+ ["Notre-Dame is a ___ cathedral, built more than 800 years ago.",["medieval","urban","vibrant"]],
+ ["We walked through ___ backstreets with tiny old cafés.",["quaint","bustling","urban"]],
+ ["The atmosphere at the fan zone was ___, with music and dancing every night.",["vibrant","shabby","medieval"]],
+ ["Cars weren't allowed near the venue. It was a pedestrian ___.",["zone","park","street"]],
+ ["Outside Paris, the countryside is full of green rolling ___.",["hills","zones","parks"]],
+ ["There was no on-street ___, so we left the car in an underground car park.",["parking","zone","traffic"]],
+ ["With crowds and traffic everywhere, noise ___ was a real problem.",["pollution","parking","zone"]]
+];
+const TFNG=[
+ ["Biles started gymnastics when she was six.","T"],
+ ["She has won more Olympic gold medals than anyone in history.","NG"],
+ ["Before Tokyo, she had been preparing for five years.","T"],
+ ["Everyone criticised her decision to withdraw in Tokyo.","F"],
+ ["She left Tokyo without any medals.","F"],
+ ["She had been working with a therapist before her comeback.","T"],
+ ["Andrade won more medals than Biles in Paris.","NG"],
+ ["Biles has already decided to compete in Los Angeles.","F"]
+];
+const HUNT=["has been doing","has collected","has won","have been named","had been training","had been working","has been thinking","has said"];
+const G1=[
+ ["Simone Biles ___ eleven Olympic medals so far.",["has won","has been winning","had won"]],
+ ["She ___ gymnastics since she was six.",["has been doing","had been doing","did"]],
+ ["By the time she arrived in Paris, she ___ seven Olympic medals.",["had already won","has already won","had been winning"]],
+ ["When the twisties started, she ___ in Tokyo for several days.",["had been training","has been training","has trained"]],
+ ["Look at her hands! She ___ on the bars all morning.",["has been practising","had practised","has practised"]],
+ ["___ you ever ___ a gymnastics competition live?",["Have … watched","Had … been watching","Have … been watching"]],
+ ["Andrade ___ three knee operations before her Olympic gold.",["had had","has had","had been having"]],
+ ["Kovtun is exhausted because he ___ all day.",["has been training","had trained","has trained"]],
+ ["How many times ___ Biles ___ the Olympic all-around title?",["has … won","has … been winning","had … been winning"]],
+ ["Since Paris, Biles ___ about LA 2028, but she still isn't sure.",["has been thinking","had thought","has thought"]],
+ ["Until Paris 2024, no Algerian gymnast ___ an Olympic medal.",["had won","has won","had been winning"]],
+ ["She ___ her coach for more than ten years.",["has known","has been knowing","had been knowing"]]
+];
+const G2=[
+ ["I ","(never / see) a triple-double live.",["have never seen","'ve never seen"]],
+ ["How long ","(you / train) at this club?",["have you been training"]],
+ ["She was exhausted because she ","(practise) the routine for hours.",["had been practising","had been practicing","'d been practising"]],
+ ["When the scores appeared, the crowd ","(already / start) cheering.",["had already started","'d already started"]],
+ ["Oleg Verniaiev ","(be) an Olympic champion since 2016.",["has been","'s been"]],
+ ["By the age of 19, Biles ","(win) four Olympic gold medals.",["had won","'d won"]],
+ ["My legs hurt because I ","(do) squats all morning.",["have been doing","'ve been doing"]],
+ ["","(she / ever / fall) off the beam at the Olympics?",["has she ever fallen"]]
+];
+const VIDS=[
+ {id:"9S1R8UuauBM",t:"Floor routine · team final",s:"Paris 2024 · Biles leads Team USA to gold",c:"#1D4E89",tasks:["<b>Before:</b> What do you think makes a floor routine special: power, music or personality?","<b>While:</b> Note three adjectives for the routine and the crowd. Did she stick the landings?","<b>After:</b> <i>By the end of this routine, the USA had…</i> Finish the sentence. Then: how long had the team been waiting for this gold?"]},
+ {id:"aOvJjJ-F13E",t:"All-around final",s:"Paris 2024 · Biles begins the all-around",c:"#2A5A8A",tasks:["<b>Before:</b> The all-around is the hardest title. Why?","<b>While:</b> Which apparatus does she start on? Note one thing the commentators say.","<b>After:</b> Present Perfect: <i>She has now won the all-around… times.</i>"]},
+ {id:"VE_v1dGSdf8",t:"Vault gold",s:"Paris 2024 · her 7th Olympic gold",c:"#C9A227",tasks:["<b>Before:</b> What's the difference between a vault and a floor routine?","<b>While:</b> Describe the vault in three steps: run, take-off, landing.","<b>After:</b> <i>Before this vault, she had already won… Since Rio, she has…</i>"]},
+ {id:"f2m2UL5bljw",t:"Floor final · silver",s:"Paris 2024 · Biles closes her Games",c:"#7A2A4A",tasks:["<b>Before:</b> How does an athlete feel when they don't win at their last event?","<b>While:</b> Note what went wrong and how she reacts.","<b>After:</b> Andrade won gold. Describe both gymnasts with two personality words each."]},
+ {id:"GgCjdfLz8P0",t:"What are “the twisties”?",s:"Explainer",c:"#2A6A4A",tasks:["<b>Before:</b> Have you ever suddenly forgotten how to do something you can usually do easily?","<b>While:</b> Write down how the twisties are explained. Why are they dangerous?","<b>After:</b> Explain the twisties to a partner in your own words, in 60 seconds."]},
+ {id:"0kQKRqzNBNQ",t:"Biles on the twisties",s:"Tokyo 2021",c:"#5A3A8A",tasks:["<b>Before:</b> Why might an athlete share their problems publicly?","<b>While:</b> What does she show and say about her training? Note two phrases.","<b>After:</b> Past Perfect Continuous: <i>She had been training… when…</i>"]},
+ {id:"WHRCJwSds1U",t:"Interview · mental health",s:"Biles opens up",c:"#1F5AA6",tasks:["<b>Before:</b> Is mental health as important as physical health in sport?","<b>While:</b> Note three things she says about pressure and support.","<b>After:</b> Report what she said: <i>She explained that she had…</i>"]},
+ {id:"GrBWMxXEmPg",t:"Interview · looking back at Tokyo",s:"Biles talks about Tokyo and a new project",c:"#A62A2A",tasks:["<b>Before:</b> How do people usually feel when they look back at a difficult time?","<b>While:</b> Which emotions does she show? What is her new project about?","<b>After:</b> <i>Since Tokyo, she has been…</i> Write three sentences about how her life has changed."]}
+];
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id);
+const KEY="gym-b2-v1";let st={};try{st=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function buildMC(id,data){const ol=$(id);
+  data.forEach(([s,opts])=>{const li=document.createElement('li');li.dataset.a=opts[0];const p=s.split('___');
+    const stem=p.length>2?`${p[0]}<span class="gap">?</span>${p[1]}<span class="gap g2">?</span>${p[2]}`:`${p[0]}<span class="gap">?</span>${p[1]||''}`;
+    li.innerHTML=`<span class="s">${stem}</span><div class="opts"></div>`;const box=li.querySelector('.opts');
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');li.dataset.v=o;
+        const gs=li.querySelectorAll('.gap');const parts=o.split(' … ');gs.forEach((g,k)=>{g.textContent=parts[k]||parts[0];g.classList.remove('ok','no')})});
+      box.appendChild(b)});ol.appendChild(li)})}
+[['v1',V1],['v2',V2],['v3',V3],['g1',G1]].forEach(([i,d])=>buildMC(i,d));
+document.querySelectorAll('[data-check]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.check;let ok=0,n=0;
+  $(id).querySelectorAll(':scope > li').forEach(li=>{n++;const g=li.dataset.v===li.dataset.a;if(g)ok++;
+    li.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===li.dataset.v)b.classList.add(g?'right':'wrong')});
+    li.querySelectorAll('.gap').forEach(gp=>{gp.classList.toggle('ok',g);gp.classList.toggle('no',!g)})});
+  const m=$(id+'msg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'Perfect 10! All correct.':ok+' / '+n+' correct. Try the red ones again.'}));
+
+/* typed */
+const norm=s=>(s||'').toLowerCase().replace(/[’`]/g,"'").replace(/[?.!]/g,'').replace(/\s+/g,' ').trim();
+G2.forEach(([a,b,ans],i)=>{const li=document.createElement('li');const id='t'+i;
+  li.innerHTML=`<span class="s">${a}<input id="${id}" autocomplete="off" spellcheck="false" aria-label="Gap ${i+1}"> ${b}<span class="fix" hidden>${ans[0].replace(/^has she/,'Has she')}</span></span>`;
+  li.dataset.ans=JSON.stringify(ans);const inp=li.querySelector('input');if(st[id])inp.value=st[id];inp.addEventListener('input',()=>{st[id]=inp.value;save();inp.classList.remove('ok','no')});$('g2').appendChild(li)});
+$('g2check').addEventListener('click',()=>{let ok=0,n=0;$('g2').querySelectorAll('li').forEach(li=>{n++;const inp=li.querySelector('input');const g=JSON.parse(li.dataset.ans).map(norm).includes(norm(inp.value));if(g)ok++;
+  inp.classList.toggle('ok',g);inp.classList.toggle('no',!g);li.querySelector('.fix').hidden=g});
+  const m=$('g2msg');m.className='msg '+(ok===n?'ok':'no');m.textContent=ok===n?'Perfect 10! All correct.':ok+' / '+n+' correct. The right answers are shown in green.'});
+
+/* yes/no */
+function buildYN(){const box=$('yn');box.innerHTML='';let n=0,ok=0;$('ynSc').textContent='0 / 0';
+  YN.forEach(([q,a,x])=>{const d=document.createElement('div');d.className='ynq';
+    d.innerHTML=`<span class="t">${q}</span><span class="b"><button type="button" data-v="1">Yes</button><button type="button" data-v="0">No</button></span><span class="x" hidden></span>`;
+    d.querySelectorAll('.b button').forEach(b=>b.addEventListener('click',()=>{const g=+b.dataset.v===a;n++;if(g)ok++;d.classList.add(g?'ok':'no');b.classList.add('pick');
+      d.querySelectorAll('.b button').forEach(z=>z.disabled=true);const xe=d.querySelector('.x');xe.innerHTML=`<b>${g?'Correct!':'Not quite.'}</b> ${x}`;xe.hidden=false;$('ynSc').textContent=ok+' / '+n}));
+    box.appendChild(d)})}
+buildYN();$('ynReset').addEventListener('click',buildYN);
+
+/* athletes */
+const cam='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function shrink(file,cb){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,800/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};im.src=fr.result};fr.readAsDataURL(file)}
+ATH.forEach(h=>{const a=document.createElement('article');a.className='ac';
+  a.innerHTML=`<label class="frame" for="ph-${h.k}" style="--c1:${h.col}"><input type="file" accept="image/*" id="ph-${h.k}"><span class="fl">${h.c}</span><span class="ph">${cam}Add a photo</span><span class="nm">${h.n}</span></label>
+    <div class="body"><div class="med">${h.m.map(x=>`<span>${x}</span>`).join('')}</div><p>${h.d}</p><div class="chips">${h.t.map(x=>`<span>${x}</span>`).join('')}</div></div>`;
+  const fr=a.querySelector('.frame'),inp=a.querySelector('input'),key='gym-ph-'+h.k;
+  const rm=document.createElement('button');rm.type='button';rm.className='rm';rm.textContent='Remove';rm.hidden=true;fr.appendChild(rm);
+  const set=u=>{fr.style.backgroundImage=u?`url("${u}")`:'';fr.classList.toggle('has',!!u);rm.hidden=!u};
+  try{const u=localStorage.getItem(key);if(u)set(u)}catch(e){}
+  fr.addEventListener('click',e=>{if(fr.classList.contains('has')&&e.target!==rm)e.preventDefault()});
+  inp.addEventListener('change',()=>{const f=inp.files[0];if(!f)return;shrink(f,u=>{set(u);try{localStorage.setItem(key,u)}catch(e){}inp.value=''})});
+  rm.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();set(null);try{localStorage.removeItem(key)}catch(err){}});
+  fr.addEventListener('dragover',e=>e.preventDefault());
+  fr.addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))shrink(f,u=>{set(u);try{localStorage.setItem(key,u)}catch(err){}})});
+  $('ath').appendChild(a)});
+
+/* vocab */
+VOC.forEach(([title,list])=>{const g=document.createElement('div');g.className='vgroup';
+  g.innerHTML=`<h3>${title} · ${list.length}</h3><div class="vgrid">${list.map(([w,d])=>`<div class="vw"><b>${w}</b><span>${d}</span></div>`).join('')}</div>`;$('vocab').appendChild(g)});
+
+/* reading */
+TFNG.forEach(([s,a],i)=>{const li=document.createElement('li');li.dataset.a=a;
+  li.innerHTML=`<span>${i+1}. ${s}</span><div class="tog">${['T','F','NG'].map(x=>`<button type="button" aria-pressed="false" data-v="${x}">${x}</button>`).join('')}</div>`;
+  li.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{li.querySelectorAll('button').forEach(z=>z.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');li.dataset.v=b.dataset.v;li.classList.remove('ok','no')}));
+  $('tfng').appendChild(li)});
+$('tfCheck').addEventListener('click',()=>{let ok=0;$('tfng').querySelectorAll('li').forEach(li=>{const g=li.dataset.v===li.dataset.a;if(g)ok++;li.classList.toggle('ok',g);li.classList.toggle('no',!g)});
+  const m=$('tfMsg');m.className='msg '+(ok===TFNG.length?'ok':'no');m.textContent=ok+' / '+TFNG.length});
+(function(){const art=$('art');const orig=art.innerHTML;let on=false;
+  $('hunt').addEventListener('click',e=>{on=!on;let h=orig;if(on)HUNT.forEach(p=>{h=h.split(p).join('<mark>'+p+'</mark>')});art.innerHTML=h;e.currentTarget.textContent=on?'Hide highlights':'Highlight the perfect tenses'})})();
+
+/* video */
+const scr=$('screen');
+const CAN_EMBED=/github\.io$|^localhost$|^127\./.test(location.hostname)||location.protocol==='file:';
+function loadVid(i,autoplay){const v=VIDS[i];const yt=`https://www.youtube.com/watch?v=${v.id}`;
+  const face=`<span class="pl"><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1B1400"/></svg></span><span class="tt">${String(i+1).padStart(2,'0')} · ${v.t}</span>`;
+  if(CAN_EMBED){
+    scr.innerHTML=`<button class="facade" type="button" style="--c1:${v.c}" aria-label="Play ${v.t}">${face}</button>`;
+    const play=()=>{const origin=encodeURIComponent(location.origin&&location.origin!=='null'?location.origin:'https://irenbirch.github.io');
+      scr.innerHTML=`<iframe src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="${v.t}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`};
+    scr.querySelector('.facade').addEventListener('click',play);if(autoplay)play();
+    $('vlink').innerHTML=`${v.s} · If it says “Video unavailable”, the owner doesn't allow embedding: <a href="${yt}" target="_blank" rel="noopener">open it on YouTube</a>.`;
+  }else{
+    scr.innerHTML=`<a class="facade" href="${yt}" target="_blank" rel="noopener" style="--c1:${v.c};text-decoration:none">${face}</a>`;
+    $('vlink').innerHTML=`${v.s} · In this preview the video opens on YouTube. On the class website (irenbirch.github.io) it plays right here.`;
+  }
+  $('vtasks').innerHTML=`<span class="lbl">Tasks · ${v.t}</span><ol style="margin-top:8px">${v.tasks.map(t=>`<li>${t}</li>`).join('')}</ol>`;
+  document.querySelectorAll('#playlist button').forEach((b,k)=>b.setAttribute('aria-current',k===i?'true':'false'))}
+VIDS.forEach((v,i)=>{const li=document.createElement('li');li.innerHTML=`<button type="button"><b>${String(i+1).padStart(2,'0')}</b><span>${v.t}</span><small>${v.s}</small></button>`;
+  li.querySelector('button').addEventListener('click',()=>loadVid(i,true));$('playlist').appendChild(li)});
+loadVid(0,false);
+['hw1','hw2','hw3','hw4'].forEach(id=>{const c=$(id);c.checked=!!st[id];c.addEventListener('change',()=>{st[id]=c.checked;save()})});
+
+/* hero: chalk flight paths */
+(function(){const cv=$('chalk'),cx=cv.getContext('2d');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let W,H,dust=[],t=0;
+  function rs(){const d=Math.min(2,devicePixelRatio||1);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+  rs();addEventListener('resize',rs);
+  const arc=(x0,x1,h,u)=>{const x=x0+(x1-x0)*u;const y=H*.86-4*h*u*(1-u);return [x,y]};
+  function draw(){cx.clearRect(0,0,W,H);
+    const g=cx.createRadialGradient(W*.7,0,0,W*.7,0,Math.max(W,H));g.addColorStop(0,'rgba(232,185,49,.14)');g.addColorStop(.5,'rgba(79,179,255,.05)');g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+    cx.fillStyle='rgba(79,179,255,.08)';cx.fillRect(0,H*.86,W,H*.14);
+    const arcs=[[W*.42,W*.62,H*.55],[W*.6,W*.82,H*.62],[W*.78,W*.98,H*.5]];
+    arcs.forEach(([a,b,h],k)=>{cx.strokeStyle='rgba(243,241,234,.18)';cx.setLineDash([3,7]);cx.lineWidth=2;cx.beginPath();for(let u=0;u<=1.001;u+=.02){const [x,y]=arc(a,b,h,u);u?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke();cx.setLineDash([]);
+      const u=reduce?.5:((t*.004+k*.33)%1);const [x,y]=arc(a,b,h,u);const ang=u*Math.PI*4;
+      cx.save();cx.translate(x,y);cx.rotate(ang);cx.fillStyle='rgba(232,185,49,.95)';cx.beginPath();cx.ellipse(0,0,14,5,0,0,7);cx.fill();cx.restore();
+      if(!reduce&&Math.random()<.5)dust.push({x,y,vx:(Math.random()-.5)*.6,vy:Math.random()*.4,l:1})});
+    dust=dust.filter(d=>d.l>0);dust.forEach(d=>{d.x+=d.vx;d.y+=d.vy;d.l-=.012;cx.fillStyle=`rgba(243,241,234,${d.l*.5})`;cx.fillRect(d.x,d.y,2,2)});
+    t++;if(!reduce)requestAnimationFrame(draw)}
+  draw()})();
+</script>
+
+</body>
+</html>
