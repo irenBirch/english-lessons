@@ -13,5 +13,6 @@ Interactive English lessons with exercises, self-check and grammar notes.
 | Lesson Mix Vol. 4: Guardians of the Galaxy (Focus 4) | B2 | `guardians-b2/` |
 | Stick the Landing: Olympic gymnastics & Simone Biles (Focus 4) | B2 | `gymnastics-b2/` |
 | City 2050: Living spaces & future forms (Focus 4) | B2 | `city-2050-b2/` |
+| Revision Road Trip: Focus 2 Units 1–6 | A2+ | `focus2-review-u1-6/` |
 
 Live site: https://irenbirch.github.io/english-lessons/

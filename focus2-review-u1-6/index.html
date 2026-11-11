@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Revision Road Trip</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@500;600;700;800;900&display=swap">
+<style>
+/* Concept: a road trip through Focus 2, Units 1–6. A winding road map is the navigation; each unit is a stop with its own colour, an illustrated banner and picture-led tasks. Stars on the map fill in as tasks are checked. */
+:root{
+  --bg:#FFF6E9; --paper:#FFFFFF; --ink:#2A1F3D; --muted:#6B5E7E; --rule:rgba(42,31,61,.12); --soft:#F6EAD8;
+  --road:#3B3150; --line:#FFD166;
+  --u1:#FF6B6B; --u2:#3D8BFD; --u3:#B15CFF; --u4:#22B07D; --u5:#FF9F1C; --u6:#14B8C4;
+  --ok:#1C9D63; --bad:#E0473B; --star:#FFB703;
+  --skin1:#F7C9A3; --skin2:#D9A07A; --skin3:#A86B4C; --skin4:#7A4B32;
+  --f-d:"Bricolage Grotesque","Arial Black",system-ui,sans-serif; --f-b:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17121F; --paper:#221B2E; --ink:#F4EDFB; --muted:#B5A9C6; --rule:rgba(244,237,251,.13); --soft:#2C2339;
+  --road:#4A3F60; --line:#FFD166;
+  --u1:#FF8585; --u2:#6AA6FF; --u3:#C78BFF; --u4:#3DCB95; --u5:#FFB547; --u6:#3FD3DE;
+  --ok:#3DD68C; --bad:#FF7468; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17121F; --paper:#221B2E; --ink:#F4EDFB; --muted:#B5A9C6; --rule:rgba(244,237,251,.13); --soft:#2C2339;
+  --road:#4A3F60; --line:#FFD166;
+  --u1:#FF8585; --u2:#6AA6FF; --u3:#C78BFF; --u4:#3DCB95; --u5:#FFB547; --u6:#3FD3DE;
+  --ok:#3DD68C; --bad:#FF7468; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:17.5px;line-height:1.55;font-weight:600}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:50}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-d);margin:0;line-height:1.02;letter-spacing:-.01em;text-wrap:balance}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--u2);outline-offset:3px}
+
+/* hero */
+.hero{padding-block:40px 10px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+.kick{font-weight:900;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--u1)}
+.hero h1{font-size:clamp(3rem,8.5vw,5.8rem);margin-top:8px}
+.hero h1 em{font-style:normal;color:var(--u2)}
+.hero .lede{margin-top:14px;color:var(--muted);max-width:50ch}
+.hero-art{width:100%;height:auto}
+.prog{margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar{flex:1 1 220px;height:14px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--u1),var(--u5),var(--u4),var(--u2));border-radius:99px;transition:width .5s}
+.prog b{font-family:var(--f-d);font-size:1.1rem}
+.reset{border:0;background:none;color:var(--muted);font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px}
+.reset.arm{color:var(--bad)}
+
+/* road map nav */
+.mapnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--rule)}
+.stops{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;position:relative}
+.stops::before{content:"";position:absolute;left:4%;right:4%;top:24px;height:8px;border-radius:9px;background:var(--road);background-image:repeating-linear-gradient(90deg,var(--line) 0 14px,transparent 14px 28px);background-size:28px 2px;background-repeat:repeat-x;background-position:0 50%;z-index:0}
+.stop{position:relative;z-index:1;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;min-width:0}
+.stop .dot{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-d);font-size:1.2rem;color:#fff;background:var(--c);border:4px solid var(--bg);box-shadow:0 0 0 2px var(--c);transition:transform .2s}
+.stop[aria-current="true"] .dot{transform:scale(1.16);box-shadow:0 0 0 4px var(--c)}
+.stop .nm{font-size:.74rem;font-weight:800;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.stop[aria-current="true"] .nm{color:var(--ink)}
+.stop .st{font-size:.72rem;letter-spacing:1px;color:var(--star);height:1em;line-height:1}
+
+/* station */
+.station{padding-block:34px 10px}
+.banner{border-radius:28px;background:var(--c);color:#fff;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);overflow:hidden;min-height:220px}
+.banner .txt{padding:28px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.banner .un{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;opacity:.9}
+.banner h2{font-size:clamp(2.2rem,5.5vw,3.6rem)}
+.banner .chips{display:flex;flex-wrap:wrap;gap:6px}
+.banner .chips span{background:rgba(255,255,255,.2);border-radius:99px;padding:3px 11px;font-size:.82rem;font-weight:800}
+.banner .art{display:flex;align-items:flex-end;justify-content:center;padding:14px 14px 0;background:rgba(255,255,255,.12)}
+.banner .art{min-width:0;overflow:hidden}.banner .art svg{display:block;width:100%;max-width:380px;height:auto;min-width:0}
+.rule-box{margin-top:16px;background:var(--paper);border:1px solid var(--rule);border-left:6px solid var(--c);border-radius:16px;padding:0}
+.rule-box summary{cursor:pointer;padding:14px 18px;font-weight:900;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.rule-box summary::after{content:"+";font-family:var(--f-d);font-size:1.3rem;line-height:1;color:var(--c)}
+.rule-box[open] summary::after{content:"–"}
+.rule-box .in{padding:0 18px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.rule-box h4{margin:0 0 4px;font-size:1rem;color:var(--c)}
+.rule-box p,.rule-box li{font-size:.94rem}
+.rule-box ul{margin:4px 0 0;padding-left:1.1em}
+.rule-box i{color:var(--muted)}
+.tasks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+.task{background:var(--paper);border:1px solid var(--rule);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.task.wide{grid-column:1/-1}
+.th{display:flex;gap:12px;align-items:flex-start}
+.th .n{flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--c) 18%,var(--paper));color:var(--c);display:grid;place-items:center;font-family:var(--f-d);font-size:1.1rem}
+.th h3{font-size:1.25rem}
+.th p{color:var(--muted);font-size:.92rem;margin-top:3px}
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:auto;padding-top:4px}
+.btn{border:0;cursor:pointer;font-weight:900;padding:10px 22px;border-radius:99px;background:var(--c,var(--ink));color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--rule)}
+.msg{font-weight:900}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+
+/* mc */
+.mc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:q}
+.mc>li{counter-increment:q;display:flex;flex-direction:column;gap:7px}
+.mc .s::before{content:counter(q) ". ";color:var(--muted);font-weight:800}
+.gap{display:inline-block;min-width:4.5em;border-bottom:2.5px dashed var(--c);text-align:center;color:var(--c);font-weight:900;padding:0 4px}
+.gap.ok{color:var(--ok);border-color:var(--ok);border-bottom-style:solid}.gap.no{color:var(--bad);border-color:var(--bad)}
+.opts{display:flex;flex-wrap:wrap;gap:7px}
+.opt{border:2px solid var(--rule);background:var(--bg);border-radius:12px;padding:5px 13px;cursor:pointer;font-weight:800}
+.opt[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--paper))}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--paper))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--paper))}
+
+/* picture cards */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pc{border:2px solid var(--rule);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg);min-width:0}
+.pc .pic{aspect-ratio:1/1;max-width:100%;border-radius:12px;background:color-mix(in srgb,var(--c) 12%,var(--paper));display:grid;place-items:center}
+.pc .pic svg{width:76%;height:auto}
+.pc p{font-size:.9rem;font-weight:700}
+.pc .opts{gap:5px}.pc .opt{padding:4px 10px;font-size:.88rem}
+.pc.ok{border-color:var(--ok)}.pc.no{border-color:var(--bad)}
+
+/* gaps typed */
+.lines{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:l}
+.lines li{counter-increment:l;line-height:2.2}
+.lines li::before{content:counter(l) ". ";color:var(--muted);font-weight:800}
+.story{line-height:2.3}
+input.t{background:var(--bg);border:0;border-bottom:2.5px solid var(--muted);border-radius:8px 8px 0 0;padding:0 8px;height:1.9em;width:9em;max-width:100%;font-weight:800}
+input.t.wide{width:12em}
+input.t.ok{border-bottom-color:var(--ok);color:var(--ok)}input.t.no{border-bottom-color:var(--bad);color:var(--bad)}
+.hint{color:var(--muted);font-size:.9em;font-weight:700}
+.fix{color:var(--ok);font-size:.84em;font-weight:900;margin-left:2px}
+
+/* order */
+.ord{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:o}
+.ord li{counter-increment:o;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--bg);border:2px solid transparent}
+.ord li::before{content:counter(o);font-weight:900;color:var(--muted);font-size:.8rem}
+.ord .ans{min-height:44px;border-radius:10px;border:2px dashed var(--rule);display:flex;flex-wrap:wrap;gap:6px;padding:6px;align-items:center}
+.ord .pool{display:flex;flex-wrap:wrap;gap:6px}
+.tile{border:0;border-radius:9px;padding:5px 11px;background:var(--paper);box-shadow:inset 0 0 0 2px var(--rule);cursor:pointer;font-weight:800}
+.ans .tile{background:color-mix(in srgb,var(--c) 16%,var(--paper));box-shadow:none}
+.ord li.ok{border-color:var(--ok)}.ord li.no{border-color:var(--bad)}
+.ord .fix{display:block}
+
+/* house picture */
+.house{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
+.house svg{width:100%;height:auto;border-radius:16px;background:color-mix(in srgb,var(--c) 10%,var(--paper))}
+.labels{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.labels li{display:flex;gap:10px;align-items:center}
+.labels b{width:30px;height:30px;flex:0 0 auto;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-family:var(--f-d)}
+.labels select{flex:1;min-width:0;background:var(--bg);border:2px solid var(--rule);border-radius:10px;padding:6px 8px;font-weight:800}
+.labels select.ok{border-color:var(--ok)}.labels select.no{border-color:var(--bad)}
+
+/* finish */
+.finish{padding-block:40px}
+.deck{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}
+.talk{border-radius:26px;background:var(--ink);color:var(--bg);padding:28px;min-height:250px;display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.talk .tg{font-weight:900;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--line)}
+.talk .q{font-family:var(--f-d);font-size:clamp(1.5rem,3.4vw,2.2rem);line-height:1.12}
+.talk .btn{background:var(--line);color:#2A1F3D;align-self:flex-start}
+.sum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sum div{background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:12px 14px;border-left:6px solid var(--c)}
+.sum b{display:block;font-family:var(--f-d);font-size:1.05rem}
+.sum span{color:var(--star);letter-spacing:2px}
+.sum small{color:var(--muted);font-weight:800}
+footer{padding-block:40px 40px;color:var(--muted);font-size:.85rem}
+
+@media (prefers-reduced-motion:no-preference){.station{animation:in .35s ease}@keyframes in{from{opacity:0;transform:translateY(8px)}}}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){
+  .hero{grid-template-columns:minmax(0,1fr)}.hero-art{max-width:420px}
+  .tasks,.deck,.rule-box .in,.house{grid-template-columns:minmax(0,1fr)}
+  .banner{grid-template-columns:minmax(0,1fr)}.banner .art{max-height:200px}
+  .stop .nm{display:none}.stops::before{top:20px}.stop .dot{width:40px;height:40px;font-size:1rem;border-width:3px}
+}
+@media (max-width:440px){.cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.sum{grid-template-columns:minmax(0,1fr)}.task{padding:16px}.pc{padding:9px}}
+</style>
+
+</head>
+<body>
+<header class="wrap hero">
+  <div>
+    <div class="kick">Focus 2 · Units 1–6 · Revision</div>
+    <h1>Revision <em>Road Trip</em></h1>
+    <p class="lede">Six stops, six units: personality, inventions, the arts, homes, school and jobs. Do the tasks, press <b>Check</b>, and collect stars on the map. Open <b>Grammar in a nutshell</b> at each stop if you need a reminder.</p>
+    <div class="prog"><div class="bar" aria-hidden="true"><i id="pbar"></i></div><b id="ptxt">0 / 0 ★</b><button class="reset" type="button" id="reset">Start again</button></div>
+  </div>
+  <svg class="hero-art" viewBox="0 0 480 300" role="img" aria-label="An illustrated road winding past six stops: a family, a light bulb, a palette, a house, a school and a briefcase">
+    <path d="M10 270 C 120 270 120 190 220 190 S 330 110 420 110 S 470 40 470 40" fill="none" stroke="var(--road)" stroke-width="30" stroke-linecap="round"/>
+    <path d="M10 270 C 120 270 120 190 220 190 S 330 110 420 110 S 470 40 470 40" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="12 12"/>
+    <g font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#fff" text-anchor="middle">
+      <circle cx="40" cy="230" r="26" fill="var(--u1)"/><text x="40" y="237">1</text>
+      <circle cx="130" cy="205" r="26" fill="var(--u2)"/><text x="130" y="212">2</text>
+      <circle cx="215" cy="150" r="26" fill="var(--u3)"/><text x="215" y="157">3</text>
+      <circle cx="300" cy="140" r="26" fill="var(--u4)"/><text x="300" y="147">4</text>
+      <circle cx="380" cy="70" r="26" fill="var(--u5)"/><text x="380" y="77">5</text>
+      <circle cx="450" cy="120" r="26" fill="var(--u6)"/><text x="450" y="127">6</text>
+    </g>
+    <g transform="translate(330 205)"><rect x="-38" y="-8" width="76" height="34" rx="12" fill="var(--u2)"/><rect x="-26" y="-26" width="48" height="24" rx="8" fill="var(--u2)"/><rect x="-20" y="-21" width="16" height="14" rx="3" fill="#fff" opacity=".8"/><rect x="2" y="-21" width="14" height="14" rx="3" fill="#fff" opacity=".8"/><circle cx="-20" cy="28" r="10" fill="var(--ink)"/><circle cx="20" cy="28" r="10" fill="var(--ink)"/></g>
+    <circle cx="80" cy="60" r="30" fill="var(--star)" opacity=".9"/>
+  </svg>
+</header>
+
+<nav class="mapnav" aria-label="Units">
+  <div class="wrap"><div class="stops" id="stops"></div></div>
+</nav>
+
+<main class="wrap" id="main"></main>
+<footer class="wrap">Revision of Focus 2, Units 1–6 (up to 6.2). All sentences and illustrations were made for this lesson.</footer>
+
+<script>
+/* ================= ILLUSTRATIONS ================= */
+const W='#fff';
+function face(skin,hair,style,mood,extra=''){ // original cartoon heads
+  const hairs={short:`<path d="M24 40 Q26 14 50 14 Q74 14 76 40 Q70 26 50 26 Q30 26 24 40Z" fill="${hair}"/>`,
+   long:`<path d="M20 70 Q16 18 50 16 Q84 18 80 70 L72 70 Q74 32 50 28 Q26 32 28 70Z" fill="${hair}"/>`,
+   curly:`<g fill="${hair}"><circle cx="30" cy="30" r="10"/><circle cx="44" cy="22" r="11"/><circle cx="58" cy="22" r="11"/><circle cx="71" cy="31" r="10"/><circle cx="25" cy="42" r="7"/><circle cx="76" cy="43" r="7"/></g>`,
+   bun:`<circle cx="50" cy="12" r="10" fill="${hair}"/><path d="M24 42 Q24 18 50 18 Q76 18 76 42 Q66 28 50 28 Q34 28 24 42Z" fill="${hair}"/>`,
+   spiky:`<path d="M24 40 L28 18 L38 28 L44 12 L52 26 L60 12 L64 28 L74 18 L76 40 Q64 28 50 28 Q36 28 24 40Z" fill="${hair}"/>`,
+   cap:`<path d="M24 36 Q26 16 50 16 Q74 16 76 36Z" fill="var(--u2)"/><rect x="62" y="31" width="26" height="6" rx="3" fill="var(--u2)"/>`};
+  const m={smile:`<path d="M40 60 Q50 69 60 60" stroke="#2A1F3D" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+   grin:`<path d="M38 58 Q50 74 62 58Z" fill="#2A1F3D"/><path d="M42 59 h16" stroke="#fff" stroke-width="3"/>`,
+   frown:`<path d="M40 66 Q50 58 60 66" stroke="#2A1F3D" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M33 38 l10 4 M67 38 l-10 4" stroke="#2A1F3D" stroke-width="3" stroke-linecap="round"/>`,
+   shy:`<path d="M44 62 Q50 65 56 62" stroke="#2A1F3D" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="56" rx="6" ry="3.5" fill="#FF6B6B" opacity=".6"/><ellipse cx="66" cy="56" rx="6" ry="3.5" fill="#FF6B6B" opacity=".6"/>`,
+   sleepy:`<path d="M42 62 h16" stroke="#2A1F3D" stroke-width="3" stroke-linecap="round"/>`,
+   calm:`<path d="M42 61 Q50 66 58 61" stroke="#2A1F3D" stroke-width="3" fill="none" stroke-linecap="round"/>`};
+  const eyes=mood==='sleepy'?`<path d="M36 46 q5 4 10 0 M54 46 q5 4 10 0" stroke="#2A1F3D" stroke-width="3" fill="none"/>`:mood==='shy'?`<path d="M36 47 q5 -3 10 0 M54 47 q5 -3 10 0" stroke="#2A1F3D" stroke-width="3" fill="none"/>`:`<circle cx="41" cy="46" r="3.5" fill="#2A1F3D"/><circle cx="59" cy="46" r="3.5" fill="#2A1F3D"/>`;
+  return `<svg viewBox="0 0 100 100"><rect x="30" y="80" width="40" height="22" rx="12" fill="var(--c)"/><rect x="44" y="70" width="12" height="14" fill="${skin}"/>${style==='long'?hairs.long:''}<ellipse cx="50" cy="48" rx="26" ry="28" fill="${skin}"/>${style!=='long'?hairs[style]:`<path d="M24 40 Q26 16 50 16 Q74 16 76 40 Q66 28 50 28 Q34 28 24 40Z" fill="${hair}"/>`}${eyes}${m[mood]}${extra}</svg>`}
+const I={
+ headphones:`<svg viewBox="0 0 100 100"><path d="M20 60 V50 a30 30 0 0 1 60 0 V60" stroke="var(--ink)" stroke-width="7" fill="none"/><rect x="12" y="54" width="18" height="30" rx="8" fill="var(--c)"/><rect x="70" y="54" width="18" height="30" rx="8" fill="var(--c)"/></svg>`,
+ laptop:`<svg viewBox="0 0 100 100"><rect x="20" y="22" width="60" height="42" rx="5" fill="var(--ink)"/><rect x="25" y="27" width="50" height="32" rx="2" fill="var(--c)"/><path d="M10 70 h80 l-6 10 h-68z" fill="var(--muted)"/></svg>`,
+ bulb:`<svg viewBox="0 0 100 100"><path d="M50 12 a26 26 0 0 1 16 46 v10 h-32 v-10 a26 26 0 0 1 16 -46z" fill="var(--star)"/><rect x="36" y="70" width="28" height="7" rx="2" fill="var(--muted)"/><rect x="38" y="79" width="24" height="7" rx="2" fill="var(--muted)"/><path d="M44 52 l6 -12 l6 12" stroke="#2A1F3D" stroke-width="3" fill="none"/></svg>`,
+ watch:`<svg viewBox="0 0 100 100"><rect x="36" y="6" width="28" height="88" rx="10" fill="var(--muted)"/><rect x="26" y="28" width="48" height="44" rx="12" fill="var(--ink)"/><rect x="31" y="33" width="38" height="34" rx="8" fill="var(--c)"/><path d="M38 52 l6 -6 l6 8 l10 -12" stroke="#fff" stroke-width="3" fill="none"/></svg>`,
+ robot:`<svg viewBox="0 0 100 100"><path d="M50 8 v12" stroke="var(--ink)" stroke-width="4"/><circle cx="50" cy="8" r="5" fill="var(--bad)"/><rect x="24" y="20" width="52" height="38" rx="10" fill="var(--c)"/><circle cx="40" cy="38" r="6" fill="#fff"/><circle cx="60" cy="38" r="6" fill="#fff"/><rect x="40" y="48" width="20" height="4" rx="2" fill="#fff"/><rect x="30" y="62" width="40" height="30" rx="8" fill="var(--muted)"/><rect x="14" y="64" width="12" height="24" rx="6" fill="var(--muted)"/><rect x="74" y="64" width="12" height="24" rx="6" fill="var(--muted)"/></svg>`,
+ satellite:`<svg viewBox="0 0 100 100"><g transform="rotate(-30 50 50)"><rect x="40" y="38" width="20" height="24" rx="4" fill="var(--muted)"/><rect x="8" y="42" width="28" height="16" fill="var(--c)"/><rect x="64" y="42" width="28" height="16" fill="var(--c)"/><path d="M22 42 v16 M78 42 v16" stroke="#fff" stroke-width="2"/></g><path d="M60 74 q10 -4 12 -14 M64 82 q16 -6 18 -22" stroke="var(--star)" stroke-width="3" fill="none"/></svg>`,
+ book:`<svg viewBox="0 0 100 100"><path d="M14 26 q18 -8 36 4 v54 q-18 -12 -36 -4z" fill="var(--c)"/><path d="M86 26 q-18 -8 -36 4 v54 q18 -12 36 -4z" fill="color-mix(in srgb,var(--c) 70%,#fff)"/><path d="M72 10 l10 10 l-26 40 l-12 4 l2 -12z" fill="var(--ink)"/></svg>`,
+ statue:`<svg viewBox="0 0 100 100"><rect x="26" y="80" width="48" height="12" rx="2" fill="var(--muted)"/><path d="M34 80 q0 -20 16 -22 q16 2 16 22z" fill="#C9C2D3"/><ellipse cx="50" cy="38" rx="16" ry="20" fill="#DCD6E4"/><path d="M34 34 q4 -18 16 -18 q12 0 16 18 q-6 -8 -16 -8 q-10 0 -16 8z" fill="#C9C2D3"/><path d="M80 20 l-12 22" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/><rect x="74" y="10" width="14" height="10" rx="2" fill="var(--c)" transform="rotate(30 81 15)"/></svg>`,
+ notes:`<svg viewBox="0 0 100 100"><path d="M10 30 h80 M10 42 h80 M10 54 h80 M10 66 h80 M10 78 h80" stroke="var(--muted)" stroke-width="1.5" opacity=".6"/><g fill="var(--c)"><ellipse cx="32" cy="72" rx="9" ry="7"/><ellipse cx="64" cy="62" rx="9" ry="7"/></g><path d="M40 72 V28 L72 20 V62" stroke="var(--c)" stroke-width="5" fill="none"/></svg>`,
+ clapper:`<svg viewBox="0 0 100 100"><rect x="14" y="40" width="72" height="46" rx="5" fill="var(--ink)"/><g transform="rotate(-14 14 40)"><rect x="14" y="22" width="72" height="16" rx="3" fill="var(--ink)"/><path d="M24 22 l10 16 M42 22 l10 16 M60 22 l10 16" stroke="#fff" stroke-width="5"/></g><path d="M24 56 h52 M24 68 h34" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/></svg>`,
+ palette:`<svg viewBox="0 0 100 100"><path d="M50 12 C 20 12 8 36 14 58 C 20 80 42 90 56 84 C 66 80 58 70 64 64 C 70 58 88 64 90 48 C 92 28 74 12 50 12z" fill="#E9D7B9"/><g><circle cx="34" cy="34" r="7" fill="var(--u1)"/><circle cx="54" cy="26" r="7" fill="var(--u5)"/><circle cx="72" cy="36" r="7" fill="var(--u4)"/><circle cx="28" cy="56" r="7" fill="var(--u2)"/></g><circle cx="44" cy="68" r="6" fill="var(--bg)"/></svg>`,
+ quill:`<svg viewBox="0 0 100 100"><rect x="18" y="16" width="52" height="70" rx="6" fill="var(--paper)" stroke="var(--muted)" stroke-width="3"/><path d="M28 32 h30 M28 44 h24 M28 56 h30 M28 68 h18" stroke="var(--muted)" stroke-width="3" stroke-linecap="round"/><path d="M88 8 q-30 10 -36 52 l4 2 q10 -36 32 -54z" fill="var(--c)"/></svg>`,
+ maths:`<svg viewBox="0 0 100 100"><rect x="14" y="14" width="72" height="72" rx="14" fill="var(--c)"/><g stroke="#fff" stroke-width="6" stroke-linecap="round"><path d="M28 34 h16 M36 26 v16 M58 34 h16 M28 66 l12 -12 M28 54 l12 12 M58 60 h16"/></g><circle cx="66" cy="52" r="3" fill="#fff"/><circle cx="66" cy="68" r="3" fill="#fff"/></svg>`,
+ biology:`<svg viewBox="0 0 100 100"><path d="M50 90 V44" stroke="var(--ink)" stroke-width="4"/><path d="M50 60 C 20 60 14 30 22 16 C 40 18 54 34 50 60z" fill="var(--u4)"/><path d="M50 50 C 76 50 86 26 80 12 C 62 14 48 28 50 50z" fill="color-mix(in srgb,var(--u4) 70%,#fff)"/></svg>`,
+ geography:`<svg viewBox="0 0 100 100"><circle cx="50" cy="46" r="32" fill="var(--u2)"/><path d="M30 30 q10 -6 18 2 q4 8 -6 12 q-10 2 -8 12 q-8 -6 -4 -26z M58 52 q10 -4 16 4 q-2 12 -12 14 q-8 -6 -4 -18z" fill="var(--u4)"/><path d="M50 78 v12 M32 92 h36" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></svg>`,
+ history:`<svg viewBox="0 0 100 100"><path d="M14 30 L50 12 L86 30z" fill="var(--c)"/><rect x="14" y="30" width="72" height="6" fill="var(--c)"/><g fill="color-mix(in srgb,var(--c) 60%,#fff)"><rect x="22" y="38" width="10" height="40"/><rect x="45" y="38" width="10" height="40"/><rect x="68" y="38" width="10" height="40"/></g><rect x="10" y="80" width="80" height="8" fill="var(--c)"/></svg>`,
+ chemistry:`<svg viewBox="0 0 100 100"><path d="M40 12 h20 M44 12 v28 L22 80 q-2 8 8 8 h40 q10 0 8 -8 L56 40 V12" fill="var(--paper)" stroke="var(--ink)" stroke-width="4"/><path d="M30 66 h40 l8 14 q2 8 -8 8 h-40 q-10 0 -8 -8z" fill="var(--u3)"/><circle cx="46" cy="56" r="4" fill="var(--u3)"/><circle cx="56" cy="46" r="3" fill="var(--u3)"/></svg>`,
+ pe:`<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="36" fill="var(--paper)" stroke="var(--ink)" stroke-width="4"/><path d="M50 30 l14 10 l-5 17 h-18 l-5 -17z" fill="var(--ink)"/><path d="M50 14 v16 M64 40 l20 -6 M59 57 l10 16 M41 57 l-10 16 M36 40 l-20 -6" stroke="var(--ink)" stroke-width="3"/></svg>`,
+ firefighter:`<svg viewBox="0 0 100 100"><path d="M18 60 Q18 22 50 20 Q82 22 82 60z" fill="var(--bad)"/><rect x="8" y="58" width="84" height="12" rx="6" fill="var(--bad)"/><rect x="40" y="30" width="20" height="22" rx="4" fill="var(--star)"/><path d="M50 34 v14" stroke="var(--bad)" stroke-width="3"/></svg>`,
+ nurse:`<svg viewBox="0 0 100 100"><path d="M20 70 Q20 30 50 28 Q80 30 80 70z" fill="var(--paper)" stroke="var(--muted)" stroke-width="3"/><rect x="42" y="36" width="16" height="30" rx="2" fill="var(--bad)"/><rect x="35" y="43" width="30" height="16" rx="2" fill="var(--bad)"/></svg>`,
+ chef:`<svg viewBox="0 0 100 100"><g fill="var(--paper)" stroke="var(--muted)" stroke-width="3"><path d="M28 60 C 10 56 12 30 30 32 C 32 14 58 10 62 26 C 80 18 94 40 74 58z"/><rect x="28" y="58" width="46" height="24" rx="3"/></g><path d="M38 70 h26" stroke="var(--muted)" stroke-width="3"/></svg>`,
+ pilot:`<svg viewBox="0 0 100 100"><path d="M10 54 L90 40 Q96 40 94 46 L18 64z" fill="var(--c)"/><path d="M44 48 L30 18 h10 l22 28z M48 56 L36 84 h10 l18 -30z" fill="color-mix(in srgb,var(--c) 70%,var(--ink))"/><path d="M14 56 l-6 -16 h8 l10 14z" fill="var(--c)"/></svg>`,
+ vet:`<svg viewBox="0 0 100 100"><g fill="var(--c)"><ellipse cx="50" cy="66" rx="20" ry="16"/><ellipse cx="26" cy="44" rx="8" ry="11"/><ellipse cx="42" cy="30" rx="8" ry="11"/><ellipse cx="58" cy="30" rx="8" ry="11"/><ellipse cx="74" cy="44" rx="8" ry="11"/></g><path d="M44 66 h12 M50 60 v12" stroke="#fff" stroke-width="4"/></svg>`,
+ mechanic:`<svg viewBox="0 0 100 100"><path d="M70 14 a16 16 0 0 0 -14 22 L18 74 a8 8 0 0 0 11 11 L67 47 a16 16 0 0 0 22 -14 l-10 6 l-8 -4 l-2 -9 z" fill="var(--muted)"/><circle cx="24" cy="80" r="3" fill="var(--paper)"/></svg>`
+};
+/* banner scenes */
+const inner=x=>x.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
+const G=(x,y,k,svg,style='')=>`<g transform="translate(${x} ${y}) scale(${k})" style="${style}">${inner(svg)}</g>`;
+const ART={
+ 1:`<svg viewBox="0 0 380 200">${['#F7C9A3','#A86B4C','#D9A07A','#7A4B32'].map((sk,i)=>G(8+i*92,i%2?52:30,1,face(sk,['#3B2A20','#1E1A2B','#C97B2D','#2A1F3D'][i],['long','short','curly','bun'][i],['grin','smile','shy','calm'][i]),'--c:#ffffff66')).join('')}<text x="190" y="190" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="16" fill="#fff">kind · shy · lazy · honest · creative</text></svg>`,
+ 2:`<svg viewBox="0 0 380 200">${G(20,30,1.3,I.bulb,'')}${G(150,60,1.1,I.laptop,'--c:#ffffffaa')}${G(270,20,1.0,I.robot,'--c:#ffffffaa')}<text x="190" y="190" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="16" fill="#fff">When I was reading, the lights went out…</text></svg>`,
+ 3:`<svg viewBox="0 0 380 200"><rect x="40" y="20" width="150" height="120" rx="6" fill="#fff" opacity=".9"/><path d="M50 120 L90 70 L120 100 L145 80 L180 120z" fill="var(--u4)"/><circle cx="160" cy="45" r="14" fill="var(--star)"/><path d="M115 140 l-30 50 M115 140 l30 50 M115 140 v50" stroke="#fff" stroke-width="6" stroke-linecap="round"/>${G(220,40,1.3,I.palette,'--c:#ffffffcc')}</svg>`,
+ 4:`<svg viewBox="0 0 380 200"><path d="M70 110 L150 40 L230 110z" fill="#fff"/><rect x="85" y="108" width="130" height="80" fill="#ffffffdd"/><rect x="138" y="140" width="26" height="48" fill="var(--c)"/><rect x="100" y="125" width="26" height="24" fill="var(--star)"/><rect x="176" y="125" width="26" height="24" fill="var(--star)"/><rect x="190" y="50" width="16" height="36" fill="#fff"/><g fill="#ffffffaa"><circle cx="290" cy="130" r="34"/><rect x="284" y="150" width="12" height="40"/></g><text x="300" y="60" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="30" fill="#fff">since 2015</text></svg>`,
+ 5:`<svg viewBox="0 0 380 200"><rect x="40" y="30" width="200" height="130" rx="10" fill="#1F4D3A"/><rect x="30" y="156" width="220" height="10" rx="4" fill="#C98B4A"/><text x="140" y="85" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="22" fill="#fff">If I revise,</text><text x="140" y="118" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="22" fill="#FFD166">I'll pass!</text>${G(260,40,1.0,I.maths,'--c:#ffffffcc')}<path d="M258 170 h100" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`,
+ 6:`<svg viewBox="0 0 380 200"><rect x="110" y="70" width="160" height="110" rx="14" fill="#fff"/><path d="M160 70 v-18 a10 10 0 0 1 10 -10 h40 a10 10 0 0 1 10 10 v18" stroke="#fff" stroke-width="10" fill="none"/><rect x="110" y="112" width="160" height="10" fill="var(--c)" opacity=".5"/><rect x="178" y="104" width="24" height="26" rx="4" fill="var(--star)"/>${G(10,30,0.9,I.chef,'')}${G(285,20,0.9,I.firefighter,'')}<text x="190" y="30" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#fff">If I were a pilot…</text></svg>`
+};
+const HOUSE=`<svg viewBox="0 0 420 330" role="img" aria-label="A cut-away picture of a two-storey house with numbered furniture">
+ <path d="M30 120 L210 20 L390 120z" fill="var(--c)"/><rect x="40" y="118" width="340" height="200" fill="var(--paper)" stroke="var(--ink)" stroke-width="4"/>
+ <path d="M40 215 h340 M210 118 v200" stroke="var(--ink)" stroke-width="4"/><rect x="20" y="316" width="380" height="8" fill="var(--ink)"/>
+ <!-- 1 bed (top left) --><rect x="60" y="175" width="100" height="26" rx="6" fill="var(--u2)"/><rect x="60" y="165" width="26" height="16" rx="5" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"/><rect x="56" y="160" width="8" height="42" fill="var(--ink)"/>
+ <!-- 2 wardrobe --><rect x="170" y="140" width="32" height="70" rx="3" fill="#C98B4A"/><path d="M186 140 v70" stroke="var(--ink)" stroke-width="2"/>
+ <!-- 3 bath (top right) --><path d="M232 180 h110 v12 a18 18 0 0 1 -18 18 h-74 a18 18 0 0 1 -18 -18z" fill="var(--paper)" stroke="var(--muted)" stroke-width="3"/><path d="M336 180 v-28 h12" stroke="var(--muted)" stroke-width="4" fill="none"/>
+ <!-- 4 mirror --><ellipse cx="270" cy="150" rx="16" ry="20" fill="color-mix(in srgb,var(--u2) 30%,var(--paper))" stroke="var(--muted)" stroke-width="3"/>
+ <!-- 5 sofa (bottom left) --><rect x="58" y="268" width="110" height="34" rx="10" fill="var(--u1)"/><rect x="58" y="252" width="110" height="24" rx="10" fill="color-mix(in srgb,var(--u1) 75%,#fff)"/><rect x="50" y="262" width="16" height="40" rx="7" fill="var(--u1)"/><rect x="160" y="262" width="16" height="40" rx="7" fill="var(--u1)"/>
+ <!-- 6 lamp --><path d="M188 302 v-56" stroke="var(--ink)" stroke-width="3"/><path d="M176 248 l12 -20 l12 20z" fill="var(--star)"/><rect x="180" y="300" width="16" height="6" fill="var(--ink)"/>
+ <!-- 7 fridge (bottom right) --><rect x="340" y="226" width="32" height="84" rx="4" fill="var(--paper)" stroke="var(--muted)" stroke-width="3"/><path d="M340 254 h32 M346 236 v10 M346 262 v14" stroke="var(--muted)" stroke-width="3"/>
+ <!-- 8 cooker --><rect x="268" y="252" width="56" height="58" rx="3" fill="var(--muted)"/><rect x="276" y="270" width="40" height="30" rx="2" fill="var(--ink)"/><circle cx="282" cy="258" r="3" fill="var(--paper)"/><circle cx="296" cy="258" r="3" fill="var(--paper)"/><circle cx="310" cy="258" r="3" fill="var(--paper)"/>
+ <!-- 9 table --><rect x="226" y="280" width="36" height="6" fill="#C98B4A"/><path d="M230 286 v24 M258 286 v24" stroke="#C98B4A" stroke-width="4"/>
+ <g font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="15" fill="#fff" text-anchor="middle">
+  ${[[110,152,1],[186,132,2],[300,198,3],[270,124,4],[112,244,5],[206,236,6],[356,218,7],[296,244,8],[244,272,9]].map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="12" fill="var(--ink)"/><text x="${p[0]}" y="${p[1]+5}">${i+1}</text>`).join('')}
+ </g></svg>`;
+
+/* ================= CONTENT ================= */
+const U=[
+{n:1,name:"Personality",c:"var(--u1)",chips:["personality adjectives","negative prefixes","adjective + preposition","question forms","verb + -ing / to"],
+ rules:`<div><h4>Question forms</h4><p><b>Object question</b> (з допоміжним дієсловом): <i>Who <b>do</b> you live with?</i></p><p><b>Subject question</b> (питаємо про підмет, без do/does): <i>Who <b>lives</b> with you?</i></p><p>Прийменник іде в кінець: <i>What are you laughing <b>at</b>?</i></p></div>
+ <div><h4>Verb + -ing / to</h4><ul><li><b>-ing:</b> enjoy, can't stand, avoid, mind, finish, love/hate</li><li><b>to + V:</b> want, decide, hope, promise, agree, plan, would like</li></ul><p><i>I enjoy <b>reading</b>. I want <b>to read</b>.</i></p></div>`,
+ tasks:[
+  {t:"Who's who?",d:"Read about each person and choose the best adjective.",type:"cards",items:[
+   [face('var(--skin1)','#3B2A20','long','grin'),"Mia shares her snacks and buys presents for everyone.",["generous","mean","lazy"]],
+   [face('var(--skin2)','#1E1A2B','spiky','sleepy'),"Tom never does his homework and sleeps till noon.",["lazy","hard-working","polite"]],
+   [face('var(--skin3)','#2A1F3D','curly','smile'),"Ella talks to everyone at parties and loves meeting new people.",["outgoing","shy","patient"]],
+   [face('var(--skin1)','#C97B2D','short','frown'),"Sam gets angry when he has to wait for the bus.",["impatient","patient","creative"]],
+   [face('var(--skin4)','#1E1A2B','bun','calm'),"Lily always tells the truth, even when it's difficult.",["honest","dishonest","rude"]],
+   [face('var(--skin2)','#3B2A20','cap','shy'),"Ben goes red and says nothing when he meets new people.",["shy","sociable","ambitious"]]]},
+  {t:"Make the opposite",d:"Use un-, in-, im-, ir- or dis- to complete the sentences.",type:"lines",items:[
+   ["Don't trust him. He's very ",["reliable","unreliable"],"."],
+   ["She's so ",["patient","impatient"],"! She can't wait for anything."],
+   ["It's ",["polite","impolite"]," to talk with your mouth full."],
+   ["He told a lie. That was really ",["honest","dishonest"],"."],
+   ["My room is always a mess. I'm a bit ",["organised","disorganised|disorganized"],"."],
+   ["Leaving your little sister alone is ",["responsible","irresponsible"],"."],
+   ["The new shop assistant was rude and ",["friendly","unfriendly"],"."],
+   ["Laughing at people's mistakes is ",["kind","unkind"],"."]]},
+  {t:"Adjective + preposition",d:"Choose the correct preposition.",type:"mc",items:[
+   ["I'm really good ___ maths.",["at","in","on"]],["She's interested ___ fashion and design.",["in","at","of"]],
+   ["My brother is afraid ___ spiders.",["of","from","at"]],["Are you keen ___ football?",["on","in","at"]],
+   ["Mum is very proud ___ me.",["of","about","for"]],["I'm worried ___ the test tomorrow.",["about","of","on"]]]},
+  {t:"Ask the right question",d:"Choose the correct form. Is it a subject or an object question?",type:"mc",items:[
+   ["Who ___ the window? I can see glass on the floor!",["broke","did break","does break"]],
+   ["Who ___ with you? Your parents?",["lives","does live","do live"]],
+   ["What ___ you usually do at the weekend?",["do","are","does"]],
+   ["Who ___ you talking to on the phone right now?",["are","do","is"]],
+   ["What kind of music ___ your best friend like?",["does","do","is"]],
+   ["Who ___ the cooking in your family?",["does","do","is"]]]},
+  {t:"Word order",d:"Put the words in the right order to make questions.",type:"order",items:[
+   "Who do you live with?","What are you laughing at?","Where does your best friend come from?"]},
+  {t:"-ing or to?",d:"Choose the correct form.",type:"mc",items:[
+   ["I enjoy ___ to music in the evening.",["listening","to listen"]],["We decided ___ a new hobby.",["to try","trying"]],
+   ["She can't stand ___ up early.",["getting","to get"]],["I hope ___ a vet one day.",["to become","becoming"]],
+   ["Do you mind ___ the window?",["opening","to open"]],["He promised ___ me with my project.",["to help","helping"]],
+   ["They avoid ___ junk food.",["eating","to eat"]],["I want ___ more patient.",["to be","being"]]]}
+ ]},
+{n:2,name:"Invention",c:"var(--u2)",chips:["technology","phrasal verbs","Past Continuous vs Past Simple","used to"],
+ rules:`<div><h4>Past Continuous vs Past Simple</h4><p><b>was/were + -ing</b>: тривала дія в минулому (фон). <b>Past Simple</b>: коротка дія, що її перервала.</p><p><i>I <b>was playing</b> a game when the lights <b>went</b> out.</i></p><p><b>when</b> + коротка дія, <b>while</b> + тривала дія.</p></div>
+ <div><h4>used to</h4><p>Звички і стани в минулому, яких зараз немає.</p><ul><li>+ <i>I <b>used to</b> have a cassette player.</i></li><li>– <i>I <b>didn't use to</b> like tech.</i></li><li>? <i><b>Did</b> you <b>use to</b> play outside?</i></li></ul></div>`,
+ tasks:[
+  {t:"What is it?",d:"Look at the pictures and choose the right word.",type:"cards",items:[
+   [I.headphones,"You wear them to listen to music.",["headphones","keyboard","speaker"]],[I.laptop,"A small computer you can carry.",["laptop","printer","screen"]],
+   [I.bulb,"Thomas Edison made it popular in 1879.",["light bulb","battery","switch"]],[I.watch,"It tells the time and counts your steps.",["smartwatch","tablet","charger"]],
+   [I.robot,"A machine that can move and do jobs for people.",["robot","drone","engine"]],[I.satellite,"It goes around the Earth and sends signals.",["satellite","rocket","telescope"]]]},
+  {t:"Tech talk",d:"Choose the word that completes each sentence.",type:"mc",items:[
+   ["Please turn ___ your phones in class.",["off","up","in"]],["Plug ___ the charger, the battery's almost dead.",["in","on","up"]],
+   ["Can you turn ___ the music? I can't hear it.",["up","off","out"]],["I forgot my ___, so I can't log in.",["password","keyboard","screen"]],
+   ["Type 'robots' into the search ___.",["engine","page","board"]],["My dad set ___ the new printer in ten minutes.",["up","in","on"]]]},
+  {t:"The night the lights went out",d:"Past Continuous or Past Simple? Write the verbs in the correct form.",type:"story",parts:[
+   "Last Saturday I ",["play","was playing"]," a video game when suddenly the lights ",["go","went"]," out. It ",["rain","was raining"]," outside and it was very dark. I ",["look","looked"]," for my phone. My parents ",["sit","were sitting"]," in the kitchen when we ",["hear","heard"]," a strange noise. We ",["not know","didn't know"]," what it was. Then Dad ",["find","found"]," the problem: our cat ",["sleep","was sleeping"]," on the light switch!"]},
+  {t:"Then and now",d:"Choose the correct form of used to.",type:"mc",items:[
+   ["Thirty years ago, people ___ listen to music on cassettes.",["used to","use to","were used to"]],
+   ["Did you ___ have a mobile phone when you were seven?",["use to","used to","using to"]],
+   ["My grandparents ___ have the internet when they were young.",["didn't use to","didn't used to","not used to"]],
+   ["Before GPS, drivers ___ paper maps.",["used to read","use to read","used to reading"]],
+   ["I ___ be scared of robots, but now I think they're cool.",["used to","use to","was use to"]],
+   ["___ your parents use to write letters?",["Did","Were","Used"]]]}
+ ]},
+{n:3,name:"The Arts",c:"var(--u3)",chips:["artists","films & books","Present Perfect: just / already / yet","comparatives","too / enough"],
+ rules:`<div><h4>Present Perfect vs Past Simple</h4><p><b>have/has + V3</b>: результат важливий зараз, час не вказаний. <b>just</b> (щойно), <b>already</b> (вже) ставимо перед V3; <b>yet</b> (ще не / вже?) іде в кінець у запереченнях і питаннях.</p><p><b>Past Simple</b>: є точний час (<i>yesterday, last week, in 2020, ago</i>).</p></div>
+ <div><h4>Comparatives · too / enough</h4><ul><li>short: <i>cheap → cheaper → the cheapest</i></li><li>long: <i>interesting → more interesting → the most interesting</i></li><li>irregular: <i>good → better → the best; bad → worse → the worst</i></li><li><b>too</b> + adj (забагато): <i>too loud</i>; adj + <b>enough</b> (достатньо): <i>old enough</i></li></ul></div>`,
+ tasks:[
+  {t:"Who does what?",d:"Read the clue and choose the artist.",type:"cards",items:[
+   [I.book,"He writes long stories called novels.",["novelist","poet","journalist"]],[I.statue,"She makes statues out of stone.",["sculptor","painter","director"]],
+   [I.notes,"He writes music for orchestras and films.",["composer","singer","guitarist"]],[I.clapper,"She tells the actors what to do on a film set.",["director","actress","author"]],
+   [I.palette,"He paints portraits and landscapes.",["painter","photographer","poet"]],[I.quill,"She writes short texts that often rhyme.",["poet","novelist","composer"]]]},
+  {t:"How was it?",d:"Choose the best adjective.",type:"mc",items:[
+   ["I couldn't stop reading. It was really ___.",["gripping","boring","disappointing"]],["The comedy was ___! We laughed all the time.",["hilarious","moving","scary"]],
+   ["I cried at the end. The story was so ___.",["moving","hilarious","gripping"]],["I expected a lot, but the film was ___.",["disappointing","gripping","moving"]],
+   ["I fell asleep after ten minutes. It was so ___.",["boring","scary","hilarious"]],["I couldn't sleep after that horror film. It was too ___.",["scary","boring","moving"]]]},
+  {t:"just, already, yet or Past Simple?",d:"Choose the correct option.",type:"mc",items:[
+   ["I've ___ finished the book. I put it down two minutes ago!",["just","yet","ago"]],["Have you seen the new animated film ___?",["yet","already","just"]],
+   ["We ___ to the cinema last Friday.",["went","have gone","have been going"]],["She has ___ read this book three times. She loves it!",["already","yet","ago"]],
+   ["I haven't bought the concert tickets ___.",["yet","already","just"]],["When ___ you start playing the guitar?",["did","have","has"]],
+   ["My little brother ___ never been to an art gallery.",["has","have","did"]]]},
+  {t:"Compare it!",d:"Write the correct form of the word in brackets, or too / enough.",type:"lines",items:[
+   ["Books are often ",["good","better"]," than the films."],["This is the ",["funny","funniest"]," comedy I've ever seen."],
+   ["The museum is ",["interesting","more interesting"]," than the zoo."],["That was the ",["bad","worst"]," concert of my life."],
+   ["Is painting ",["difficult","more difficult"]," than drawing?"],["I'm not old ",["too / enough","enough"]," to watch this film. It's 16+."],
+   ["The music is ",["too / enough","too"]," loud. Turn it down!"]]}
+ ]},
+{n:4,name:"Living",c:"var(--u4)",chips:["rooms & furniture","make / do","Present Perfect + for / since","future forms"],
+ rules:`<div><h4>Present Perfect + for / since</h4><p>Дія почалася в минулому і триває зараз. <i>How long have you lived here?</i></p><ul><li><b>for</b> + період: <i>for three years, for ages, for a week</i></li><li><b>since</b> + момент: <i>since 2019, since Monday, since I was five</i></li></ul></div>
+ <div><h4>Future forms</h4><ul><li><b>Present Continuous</b>: домовленість, є час і місце. <i>I'm meeting Ann at 5.</i></li><li><b>be going to</b>: план/намір або прогноз за доказами. <i>Look at the clouds! It's going to rain.</i></li><li><b>will</b>: рішення в момент мовлення, думка про майбутнє. <i>I think robots will clean our houses.</i></li></ul></div>`,
+ tasks:[
+  {t:"Inside the house",d:"Name the things in the picture.",type:"house",answers:["bed","wardrobe","bath","mirror","sofa","lamp","fridge","cooker","table"],extra:["desk","armchair","shower"]},
+  {t:"make or do?",d:"Choose make or do.",type:"mc",items:[
+   ["Please ___ your bed before school.",["make","do"]],["It's your turn to ___ the washing-up.",["do","make"]],
+   ["Don't ___ a mess in the kitchen!",["make","do"]],["I always ___ my homework after dinner.",["do","make"]],
+   ["The neighbours ___ a lot of noise at night.",["make","do"]],["We ___ the shopping on Saturdays.",["do","make"]],
+   ["Can you ___ me a favour?",["do","make"]],["I need to ___ a phone call.",["make","do"]]]},
+  {t:"for or since?",d:"Choose the correct option.",type:"mc",items:[
+   ["I've lived in this flat ___ 2019.",["since","for"]],["We've had our dog ___ three years.",["for","since"]],
+   ["She has wanted her own room ___ she was five.",["since","for"]],["They've known their neighbours ___ ages.",["for","since"]],
+   ["How long ___ you lived in your house?",["have","did","are"]],["My brother ___ in Kyiv since last summer.",["has lived","lives","lived"]],
+   ["I haven't cleaned my room ___ Monday!",["since","for"]]]},
+  {t:"Plans, predictions, decisions",d:"Choose the best future form.",type:"mc",items:[
+   ["Look at those dark clouds! It ___ rain.",["is going to","will","is raining"]],
+   ["I ___ my grandma on Sunday. It's in my calendar.",["am visiting","will visit","visit"]],
+   ["I think people ___ live on Mars one day.",["will","are living","are going to living"]],
+   ["I've decided: I ___ paint my room blue.",["am going to","will","paint"]],
+   ["The doorbell's ringing! – OK, I ___ get it.",["'ll","am going to","am getting"]],
+   ["We ___ to a new flat next month. We've signed the contract.",["are moving","will move","move"]]]}
+ ]},
+{n:5,name:"School",c:"var(--u5)",chips:["school subjects","phrasal verbs","get phrases","First Conditional","relative clauses"],
+ rules:`<div><h4>First Conditional</h4><p>Реальна умова в майбутньому.</p><p><b>If + Present Simple, will + V</b></p><p><i>If you <b>revise</b>, you'<b>ll pass</b>.</i> Після <b>if</b> не вживаємо will!</p></div>
+ <div><h4>Relative clauses</h4><ul><li><b>who</b>: люди. <i>the girl who won</i></li><li><b>which / that</b>: речі. <i>the book which I need</i></li><li><b>where</b>: місця. <i>the school where my mum studied</i></li><li><b>whose</b>: чий. <i>the boy whose dad is a pilot</i></li></ul></div>`,
+ tasks:[
+  {t:"Guess the subject",d:"Look at the picture, read the clue and choose the subject.",type:"cards",items:[
+   [I.maths,"We do sums and solve equations.",["maths","physics","IT"]],[I.biology,"We learn about plants, animals and the human body.",["biology","chemistry","geography"]],
+   [I.geography,"We study maps, countries and the weather.",["geography","history","biology"]],[I.history,"We learn about the past and famous events.",["history","literature","geography"]],
+   [I.chemistry,"We do experiments with liquids and gases.",["chemistry","art","maths"]],[I.pe,"We play sports and do exercises in the gym.",["PE","music","IT"]]]},
+  {t:"School life",d:"Choose the word that completes the sentence.",type:"mc",items:[
+   ["Please hand ___ your essays on Friday.",["in","out","off"]],["If you don't know a word, look it ___ in a dictionary.",["up","at","for"]],
+   ["I was ill for a week, so I need to catch ___.",["up","on","in"]],["If you miss lessons, you'll fall ___.",["behind","down","over"]],
+   ["I get ___ well with all my classmates.",["on","in","up"]],["She wants to get ___ a good university.",["into","on","at"]],
+   ["I hope I'll get good ___ this year.",["marks","notes","points"]]]},
+  {t:"If…",d:"Write the verbs in the First Conditional.",type:"lines",items:[
+   ["If you ",["revise","revise"]," tonight, you ",["get","will get"]," a good mark."],
+   ["I ",["not / go","won't go"]," out if it ",["rain","rains"],"."],
+   ["If she ",["not / hand","doesn't hand"]," in her project, the teacher ",["be","will be"]," angry."],
+   ["What will you do if you ",["fail","fail"]," the exam?"],
+   ["If we ",["finish","finish"]," early, we ",["play","will play"]," a game."]]},
+  {t:"who, which, where or whose?",d:"Choose the correct word.",type:"mc",items:[
+   ["A teacher is a person ___ helps students learn.",["who","which","where"]],["This is the school ___ my mum studied.",["where","which","who"]],
+   ["That's the boy ___ dad is a pilot.",["whose","who","which"]],["Biology is the subject ___ I like most.",["which","who","where"]],
+   ["The library is a place ___ you can study quietly.",["where","which","whose"]],["Is that the book ___ you need for the test?",["which","who","where"]],
+   ["She's the girl ___ won the science prize.",["who","which","whose"]]]}
+ ]},
+{n:6,name:"Working life",c:"var(--u6)",chips:["jobs","work + prepositions","job vs work","Second Conditional"],
+ rules:`<div><h4>Second Conditional</h4><p>Уявна, малоймовірна ситуація в теперішньому чи майбутньому.</p><p><b>If + Past Simple, would + V</b></p><p><i>If I <b>had</b> a million, I'<b>d travel</b> the world.</i></p><p><i>If I <b>were</b> you, I'd apply.</i> (were для всіх осіб)</p></div>
+ <div><h4>Work words</h4><ul><li>work <b>as</b> a nurse · <b>for</b> a company · <b>in</b> a hospital · <b>with</b> animals</li><li><b>job</b> (злічуване): <i>a job, two jobs</i>; <b>work</b> (незлічуване): <i>a lot of work</i></li><li>full-time / part-time · well-paid / badly-paid · work long hours</li></ul></div>`,
+ tasks:[
+  {t:"Who am I?",d:"Read the clue and choose the job.",type:"cards",items:[
+   [I.firefighter,"I put out fires and rescue people.",["firefighter","police officer","builder"]],[I.nurse,"I look after patients in a hospital.",["nurse","vet","pilot"]],
+   [I.chef,"I cook in a restaurant kitchen.",["chef","waiter","farmer"]],[I.pilot,"I fly planes all over the world.",["pilot","flight attendant","engineer"]],
+   [I.vet,"I help sick animals.",["vet","doctor","dentist"]],[I.mechanic,"I repair cars.",["mechanic","plumber","electrician"]]]},
+  {t:"At work",d:"Choose the correct word.",type:"mc",items:[
+   ["My mum works ___ a doctor.",["as","for","in"]],["He works ___ a big IT company.",["for","as","with"]],
+   ["I'd love to work ___ animals.",["with","for","as"]],["She works ___ a hospital in the city centre.",["in","for","as"]],
+   ["A ___ job is only a few hours a week.",["part-time","full-time","well-paid"]],["I'm looking for a new ___.",["job","work"]],
+   ["I've got a lot of ___ to do today.",["work","job","jobs"]],["Doctors often work long ___.",["hours","days","times"]]]},
+  {t:"If I were…",d:"Write the verbs in the Second Conditional.",type:"lines",items:[
+   ["If I ",["be","were|was"]," rich, I ",["buy","would buy"]," a house by the sea."],
+   ["If she ",["have","had"]," more time, she ",["learn","would learn"]," to fly."],
+   ["I ",["not / work","wouldn't work"]," in an office if I ",["can","could"]," choose."],
+   ["If I ",["be","were|was"]," you, I ",["apply","would apply"]," for that job."],
+   ["If my dad ",["not / have","didn't have"]," to work at weekends, we ",["go","would go"]," on more trips."]]},
+  {t:"Dream job questions",d:"Put the words in order. Then ask a partner!",type:"order",items:[
+   "What would you do if you won a million?","If you could have any job, what would it be?","Would you work at weekends if you were a chef?"]}
+ ]}
+];
+const TALK=["Describe your best friend's personality. What is he or she good at?","What do you enjoy doing at the weekend? What do you hate doing?","Which invention couldn't you live without? Why?","What did you use to do when you were little that you don't do now?","What were you doing at 8 o'clock last night?","Have you read a good book or seen a good film lately? What was it like?","What's the best concert, film or show you've ever seen?","How long have you lived in your home? Describe your room.","What are you doing this weekend? What are you going to do this summer?","What will you do if you get a bad mark in your next test?","Describe a teacher who has helped you a lot.","If you could have any job in the world, what would it be?","If you had a million hryvnias, what would you do with it?","Would you rather work in an office or outdoors? Why?"];
+
+/* ================= ENGINE ================= */
+const $=id=>document.getElementById(id);
+const KEY="focus2-roadtrip-v1";let st={s:{},v:{},cur:0};try{Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function norm(s){return(' '+(s||'').toLowerCase().replace(/[’`]/g,"'").replace(/[?.!,]/g,' ')+' ')
+  .replace(/won't/g,'will not').replace(/can't/g,'can not').replace(/n't/g,' not').replace(/'ll/g,' will').replace(/'d/g,' would').replace(/'m/g,' am').replace(/'re/g,' are')
+  .replace(/cannot/g,'can not').replace(/\s+/g,' ').trim()}
+const ok=(v,a)=>a.split('|').some(x=>norm(x)===norm(v));
+const total=U.reduce((s,u)=>s+u.tasks.reduce((t,k)=>t+count(k),0),0);
+function count(k){if(k.type==='lines')return k.items.reduce((s,l)=>s+l.filter(x=>Array.isArray(x)).length,0);if(k.type==='story')return k.parts.filter(Array.isArray).length;if(k.type==='house')return k.answers.length;return k.items.length}
+function unitScore(u){let o=0,n=0;U[u].tasks.forEach((k,i)=>{const r=st.s[u+'-'+i];n+=count(k);if(r)o+=r[0]});return [o,n]}
+const stars=([o,n])=>{const p=o/n;return p>=.9?3:p>=.7?2:p>=.35?1:0};
+function refresh(){let o=0;U.forEach((u,i)=>o+=unitScore(i)[0]);$('pbar').style.width=(o/total*100)+'%';$('ptxt').textContent=o+' / '+total+' ★';
+  document.querySelectorAll('.stop').forEach((b,i)=>{const s=b.querySelector('.st');if(s&&i>=1&&i<=6){const k=stars(unitScore(i-1));s.textContent='★'.repeat(k)+'☆'.repeat(3-k)}})}
+function record(key,o,n){const p=st.s[key];if(!p||o>=p[0])st.s[key]=[o,n];save();refresh()}
+function setMsg(el,o,n){el.className='msg '+(o===n?'ok':'no');el.textContent=o===n?'All correct! ★':o+' / '+n+' correct'}
+
+/* nav */
+const stopsEl=$('stops');
+const NAV=[{name:"Start",c:"var(--ink)",lbl:"★"},...U.map(u=>({name:u.name,c:u.c,lbl:u.n})),{name:"Finish",c:"var(--star)",lbl:"🏁"}];
+NAV.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.className='stop';b.style.setProperty('--c',s.c);
+  b.innerHTML=`<span class="dot">${s.lbl}</span><span class="nm">${s.name}</span><span class="st"></span>`;b.setAttribute('aria-label',i===0?'Start':i===7?'Finish':'Unit '+i+': '+s.name);
+  b.addEventListener('click',()=>show(i,true));stopsEl.appendChild(b)});
+
+function show(i,scroll){st.cur=i;save();document.querySelectorAll('.stop').forEach((b,k)=>b.setAttribute('aria-current',k===i?'true':'false'));
+  const m=$('main');m.innerHTML='';if(i===0)renderStart(m);else if(i===7)renderFinish(m);else renderUnit(m,i-1);
+  if(scroll)window.scrollTo({top:document.querySelector('.mapnav').offsetTop-4,behavior:'smooth'})}
+
+function renderStart(m){const s=document.createElement('section');s.className='station';s.style.setProperty('--c','var(--u1)');
+  s.innerHTML=`<div class="tasks"><div class="task wide"><div class="th"><span class="n">0</span><div><h3>Warm-up: Find your way</h3><p>Answer as fast as you can. Every question is from a different unit!</p></div></div><ol class="mc" id="wu"></ol><div class="foot"><button class="btn" type="button" id="wuc">Check</button><span class="msg" id="wum"></span></div></div></div>`;
+  m.appendChild(s);
+  const WU=[["My sister is very ___. She never shares anything.",["mean","generous","kind"]],["I ___ TV when you called me.",["was watching","watched","am watching"]],["Have you finished your project ___?",["yet","already","just"]],["I've lived here ___ I was born.",["since","for","from"]],["If it ___ tomorrow, we'll stay at home.",["rains","will rain","rained"]],["If I ___ a pilot, I'd fly to Japan.",["were","am","will be"]]];
+  buildMC($('wu'),WU,'wu');$('wuc').addEventListener('click',()=>{const [o,n]=checkMC($('wu'));setMsg($('wum'),o,n)});
+  const go=document.createElement('div');go.className='foot';go.style.marginTop='18px';go.innerHTML='<button class="btn" type="button" style="--c:var(--u1)">Go to Unit 1 →</button>';go.firstChild.addEventListener('click',()=>show(1,true));s.appendChild(go)}
+
+function renderUnit(m,u){const D=U[u];const s=document.createElement('section');s.className='station';s.style.setProperty('--c',D.c);
+  s.innerHTML=`<div class="banner"><div class="txt"><span class="un">Stop ${D.n} · Focus 2 Unit ${D.n}</span><h2>${D.name}</h2><div class="chips">${D.chips.map(c=>`<span>${c}</span>`).join('')}</div></div><div class="art">${ART[D.n]}</div></div>
+  <details class="rule-box"><summary>Grammar in a nutshell</summary><div class="in">${D.rules}</div></details><div class="tasks"></div>`;
+  const box=s.querySelector('.tasks');
+  D.tasks.forEach((k,i)=>{const key=u+'-'+i;const t=document.createElement('article');t.className='task'+(['cards','story','house'].includes(k.type)?' wide':'');
+    t.innerHTML=`<div class="th"><span class="n">${i+1}</span><div><h3>${k.t}</h3><p>${k.d}</p></div></div><div class="body"></div><div class="foot"><button class="btn" type="button">Check</button><span class="msg"></span></div>`;
+    const body=t.querySelector('.body'),msg=t.querySelector('.msg');let check;
+    if(k.type==='mc'){const ol=document.createElement('ol');ol.className='mc';body.appendChild(ol);buildMC(ol,k.items,key);check=()=>checkMC(ol)}
+    else if(k.type==='cards'){check=buildCards(body,k.items,key)}
+    else if(k.type==='lines'){check=buildLines(body,k.items,key)}
+    else if(k.type==='story'){check=buildStory(body,k.parts,key)}
+    else if(k.type==='order'){check=buildOrder(body,k.items)}
+    else if(k.type==='house'){check=buildHouse(body,k,key)}
+    t.querySelector('.btn').addEventListener('click',()=>{const [o,n]=check();setMsg(msg,o,n);record(key,o,n)});box.appendChild(t)});
+  const nav=document.createElement('div');nav.className='foot';nav.style.marginTop='20px';
+  nav.innerHTML=`<button class="btn ghost" type="button">← ${u?'Unit '+u:'Start'}</button><button class="btn" type="button">${u<5?'Next stop: Unit '+(u+2):'Finish line'} →</button>`;
+  nav.children[0].addEventListener('click',()=>show(u,true));nav.children[1].addEventListener('click',()=>show(u+2,true));s.appendChild(nav);m.appendChild(s)}
+
+function buildMC(ol,items,key){items.forEach(([s,opts],qi)=>{const li=document.createElement('li');li.dataset.a=opts[0];const p=s.split('___');
+  li.innerHTML=`<span class="s">${p[0]}<span class="gap">?</span>${p[1]||''}</span><div class="opts"></div>`;const box=li.querySelector('.opts');const vk=key+'m'+qi;
+  const pick=(b,o)=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');li.dataset.v=o;const g=li.querySelector('.gap');g.textContent=o;g.classList.remove('ok','no')};
+  shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',()=>{pick(b,o);st.v[vk]=o;save()});box.appendChild(b);if(st.v[vk]===o)pick(b,o)});ol.appendChild(li)})}
+function checkMC(ol){let o=0,n=0;ol.querySelectorAll(':scope>li').forEach(li=>{n++;const g=li.dataset.v===li.dataset.a;if(g)o++;
+  li.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===li.dataset.v)b.classList.add(g?'right':'wrong')});
+  const gp=li.querySelector('.gap');gp.classList.toggle('ok',g);gp.classList.toggle('no',!g)});return [o,n]}
+function buildCards(body,items,key){const g=document.createElement('div');g.className='cards';body.appendChild(g);
+  items.forEach(([svg,txt,opts],qi)=>{const c=document.createElement('div');c.className='pc';c.dataset.a=opts[0];const vk=key+'c'+qi;
+    c.innerHTML=`<div class="pic" aria-hidden="true">${svg}</div><p>${txt}</p><div class="opts"></div>`;const box=c.querySelector('.opts');
+    const pick=b=>{box.querySelectorAll('.opt').forEach(x=>{x.setAttribute('aria-pressed','false');x.classList.remove('right','wrong')});b.setAttribute('aria-pressed','true');c.dataset.v=b.dataset.v;c.classList.remove('ok','no')};
+    shuffle(opts).forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;b.dataset.v=o;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{pick(b);st.v[vk]=o;save()});box.appendChild(b);if(st.v[vk]===o)pick(b)});g.appendChild(c)});
+  return ()=>{let o=0,n=0;g.querySelectorAll('.pc').forEach(c=>{n++;const r=c.dataset.v===c.dataset.a;if(r)o++;c.classList.toggle('ok',r);c.classList.toggle('no',!r);
+    c.querySelectorAll('.opt').forEach(b=>{b.classList.remove('right','wrong');if(b.dataset.v===c.dataset.v)b.classList.add(r?'right':'wrong')})});return [o,n]}}
+function mkInput(spec,id,wide){const w=document.createElement('span');const i=document.createElement('input');i.className='t'+(wide?' wide':'');i.id=id;i.autocomplete='off';i.spellcheck=false;i.setAttribute('autocapitalize','off');
+  i.setAttribute('aria-label',spec[0]);i.dataset.a=spec[1];if(st.v[id])i.value=st.v[id];i.addEventListener('input',()=>{st.v[id]=i.value;save();i.classList.remove('ok','no')});
+  const h=document.createElement('span');h.className='hint';h.textContent=' ('+spec[0]+') ';const f=document.createElement('span');f.className='fix';f.hidden=true;f.textContent='→ '+spec[1].split('|')[0]+' ';
+  w.append(i,h,f);return w}
+function checkInputs(root){let o=0,n=0;root.querySelectorAll('input.t').forEach(i=>{n++;const g=ok(i.value,i.dataset.a);if(g)o++;i.classList.toggle('ok',g);i.classList.toggle('no',!g);i.parentElement.querySelector('.fix').hidden=g});return [o,n]}
+function buildLines(body,items,key){const ol=document.createElement('ol');ol.className='lines';body.appendChild(ol);let k=0;
+  items.forEach(parts=>{const li=document.createElement('li');parts.forEach(p=>{if(typeof p==='string')li.append(p);else li.append(mkInput(p,key+'i'+(k++),p[1].length>10))});ol.appendChild(li)});
+  return ()=>checkInputs(ol)}
+function buildStory(body,parts,key){const d=document.createElement('p');d.className='story';body.appendChild(d);let k=0;
+  parts.forEach(p=>{if(typeof p==='string')d.append(p);else d.append(mkInput(p,key+'i'+(k++),true))});return ()=>checkInputs(d)}
+function buildOrder(body,items){const ol=document.createElement('ol');ol.className='ord';body.appendChild(ol);
+  items.forEach(sent=>{const li=document.createElement('li');li.dataset.a=sent;const words=sent.split(' ');let sh;do{sh=shuffle(words)}while(sh.join(' ')===sent&&words.length>2);
+    li.innerHTML='<div class="ans" aria-label="Your sentence"></div><div class="pool"></div><span class="fix" hidden>→ '+sent+'</span>';
+    const ans=li.querySelector('.ans'),pool=li.querySelector('.pool');
+    sh.forEach(w=>{const b=document.createElement('button');b.type='button';b.className='tile';b.textContent=w;
+      b.addEventListener('click',()=>{(b.parentElement===pool?ans:pool).appendChild(b);li.classList.remove('ok','no')});pool.appendChild(b)});ol.appendChild(li)});
+  return ()=>{let o=0,n=0;ol.querySelectorAll('li').forEach(li=>{n++;const v=[...li.querySelectorAll('.ans .tile')].map(b=>b.textContent).join(' ');const g=v===li.dataset.a;if(g)o++;
+    li.classList.toggle('ok',g);li.classList.toggle('no',!g);li.querySelector('.fix').hidden=g});return [o,n]}}
+function buildHouse(body,k,key){const d=document.createElement('div');d.className='house';d.innerHTML=HOUSE+'<ol class="labels"></ol>';body.appendChild(d);
+  const opts=[...k.answers,...k.extra].sort();const ol=d.querySelector('.labels');
+  k.answers.forEach((a,i)=>{const li=document.createElement('li');const id=key+'h'+i;li.innerHTML=`<b>${i+1}</b><select id="${id}" aria-label="Item ${i+1}"><option value="">choose…</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    const s=li.querySelector('select');s.dataset.a=a;if(st.v[id])s.value=st.v[id];s.addEventListener('change',()=>{st.v[id]=s.value;save();s.classList.remove('ok','no')});ol.appendChild(li)});
+  return ()=>{let o=0,n=0;ol.querySelectorAll('select').forEach(s=>{n++;const g=s.value===s.dataset.a;if(g)o++;s.classList.toggle('ok',g);s.classList.toggle('no',!g)});return [o,n]}}
+
+function renderFinish(m){const s=document.createElement('section');s.className='finish';s.style.setProperty('--c','var(--ink)');
+  s.innerHTML=`<div class="deck"><div class="talk"><span class="tg">Speaking · talk for 1 minute</span><p class="q" id="tq">Press the button for a question.</p><button class="btn" type="button" id="tn">Next question</button></div>
+   <div class="stack" style="display:flex;flex-direction:column;gap:12px"><h2 style="font-size:2.2rem">Your trip so far</h2><div class="sum" id="sum"></div></div></div>`;m.appendChild(s);
+  let deck=shuffle(TALK),ti=0;$('tn').addEventListener('click',()=>{if(ti>=deck.length){deck=shuffle(TALK);ti=0}$('tq').textContent=deck[ti++]});
+  $('sum').innerHTML=U.map((u,i)=>{const sc=unitScore(i),k=stars(sc);return `<div style="--c:${u.c}"><b>${u.n}. ${u.name}</b><span>${'★'.repeat(k)+'☆'.repeat(3-k)}</span> <small>${sc[0]} / ${sc[1]}</small></div>`}).join('')}
+
+/* reset */
+let armT;$('reset').addEventListener('click',e=>{const b=e.currentTarget;if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Click again to clear everything';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Start again'},3500);return}
+  clearTimeout(armT);st={s:{},v:{},cur:0};save();b.classList.remove('arm');b.textContent='Start again';refresh();show(0,true)});
+show(Math.min(st.cur||0,7),false);refresh();
+</script>
+
+</body>
+</html>
