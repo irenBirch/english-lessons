@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Grammar Flashcards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+/* Concept: a deck of grammar flashcards. The overview is a grid of colour-coded card fronts (one colour per family: Present, Past, Future, Passive, Reported speech). Conditionals get their own traffic light. Tapping a card opens study mode: a big card that flips to the rule, with prev/next and swipe. */
+:root{
+  --bg:#F5F3EE; --paper:#FFFFFF; --ink:#16161D; --muted:#5F5E6B; --rule:rgba(22,22,29,.11); --soft:#ECE9E1;
+  --pres:#0E9F8E; --past:#F0703A; --fut:#5B5BF0; --pas:#C2418F; --rep:#2F86D6; --cond:#16161D;
+  --green:#22B455; --yellow:#F4C20D; --red:#E8392F; --purple:#9B4DEB;
+  --ok:#1F9D57;
+  --f-d:"Unbounded","Arial Black",system-ui,sans-serif; --f-b:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121218; --paper:#1C1C25; --ink:#F1F0F5; --muted:#A9A8B8; --rule:rgba(241,240,245,.12); --soft:#262631;
+  --pres:#2CC7B4; --past:#FF8A57; --fut:#8484FF; --pas:#E46BB2; --rep:#5AA9F0; --cond:#F1F0F5;
+  --green:#3BD16F; --yellow:#FFD43B; --red:#FF5A4F; --purple:#B47CFF; --ok:#3BD16F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121218; --paper:#1C1C25; --ink:#F1F0F5; --muted:#A9A8B8; --rule:rgba(241,240,245,.12); --soft:#262631;
+  --pres:#2CC7B4; --past:#FF8A57; --fut:#8484FF; --pas:#E46BB2; --rep:#5AA9F0; --cond:#F1F0F5;
+  --green:#3BD16F; --yellow:#FFD43B; --red:#FF5A4F; --purple:#B47CFF; --ok:#3BD16F; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{overflow-x:clip;background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:17px;line-height:1.55;font-weight:600}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-d);margin:0;line-height:1.05;letter-spacing:-.015em;text-wrap:balance}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--fut);outline-offset:3px}
+.k{font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* hero */
+.hero{padding-block:44px 22px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:end}
+.hero h1{font-size:clamp(2.4rem,7vw,4.6rem);margin-top:10px}
+.hero h1 span{display:inline-block;background:var(--ink);color:var(--bg);padding:0 .18em;border-radius:.14em;transform:rotate(-2deg)}
+.hero .lede{margin-top:16px;color:var(--muted);max-width:56ch}
+.fan{position:relative;height:200px}
+.fan div{position:absolute;bottom:0;left:50%;width:132px;height:180px;border-radius:18px;background:var(--c);color:#fff;padding:14px;font-family:var(--f-d);font-size:.86rem;line-height:1.15;box-shadow:0 10px 26px rgba(0,0,0,.14);transform-origin:50% 120%}
+.fan div small{display:block;font-family:var(--f-b);font-weight:800;font-size:.7rem;opacity:.85;margin-top:6px}
+
+/* toolbar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--rule)}
+.bar .wrap{display:flex;gap:10px;align-items:center;padding-block:10px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1 1 420px;min-width:0}
+.chip{flex:0 0 auto;border:0;border-radius:99px;padding:7px 14px;font-weight:800;font-size:.86rem;background:var(--soft);cursor:pointer;display:flex;align-items:center;gap:7px}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.search{flex:0 1 220px;min-width:0;border:1.5px solid var(--rule);background:var(--paper);border-radius:99px;padding:7px 14px;font-weight:700}
+.study{border:0;border-radius:99px;padding:8px 18px;font-weight:800;background:var(--fut);color:#fff;cursor:pointer}
+
+/* sections */
+section.grp{padding-block:40px 6px}
+.gh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.gh h2{font-size:clamp(1.6rem,4vw,2.4rem)}
+.gh .dot{width:16px;height:16px;border-radius:50%;background:var(--c);transform:translateY(-3px)}
+.gh p{color:var(--muted);flex-basis:100%}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{position:relative;border:0;text-align:left;cursor:pointer;border-radius:22px;background:var(--paper);padding:0;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 0 var(--rule),0 0 0 1px var(--rule);transition:transform .18s,box-shadow .18s;min-width:0}
+.card:hover{transform:translateY(-3px) rotate(-.6deg);box-shadow:0 12px 24px rgba(0,0,0,.08),0 0 0 1px var(--rule)}
+.card .top{background:var(--c);color:#fff;padding:14px 16px 10px;display:flex;flex-direction:column;gap:4px;min-height:96px}
+.card .top small{font-weight:800;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.card .top b{font-family:var(--f-d);font-size:1.05rem;line-height:1.15}
+.card .tl{padding:8px 12px 0}
+.card .tl svg{width:100%;height:auto;display:block}
+.card .f{padding:6px 16px 14px;font-weight:800;font-size:.9rem}
+.card .f code{font-family:var(--f-b);background:var(--soft);border-radius:7px;padding:2px 7px}
+.card .ua{display:block;color:var(--muted);font-size:.82rem;font-weight:700;margin-top:6px}
+.card .known{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--ok);display:grid;place-items:center;font-weight:900;font-size:.8rem}
+
+/* traffic light */
+.lightbox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:center}
+.tlight{width:150px;background:#22222B;border-radius:34px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:inset 0 0 0 4px #35353F,0 18px 30px rgba(0,0,0,.18);position:relative}
+.tlight::after{content:"";position:absolute;left:50%;bottom:-60px;width:18px;height:60px;transform:translateX(-50%);background:#35353F;border-radius:0 0 6px 6px}
+.lamp{width:118px;height:118px;border-radius:50%;border:0;cursor:pointer;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 40%,#fff),var(--c) 55%,color-mix(in srgb,var(--c) 60%,#000));display:grid;place-items:center;color:#fff;font-family:var(--f-d);font-size:1.5rem;text-shadow:0 2px 6px rgba(0,0,0,.35);box-shadow:0 0 0 5px #15151B,0 0 26px color-mix(in srgb,var(--c) 70%,transparent);transition:transform .2s,filter .2s}
+.lamp:hover{transform:scale(1.05)}
+.lamp small{display:block;font-family:var(--f-b);font-size:.68rem;font-weight:800;letter-spacing:.06em;text-shadow:none;opacity:.95;margin-top:-6px}
+.lamp.off{filter:saturate(.25) brightness(.55);box-shadow:0 0 0 5px #15151B}
+.rows{display:flex;flex-direction:column;gap:12px}
+.crow{border:0;text-align:left;cursor:pointer;border-radius:20px;padding:16px 18px;background:color-mix(in srgb,var(--c) 14%,var(--paper));display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 14px;align-items:start;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c) 30%,transparent);transition:transform .15s}
+.crow:hover{transform:translateX(4px)}
+.crow .bulb{width:22px;height:22px;border-radius:50%;background:var(--c);margin-top:4px;box-shadow:0 0 12px var(--c)}
+.crow h3{font-size:1.1rem}
+.crow .pct{font-family:var(--f-d);font-size:1.5rem;color:color-mix(in srgb,var(--c) 75%,var(--ink));line-height:1}
+.crow p{grid-column:2/4;color:var(--ink);font-weight:700}
+.crow .ex{grid-column:2/4;border-left:3px solid var(--c);padding-left:10px;font-weight:700;color:color-mix(in srgb,var(--c) 55%,var(--ink));font-style:italic}
+
+/* study overlay */
+.ov{position:fixed;inset:0;z-index:100;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.ovin{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-height:100%}
+.ovtop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ovtop .cnt{font-weight:800;color:var(--muted)}
+.ib{border:0;background:var(--paper);box-shadow:0 0 0 1.5px var(--rule);border-radius:99px;padding:8px 16px;font-weight:800;cursor:pointer}
+.scene{perspective:1600px}
+.flip{display:grid;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;cursor:pointer}
+.flip.on{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:28px;background:var(--paper);box-shadow:0 20px 50px rgba(0,0,0,.14),0 0 0 1px var(--rule);overflow:hidden;min-width:0}
+.back{transform:rotateY(180deg)}
+.front{display:flex;flex-direction:column}
+.front .hd{background:var(--c);color:#fff;padding:30px 28px;display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center}
+.front .hd small{font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;opacity:.9}
+.front .hd h2{font-size:clamp(1.8rem,6vw,3rem)}
+.front .hd .ua{font-weight:800;opacity:.92;font-size:1.05rem}
+.front .tlbig{padding:18px 24px 6px}
+.front .tlbig svg{width:100%;height:auto}
+.front .tap{padding:4px 24px 22px;color:var(--muted);font-weight:800;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.back .bh{background:var(--c);color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.back .bh b{font-family:var(--f-d);font-size:1.05rem}
+.back .bd{padding:20px 24px 24px;display:flex;flex-direction:column;gap:16px}
+.blk h4{margin:0 0 6px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--c) 70%,var(--ink))}
+.blk ul{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:4px}
+.form{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:baseline}
+.form .s{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,var(--paper));color:color-mix(in srgb,var(--c) 70%,var(--ink));font-weight:900}
+.form div{font-weight:800}
+.form em{font-style:normal;color:var(--muted);font-weight:700;display:block;font-size:.92rem}
+.mk{display:flex;flex-wrap:wrap;gap:6px}
+.mk span{background:var(--soft);border-radius:8px;padding:3px 9px;font-weight:800;font-size:.86rem}
+.exs{display:flex;flex-direction:column;gap:8px}
+.exs p{border-left:3px solid var(--c);padding-left:12px;font-weight:800}
+.exs p span{display:block;font-weight:600;color:var(--muted);font-size:.9rem}
+.exs b{color:color-mix(in srgb,var(--c) 75%,var(--ink))}
+table.t{width:100%;border-collapse:collapse;font-size:.92rem}
+table.t th,table.t td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+table.t th{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+table.t td:first-child{font-weight:800}
+.tblwrap{overflow-x:auto}
+.note{background:color-mix(in srgb,var(--yellow) 22%,var(--paper));border-radius:14px;padding:10px 14px;font-weight:700;font-size:.94rem}
+.ovnav{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding-bottom:10px}
+.ovnav .mid{display:flex;gap:8px;flex-wrap:wrap}
+.ib.knowbtn[aria-pressed="true"]{background:var(--ok);color:#fff;box-shadow:none}
+.ib.pr{background:var(--ink);color:var(--bg);box-shadow:none}
+
+footer{padding-block:50px 40px;color:var(--muted);font-size:.86rem}
+@media (prefers-reduced-motion:reduce){.flip{transition:none}.card,.crow,.lamp{transition:none}}
+@media (max-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.fan{height:170px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .lightbox{grid-template-columns:minmax(0,1fr)}.tlight{flex-direction:row;width:auto;align-self:center;margin:0 auto 10px;padding:12px;gap:10px;border-radius:30px}.tlight::after{display:none}.lamp{width:68px;height:68px;font-size:1rem}.lamp small{font-size:.55rem;margin-top:-2px}
+ .search{flex:1 1 100%}}
+@media (max-width:420px){.grid{gap:10px}.card .top{padding:12px;min-height:88px}.card .top b{font-size:.92rem}.card .f{padding:6px 12px 12px;font-size:.82rem}.lamp{width:58px;height:58px}.back .bd,.back .bh{padding-left:16px;padding-right:16px}.front .hd{padding:24px 18px}}
+</style>
+
+</head>
+<body>
+<header class="wrap hero">
+  <div>
+    <div class="k">English grammar · A2–B2</div>
+    <h1>Grammar <span>Flashcards</span></h1>
+    <p class="lede">Усі часи англійської, пасив, непряма мова і умовні речення. Натисни на картку, щоб відкрити її, і ще раз, щоб перевернути: там правило, формули, слова-маркери й приклади. Позначай «I know it», щоб бачити свій прогрес.</p>
+  </div>
+  <div class="fan" aria-hidden="true">
+    <div style="--c:var(--pres);transform:translateX(-120%) rotate(-14deg)">Present Perfect<small>have + V3</small></div>
+    <div style="--c:var(--past);transform:translateX(-80%) rotate(-5deg)">Past Simple<small>V2 / -ed</small></div>
+    <div style="--c:var(--fut);transform:translateX(-35%) rotate(5deg)">Future Perfect<small>will have + V3</small></div>
+    <div style="--c:var(--red);transform:translateX(10%) rotate(14deg)">2nd Conditional<small>if + V2, would + V</small></div>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="chips" id="chips" role="group" aria-label="Filter cards"></div>
+    <input class="search" id="q" type="search" placeholder="Search: perfect, if, said…" aria-label="Search cards">
+    <button class="study" type="button" id="studyAll">Study mode ▶</button>
+  </div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<div class="ov" id="ov" hidden role="dialog" aria-modal="true" aria-label="Study mode">
+  <div class="ovin">
+    <div class="ovtop"><span class="cnt" id="cnt"></span><div style="display:flex;gap:8px"><button class="ib" type="button" id="shuf">Shuffle</button><button class="ib" type="button" id="close">Close ✕</button></div></div>
+    <div class="scene"><div class="flip" id="flip" tabindex="0" aria-live="polite"></div></div>
+    <div class="ovnav"><button class="ib" type="button" id="prev">← Back</button><div class="mid"><button class="ib pr" type="button" id="turn">Flip</button><button class="ib knowbtn" type="button" id="know" aria-pressed="false">✓ I know it</button></div><button class="ib" type="button" id="next">Next →</button></div>
+  </div>
+</div>
+
+<footer class="wrap">Grammar Flashcards · Present, Past, Future, Passive, Reported Speech, Conditionals. Tip: in study mode use ← → and Space, or swipe.</footer>
+
+<script>
+/* ======== TIMELINES ======== */
+// x from 0..100, NOW = 50. shapes: dot(x), dots(a,b), wave(a,b), bar(a,b), ref(x,label) = reference point
+function TL(sh,c){const X=v=>20+v*5.6;let s=`<svg viewBox="0 0 600 92" aria-hidden="true"><line x1="10" y1="54" x2="590" y2="54" stroke="var(--muted)" stroke-width="2" opacity=".5"/><path d="M582 48 l10 6 l-10 6" fill="var(--muted)" opacity=".5"/>
+ <line x1="${X(50)}" y1="20" x2="${X(50)}" y2="74" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="4 4"/><text x="${X(50)}" y="90" text-anchor="middle" font-family="Manrope,sans-serif" font-weight="800" font-size="13" fill="var(--ink)">NOW</text>
+ <text x="16" y="90" font-family="Manrope,sans-serif" font-weight="700" font-size="12" fill="var(--muted)">past</text><text x="584" y="90" text-anchor="end" font-family="Manrope,sans-serif" font-weight="700" font-size="12" fill="var(--muted)">future</text>`;
+ sh.forEach(o=>{if(o[0]==='dot')s+=`<circle cx="${X(o[1])}" cy="54" r="10" fill="${c}"/>`;
+  if(o[0]==='x')s+=`<path d="M${X(o[1])-9} 45 l18 18 M${X(o[1])+9} 45 l-18 18" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`;
+  if(o[0]==='dots')for(let v=o[1];v<=o[2];v+=(o[2]-o[1])/5)s+=`<circle cx="${X(v)}" cy="54" r="7" fill="${c}"/>`;
+  if(o[0]==='wave'){let d=`M${X(o[1])} 54`;const a=X(o[1]),b=X(o[2]),n=Math.max(2,Math.round((b-a)/26));const w=(b-a)/n;for(let i=0;i<n;i++)d+=` q${w/4} -16 ${w/2} 0 t${w/2} 0`;s+=`<path d="${d}" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`}
+  if(o[0]==='bar')s+=`<rect x="${X(o[1])}" y="48" width="${X(o[2])-X(o[1])}" height="12" rx="6" fill="${c}"/>`;
+  if(o[0]==='arrow')s+=`<path d="M${X(o[1])} 30 Q ${(X(o[1])+X(o[2]))/2} 6 ${X(o[2])} 30" fill="none" stroke="${c}" stroke-width="3"/><path d="M${X(o[2])-8} 24 l8 7 l2 -10" fill="none" stroke="${c}" stroke-width="3"/>`;
+  if(o[0]==='ref')s+=`<line x1="${X(o[1])}" y1="28" x2="${X(o[1])}" y2="74" stroke="var(--muted)" stroke-width="2"/><text x="${X(o[1])}" y="20" text-anchor="middle" font-family="Manrope,sans-serif" font-weight="800" font-size="12" fill="var(--muted)">${o[2]}</text>`;
+ });return s+'</svg>'}
+
+/* ======== DATA ======== */
+const CATS=[
+ {id:'present',name:'Present',c:'var(--pres)',d:'Теперішні часи: що відбувається зазвичай, зараз і до цього моменту.'},
+ {id:'past',name:'Past',c:'var(--past)',d:'Минулі часи: що сталося, що тривало і що відбулося ще раніше.'},
+ {id:'future',name:'Future',c:'var(--fut)',d:'Майбутні часи і форми: рішення, плани, прогнози і «до якогось моменту».'},
+ {id:'passive',name:'Passive',c:'var(--pas)',d:'Пасивний стан: важливо, що сталося, а не хто це зробив.'},
+ {id:'reported',name:'Reported Speech',c:'var(--rep)',d:'Непряма мова: як переказати чужі слова, питання і прохання.'},
+ {id:'cond',name:'Conditionals',c:'var(--cond)',d:'Умовні речення. Світлофор показує, наскільки ймовірна ситуація.'}];
+const C=[
+/* PRESENT */
+{cat:'present',name:'Present Simple',ua:'Теперішній простий',tl:[['dots',8,92]],f:'V / V-s',
+ use:['Звички та регулярні дії','Факти й загальні істини','Розклади (поїзди, уроки, фільми)','Стани: like, know, want, believe'],
+ form:[['+','I / you / we / they <b>work</b>','he / she / it <b>works</b>'],['–','I <b>don\'t work</b>','she <b>doesn\'t work</b>'],['?','<b>Do</b> you <b>work</b>?','<b>Does</b> she <b>work</b>?']],
+ mk:['always','usually','often','sometimes','never','every day','on Mondays','once a week'],
+ ex:[['She <b>plays</b> tennis every Saturday.','Вона грає в теніс щосуботи.'],['Water <b>boils</b> at 100°C.','Вода кипить при 100°C.'],['The train <b>leaves</b> at 8:15.','Поїзд відправляється о 8:15.']],
+ note:'He / she / it: додаємо <b>-s / -es</b>: works, watches, goes, studies. У запереченнях і питаннях -s «переходить» у does.'},
+{cat:'present',name:'Present Continuous',ua:'Теперішній тривалий',tl:[['wave',40,60]],f:'am / is / are + V-ing',
+ use:['Дія відбувається прямо зараз','Тимчасова ситуація (this week, these days)','Домовленості на майбутнє (є час і місце)','Роздратування: always + -ing'],
+ form:[['+','I <b>am working</b>','she <b>is working</b> · they <b>are working</b>'],['–','I\'<b>m not working</b>','he <b>isn\'t working</b>'],['?','<b>Are</b> you <b>working</b>?','<b>Is</b> he <b>working</b>?']],
+ mk:['now','right now','at the moment','today','this week','Look!','Listen!','currently'],
+ ex:[['Shh! The baby <b>is sleeping</b>.','Тихо! Дитина спить.'],['I<b>\'m staying</b> with my aunt this week.','Цього тижня я живу в тітки.'],['We<b>\'re meeting</b> Ann at 5 tomorrow.','Завтра о 5 ми зустрічаємося з Анною.']],
+ note:'<b>State verbs</b> (like, love, know, want, need, believe, own) зазвичай не вживаються в Continuous: <i>I know</i>, а не <i>I\'m knowing</i>.'},
+{cat:'present',name:'Present Perfect',ua:'Теперішній доконаний',tl:[['dot',30],['arrow',30,50]],f:'have / has + V3',
+ use:['Досвід у житті (час не важливий)','Результат минулої дії важливий зараз','Дія почалася в минулому і триває досі (for / since)','Новини: just, already, yet'],
+ form:[['+','I <b>have finished</b>','she <b>has finished</b>'],['–','I <b>haven\'t finished</b>','he <b>hasn\'t finished</b>'],['?','<b>Have</b> you <b>finished</b>?','<b>Has</b> she <b>finished</b>?']],
+ mk:['ever','never','just','already','yet','for','since','so far','recently','this year'],
+ ex:[['I<b>\'ve</b> never <b>been</b> to Paris.','Я ніколи не був у Парижі.'],['She<b>\'s lost</b> her keys. She can\'t get in.','Вона загубила ключі (і зараз не може зайти).'],['We<b>\'ve lived</b> here since 2019.','Ми живемо тут з 2019 року.']],
+ note:'Якщо є точний час у минулому (yesterday, in 2020, ago), то це <b>Past Simple</b>: <i>I saw him yesterday</i>, а не <i>I have seen him yesterday</i>.'},
+{cat:'present',name:'Present Perfect Continuous',ua:'Теперішній доконано-тривалий',tl:[['wave',22,50]],f:'have / has been + V-ing',
+ use:['Як довго триває дія до цього моменту','Дія щойно закінчилась, і видно результат'],
+ form:[['+','I <b>have been waiting</b>','she <b>has been waiting</b>'],['–','I <b>haven\'t been waiting</b>','it <b>hasn\'t been raining</b>'],['?','<b>Have</b> you <b>been waiting</b> long?','How long <b>has</b> she <b>been learning</b>?']],
+ mk:['for','since','how long','all day','all morning','lately','recently'],
+ ex:[['I<b>\'ve been waiting</b> for an hour!','Я чекаю вже годину!'],['She<b>\'s been learning</b> English since she was six.','Вона вчить англійську з шести років.'],['Your eyes are red. <b>Have</b> you <b>been crying</b>?','У тебе червоні очі. Ти плакала?']],
+ note:'Present Perfect: <b>скільки</b> / результат (<i>I\'ve read 3 books</i>). Perfect Continuous: <b>як довго</b> / процес (<i>I\'ve been reading all day</i>).'},
+/* PAST */
+{cat:'past',name:'Past Simple',ua:'Минулий простий',tl:[['dot',25]],f:'V2 / V-ed',
+ use:['Завершена дія в минулому з відомим часом','Послідовність дій в історії','Минулі звички і стани'],
+ form:[['+','I <b>worked</b> · she <b>went</b>','правильні -ed, неправильні: V2'],['–','I <b>didn\'t work</b>','she <b>didn\'t go</b>'],['?','<b>Did</b> you <b>work</b>?','Where <b>did</b> she <b>go</b>?']],
+ mk:['yesterday','last week','last year','ago','in 2015','when I was five','then'],
+ ex:[['We <b>visited</b> Lviv last summer.','Минулого літа ми їздили до Львова.'],['He <b>got</b> up, <b>had</b> breakfast and <b>left</b>.','Він встав, поснідав і пішов.'],['<b>Did</b> you <b>see</b> the film?','Ти бачив фільм?']],
+ note:'Після <b>did / didn\'t</b> дієслово повертається в першу форму: <i>Did she go?</i>, а не <i>Did she went?</i>'},
+{cat:'past',name:'Past Continuous',ua:'Минулий тривалий',tl:[['wave',14,36],['x',27]],f:'was / were + V-ing',
+ use:['Процес у певний момент у минулому','Фон для іншої, короткої дії (when)','Дві дії одночасно (while)'],
+ form:[['+','I / he <b>was reading</b>','you / we / they <b>were reading</b>'],['–','she <b>wasn\'t reading</b>','they <b>weren\'t reading</b>'],['?','<b>Was</b> he <b>reading</b>?','What <b>were</b> you <b>doing</b>?']],
+ mk:['at 5 pm yesterday','at that moment','when','while','all evening'],
+ ex:[['At 8 pm I <b>was doing</b> my homework.','О 8 вечора я робив домашнє.'],['I <b>was walking</b> home when it <b>started</b> to rain.','Я йшов додому, коли почався дощ.'],['While Mum <b>was cooking</b>, Dad <b>was reading</b>.','Поки мама готувала, тато читав.']],
+ note:'Довга дія у Past Continuous, а коротка дія, що її перервала, у Past Simple. <b>when</b> + коротка дія, <b>while</b> + довга.'},
+{cat:'past',name:'Past Perfect',ua:'Минулий доконаний («передминулий»)',tl:[['dot',14],['ref',30,'past moment'],['arrow',14,30]],f:'had + V3',
+ use:['Дія, що сталася раніше за іншу дію в минулому','Пояснення причини в розповіді','Непряма мова (замість Past Simple / Present Perfect)'],
+ form:[['+','I / she / they <b>had left</b>','однаково для всіх осіб'],['–','he <b>hadn\'t left</b>',''],['?','<b>Had</b> you <b>left</b>?','']],
+ mk:['before','after','by the time','already','just','never','when'],
+ ex:[['When we arrived, the film <b>had</b> already <b>started</b>.','Коли ми прийшли, фільм уже почався.'],['She was sad because she <b>had lost</b> her phone.','Вона була сумна, бо загубила телефон.'],['I <b>had</b> never <b>seen</b> snow before I went to Norway.','Я ніколи не бачив снігу до поїздки в Норвегію.']],
+ note:'Порівняй: <i>When I arrived, he <b>left</b></i> (я прийшов, він пішов) і <i>When I arrived, he <b>had left</b></i> (він пішов ще до мене).'},
+{cat:'past',name:'Past Perfect Continuous',ua:'Минулий доконано-тривалий',tl:[['wave',8,30],['ref',30,'past moment']],f:'had been + V-ing',
+ use:['Як довго тривала дія до певного моменту в минулому','Причина видимого стану в минулому'],
+ form:[['+','I <b>had been working</b>',''],['–','she <b>hadn\'t been working</b>',''],['?','How long <b>had</b> you <b>been working</b>?','']],
+ mk:['for','since','how long','before','all day','by the time'],
+ ex:[['We <b>had been waiting</b> for an hour when the bus came.','Ми чекали вже годину, коли приїхав автобус.'],['He was tired because he <b>had been running</b>.','Він був втомлений, бо бігав.']],
+ note:'Це «Present Perfect Continuous, але в минулому»: точка відліку не зараз, а момент у минулому.'},
+/* FUTURE */
+{cat:'future',name:'Future Simple (will)',ua:'Майбутній простий',tl:[['dot',75]],f:'will + V',
+ use:['Рішення в момент мовлення','Прогноз-думка (I think, probably)','Обіцянки, пропозиції, прохання','Факти про майбутнє'],
+ form:[['+','I / she / they <b>will help</b>','\'ll help'],['–','I <b>won\'t help</b>','= will not'],['?','<b>Will</b> you <b>help</b> me?','']],
+ mk:['tomorrow','next week','soon','in 2050','I think','probably','I\'m sure','maybe'],
+ ex:[['It\'s cold. I<b>\'ll close</b> the window.','Холодно. Я зачиню вікно.'],['I think robots <b>will do</b> our homework one day.','Думаю, колись роботи робитимуть за нас домашнє.'],['I <b>won\'t tell</b> anyone, I promise.','Я нікому не скажу, обіцяю.']],
+ note:'Після <b>when, if, before, after, as soon as</b> у майбутньому вживаємо Present Simple: <i>I\'ll call you when I <b>get</b> home.</i>'},
+{cat:'future',name:'be going to',ua:'Конструкція «збираюся»',tl:[['dot',50],['arrow',50,78],['dot',78]],f:'am / is / are going to + V',
+ use:['План або намір, рішення вже прийняте','Прогноз на основі того, що бачимо зараз'],
+ form:[['+','I\'<b>m going to study</b>','she\'<b>s going to study</b>'],['–','we <b>aren\'t going to study</b>',''],['?','<b>Are</b> you <b>going to study</b>?','']],
+ mk:['tonight','tomorrow','next summer','Look!','soon'],
+ ex:[['I<b>\'m going to learn</b> to drive this summer.','Цього літа я збираюся навчитися кермувати.'],['Look at those clouds! It<b>\'s going to rain</b>.','Глянь на хмари! Зараз піде дощ.']],
+ note:'<b>will</b>: вирішив зараз. <b>going to</b>: вирішив раніше. <b>Present Continuous</b>: вже домовився (є час і місце).'},
+{cat:'future',name:'Future Continuous',ua:'Майбутній тривалий',tl:[['wave',66,84],['ref',75,'future moment']],f:'will be + V-ing',
+ use:['Процес у певний момент у майбутньому','Заплановані, «самі собою зрозумілі» події','Ввічливі питання про плани'],
+ form:[['+','I <b>will be travelling</b>',''],['–','she <b>won\'t be working</b>',''],['?','<b>Will</b> you <b>be using</b> the car?','']],
+ mk:['this time tomorrow','at 8 pm tomorrow','this time next week','in ten years\' time'],
+ ex:[['This time tomorrow I<b>\'ll be lying</b> on the beach.','Завтра о цій порі я лежатиму на пляжі.'],['<b>Will</b> you <b>be using</b> your laptop tonight?','Ти сьогодні ввечері користуватимешся ноутбуком? (ввічливо)']],
+ note:'Ввічливе питання: <i>Will you be going to the shop?</i> звучить м\'якше, ніж <i>Are you going to go?</i>'},
+{cat:'future',name:'Future Perfect',ua:'Майбутній доконаний',tl:[['dot',66],['ref',82,'by…'],['arrow',66,82]],f:'will have + V3',
+ use:['Дія завершиться до певного моменту в майбутньому'],
+ form:[['+','I <b>will have finished</b>',''],['–','they <b>won\'t have finished</b>',''],['?','<b>Will</b> you <b>have finished</b> by 6?','']],
+ mk:['by Friday','by 2030','by then','by the time','in two days\' time'],
+ ex:[['By 2030, the city <b>will have built</b> a new metro.','До 2030 року місто збудує нове метро.'],['I <b>won\'t have finished</b> the essay by tomorrow.','Я не встигну закінчити есе до завтра.']],
+ note:'Головне слово тут <b>by</b> («до, не пізніше ніж»). Після <b>by the time</b> вживаємо Present Simple: <i>By the time you <b>arrive</b>, I\'ll have cooked dinner.</i>'},
+{cat:'future',name:'Future Perfect Continuous',ua:'Майбутній доконано-тривалий',tl:[['wave',40,82],['ref',82,'by…']],f:'will have been + V-ing',
+ use:['Як довго триватиме дія до певного моменту в майбутньому'],
+ form:[['+','I <b>will have been learning</b>',''],['–','she <b>won\'t have been working</b>',''],['?','How long <b>will</b> you <b>have been studying</b>?','']],
+ mk:['by … for','by next year','by the end of','for ten years'],
+ ex:[['By June, I<b>\'ll have been learning</b> English for five years.','У червні буде п\'ять років, як я вчу англійську.'],['By 8 pm, she <b>will have been working</b> for ten hours.','О 8 вечора буде десять годин, як вона працює.']],
+ note:'Зазвичай у реченні є і <b>by</b> (до якого моменту), і <b>for</b> (як довго).'},
+/* PASSIVE */
+{cat:'passive',name:'Passive: how it works',ua:'Пасивний стан: як утворюється',tl:null,f:'be + V3',
+ use:['Важливо, що сталося, а не хто це зробив','Виконавець невідомий або очевидний','Офіційний стиль, новини, наука'],
+ form:[['A','Someone <b>stole</b> my bike.','Active: хтось украв'],['P','My bike <b>was stolen</b>.','Passive: велосипед був украдений'],['by','The book was written <b>by</b> J. K. Rowling.','by + виконавець (якщо важливо)']],
+ mk:['be + V3','by','made in','built in','is called'],
+ ex:[['English <b>is spoken</b> all over the world.','Англійською говорять у всьому світі.'],['The bridge <b>was built</b> in 1900.','Міст збудували у 1900 році.'],['Your order <b>will be delivered</b> tomorrow.','Ваше замовлення доставлять завтра.']],
+ note:'Час показує дієслово <b>be</b>, а основне дієслово завжди в <b>V3</b>. Пасив можливий лише з дієсловами, які мають додаток (не з go, come, happen).'},
+{cat:'passive',name:'Passive: all tenses',ua:'Пасив у всіх часах',tl:null,f:'is done · was done · has been done…',
+ table:[['Tense','Passive','Example'],['Present Simple','am / is / are + V3','Cars <b>are made</b> here.'],['Present Continuous','am / is / are being + V3','The road <b>is being repaired</b>.'],['Present Perfect','have / has been + V3','The tickets <b>have been sold</b>.'],['Past Simple','was / were + V3','It <b>was painted</b> in 1503.'],['Past Continuous','was / were being + V3','The room <b>was being cleaned</b>.'],['Past Perfect','had been + V3','The cake <b>had been eaten</b>.'],['Future Simple','will be + V3','You <b>will be met</b> at the airport.'],['be going to','am / is / are going to be + V3','It<b>\'s going to be sold</b>.'],['Modals','can / must / should be + V3','Phones <b>must be switched</b> off.']],
+ ex:[['Questions: <b>Was</b> the window <b>broken</b>? <b>Has</b> the work <b>been done</b>?',''],['Negatives: It <b>wasn\'t built</b> in a day. It <b>hasn\'t been</b> <b>decided</b>.','']],
+ note:'Perfect Continuous і Future Continuous у пасиві майже не вживаються.'},
+/* REPORTED */
+{cat:'reported',name:'Reported statements',ua:'Непряма мова: твердження',tl:null,f:'said (that) / told sb (that) + one tense back',
+ use:['Переказуємо чужі слова','Якщо said / told у минулому, час «зсувається» на крок назад (backshift)'],
+ table:[['Direct','Reported'],['Present Simple: “I <b>like</b> it.”','Past Simple: she said she <b>liked</b> it'],['Present Continuous: “I\'<b>m working</b>.”','Past Continuous: he said he <b>was working</b>'],['Present Perfect: “I\'<b>ve finished</b>.”','Past Perfect: she said she <b>had finished</b>'],['Past Simple: “I <b>saw</b> him.”','Past Perfect: he said he <b>had seen</b> him'],['will: “I\'<b>ll call</b>.”','would: she said she <b>would call</b>'],['can: “I <b>can</b> swim.”','could: he said he <b>could</b> swim'],['must: “I <b>must</b> go.”','had to: she said she <b>had to</b> go']],
+ ex:[['“I\'m tired.” → She <b>said</b> (that) she <b>was</b> tired.',''],['“I\'ll help you.” → He <b>told me</b> he <b>would</b> help me.','']],
+ note:'<b>say</b> без «кому»: <i>He said that…</i> <b>tell</b> + кому: <i>He told <b>me</b> that…</i> (не <i>said me</i>!). Займенники теж міняються: I → he / she, my → his / her.'},
+{cat:'reported',name:'Time & place words',ua:'Непряма мова: слова часу і місця',tl:null,f:'now → then · today → that day',
+ table:[['Direct','Reported'],['now','then / at that moment'],['today','that day'],['tonight','that night'],['yesterday','the day before / the previous day'],['tomorrow','the next day / the following day'],['last week','the week before'],['next week','the following week'],['ago','before'],['here','there'],['this / these','that / those']],
+ ex:[['“I\'m leaving <b>tomorrow</b>.” → He said he was leaving <b>the next day</b>.',''],['“I saw her <b>here yesterday</b>.” → She said she had seen her <b>there the day before</b>.','']],
+ note:'Якщо переказуємо одразу і в тому ж місці, слова можна не змінювати.'},
+{cat:'reported',name:'Reported questions',ua:'Непряма мова: питання',tl:null,f:'asked + if / whether / wh- + S + V',
+ use:['Питання стає звичайним реченням: порядок слів прямий, без do / does / did і без знака питання','Загальні питання (yes / no): <b>if</b> або <b>whether</b>','Спеціальні питання: питальне слово + підмет + дієслово'],
+ form:[['?','“<b>Do you like</b> pizza?”','→ She asked me <b>if I liked</b> pizza.'],['?','“Where <b>do you live</b>?”','→ He asked me where <b>I lived</b>.'],['?','“What <b>are you doing</b>?”','→ Mum asked what <b>I was doing</b>.']],
+ mk:['asked','wanted to know','wondered','if','whether'],
+ ex:[['“<b>Have you finished</b>?” → The teacher asked <b>if we had finished</b>.',''],['“When <b>will you come</b>?” → She asked when <b>I would come</b>.','']],
+ note:'Типова помилка: <i>He asked where <s>did I live</s></i>. Правильно: <i>He asked where <b>I lived</b>.</i>'},
+{cat:'reported',name:'Commands & requests',ua:'Непряма мова: накази і прохання',tl:null,f:'told / asked sb (not) to + V',
+ use:['Наказ: <b>told</b> + кому + <b>to</b> + V','Прохання: <b>asked</b> + кому + <b>to</b> + V','Заперечення: <b>not to</b> + V'],
+ form:[['!','“Sit down!”','→ The teacher <b>told us to sit</b> down.'],['!','“Please help me.”','→ She <b>asked me to help</b> her.'],['!','“Don\'t touch it!”','→ Dad <b>told me not to touch</b> it.']],
+ mk:['told','asked','ordered','advised','warned','not to'],
+ ex:[['“Close the window, please.” → He <b>asked me to close</b> the window.',''],['“Don\'t be late!” → Mum <b>told me not to be</b> late.','']],
+ note:'Час тут не зсуваємо: після <b>to</b> завжди перша форма дієслова.'},
+/* CONDITIONALS */
+{cat:'cond',light:'green',pct:'100%',name:'Zero Conditional',ua:'Нульовий тип: 100% станеться',tl:null,f:'If + Present Simple, Present Simple',
+ short:'Факт, закон природи, правило: так буває <b>завжди</b>.',use:['Факти та закони природи','Загальні правила й інструкції','Те, що відбувається завжди за певної умови'],
+ form:[['If','If you <b>heat</b> ice, it <b>melts</b>.','обидві частини в Present Simple'],['=','If = when (коли завгодно)','']],
+ mk:['if','when','whenever','unless'],
+ ex:[['If you <b>heat</b> ice, it <b>melts</b>.','Якщо нагріти лід, він тане.'],['If I <b>drink</b> coffee at night, I <b>can\'t</b> sleep.','Якщо я п\'ю каву ввечері, не можу заснути.'],['Plants <b>die</b> if they <b>don\'t get</b> water.','Рослини гинуть без води.']],
+ note:'Зелене світло: ситуація відбудеться на <b>100%</b>, бо так влаштований світ.'},
+{cat:'cond',light:'yellow',pct:'50/50',name:'First Conditional',ua:'Перший тип: 50/50',tl:null,f:'If + Present Simple, will + V',
+ short:'Реальна ситуація в майбутньому: <b>може, станеться, а може, й ні</b>.',use:['Реальні, можливі ситуації в майбутньому','Попередження, обіцянки, погрози','Плани, що залежать від умови'],
+ form:[['If','If it <b>rains</b>, we <b>will cancel</b> our picnic.',''],['–','If you <b>don\'t hurry</b>, you<b>\'ll miss</b> the bus.',''],['?','What <b>will</b> you <b>do</b> if you <b>fail</b>?','']],
+ mk:['if','unless (= if not)','when','as soon as'],
+ ex:[['If it <b>rains</b>, we<b>\'ll cancel</b> the picnic.','Якщо піде дощ, ми скасуємо пікнік.'],['If you <b>study</b>, you<b>\'ll pass</b> the test.','Якщо вчитимешся, складеш тест.'],['I <b>won\'t go</b> unless you <b>come</b> with me.','Я не піду, якщо ти не підеш зі мною.']],
+ note:'Жовте світло: <b>50/50</b>. Після <b>if</b> ніколи не ставимо will: <i>If it <s>will rain</s></i> ✗'},
+{cat:'cond',light:'red',pct:'0%',name:'Second Conditional',ua:'Другий тип: 0%, уявна ситуація',tl:null,f:'If + Past Simple, would + V',
+ short:'Неможлива або дуже малоймовірна ситуація <b>зараз чи в майбутньому</b>. Ми лише уявляємо.',use:['Уявні ситуації в теперішньому','Малоймовірне майбутнє (виграти мільйон)','Поради: If I were you…'],
+ form:[['If','If I <b>met</b> the Queen, I <b>would take</b> a selfie with her.',''],['–','If I <b>didn\'t have</b> homework, I<b>\'d go</b> out.',''],['?','What <b>would</b> you <b>do</b> if you <b>won</b> a million?','']],
+ mk:['if','would','could','might','If I were you'],
+ ex:[['If I <b>had</b> wings, I<b>\'d fly</b> to school.','Якби в мене були крила, я б літав до школи.'],['If I <b>were</b> you, I<b>\'d apply</b> for the job.','На твоєму місці я б подав заявку.'],['If she <b>lived</b> by the sea, she <b>would swim</b> every day.','Якби вона жила біля моря, плавала б щодня.']],
+ note:'Червоне світло: <b>0%</b>, такого (майже) не станеться. З усіма особами можна казати <b>were</b>: <i>If I / he / she were…</i>'},
+{cat:'cond',light:'purple',pct:'alt.',name:'Third Conditional',ua:'Третій тип: альтернативна реальність',tl:null,f:'If + Past Perfect, would have + V3',
+ short:'<b>Альтернативне минуле</b>: як могло бути, але вже не сталося. Змінити нічого не можна.',use:['Уявляємо інше минуле','Жаль, критика, «якби ж то…»'],
+ form:[['If','If you <b>hadn\'t shown up</b> late, you <b>would have got</b> a piece of cake.',''],['–','If I <b>had known</b>, I <b>wouldn\'t have come</b>.',''],['?','What <b>would</b> you <b>have done</b> if you <b>had lost</b>?','']],
+ mk:['if','had + V3','would have','could have','might have'],
+ ex:[['If I <b>had studied</b>, I <b>would have passed</b>.','Якби я вчився, то склав би (але не вчився і не склав).'],['If we <b>hadn\'t missed</b> the bus, we <b>wouldn\'t have been</b> late.','Якби ми не спізнилися на автобус, то не запізнилися б.']],
+ note:'Фіолетове світло: <b>паралельний всесвіт</b>. Це вже в минулому, тож ситуація не відбудеться ніколи.'},
+{cat:'cond',light:'mixed',pct:'mix',name:'Mixed Conditional',ua:'Змішаний тип: минуле → тепер',tl:null,f:'If + Past Perfect, would + V',
+ short:'Інше минуле дало б інше <b>теперішнє</b>.',use:['Минула умова → результат зараз','Або: теперішня риса → результат у минулому'],
+ form:[['1','If I <b>had slept</b> more, I <b>wouldn\'t be</b> tired now.','минуле → тепер'],['2','If I <b>were</b> braver, I <b>would have asked</b> her.','тепер → минуле']],
+ mk:['now','today','yesterday','last night'],
+ ex:[['If I <b>had taken</b> the map, we <b>wouldn\'t be</b> lost now.','Якби я взяв карту, ми б зараз не заблукали.'],['If she <b>spoke</b> French, she <b>would have understood</b> the film.','Якби вона знала французьку, то зрозуміла б фільм.']],
+ note:'Фіолетовий + червоний: половина з 3-го типу, половина з 2-го.'}
+];
+C.forEach((c,i)=>{c.id=i});
+const LIGHT={green:'var(--green)',yellow:'var(--yellow)',red:'var(--red)',purple:'var(--purple)',mixed:'linear-gradient(135deg,var(--purple) 50%,var(--red) 50%)'};
+const colorOf=c=>c.light?(c.light==='mixed'?'var(--purple)':LIGHT[c.light]):CATS.find(k=>k.id===c.cat).c;
+
+/* ======== STATE ======== */
+const KEY='grammar-cards-v1';let known={};try{known=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(known))}catch(e){}};
+const $=id=>document.getElementById(id);
+let filter='all',query='';
+
+/* ======== CHIPS ======== */
+[{id:'all',name:'All cards',c:'var(--ink)'},...CATS].forEach(k=>{const b=document.createElement('button');b.type='button';b.className='chip';b.innerHTML=`<i style="--c:${k.id==='cond'?'var(--yellow)':k.c}"></i>${k.name}`;
+ b.setAttribute('aria-pressed',k.id===filter?'true':'false');b.addEventListener('click',()=>{filter=k.id;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));render()});$('chips').appendChild(b)});
+$('q').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();render()});
+
+function visible(){return C.filter(c=>(filter==='all'||c.cat===filter)&&(!query||(c.name+' '+c.ua+' '+c.f+' '+(c.mk||[]).join(' ')).toLowerCase().includes(query)))}
+
+/* ======== RENDER GRID ======== */
+function cardFront(c){const col=colorOf(c);const b=document.createElement('button');b.type='button';b.className='card';b.style.setProperty('--c',col);
+ b.innerHTML=`<span class="top"><small>${c.light?('● '+c.pct):CATS.find(k=>k.id===c.cat).name}</small><b>${c.name}</b></span>${c.tl?`<span class="tl">${TL(c.tl,col)}</span>`:''}<span class="f"><code>${c.f}</code><span class="ua">${c.ua}</span></span>${known[c.id]?'<span class="known" aria-label="known">✓</span>':''}`;
+ b.addEventListener('click',()=>openDeck(visible(),c.id));return b}
+function render(){const m=$('main');m.innerHTML='';const vis=visible();
+ if(!vis.length){m.innerHTML='<p style="padding:40px 0;color:var(--muted);font-weight:800">Nothing found. Try another word.</p>';return}
+ CATS.forEach(k=>{const list=vis.filter(c=>c.cat===k.id);if(!list.length)return;const s=document.createElement('section');s.className='grp';s.style.setProperty('--c',k.id==='cond'?'var(--yellow)':k.c);
+  const kn=list.filter(c=>known[c.id]).length;
+  s.innerHTML=`<div class="gh"><span class="dot"></span><h2>${k.name}</h2><span class="k">${kn} / ${list.length} known</span><p>${k.d}</p></div>`;
+  if(k.id==='cond'){s.appendChild(lightUI(list))}else{const g=document.createElement('div');g.className='grid';list.forEach(c=>g.appendChild(cardFront(c)));s.appendChild(g)}
+  m.appendChild(s)})}
+function lightUI(list){const w=document.createElement('div');w.className='lightbox';
+ const order=['red','yellow','green','purple'];const tl=document.createElement('div');tl.className='tlight';tl.setAttribute('aria-label','Traffic light');
+ const label={green:'100%',yellow:'50/50',red:'0%',purple:'ALT'};
+ order.forEach(l=>{const c=list.find(x=>x.light===l);const b=document.createElement('button');b.type='button';b.className='lamp'+(c?'':' off');b.style.setProperty('--c',LIGHT[l]);
+  b.innerHTML=`<span>${label[l]}<small>${c?c.name.split(' ')[0]:''}</small></span>`;if(c){b.setAttribute('aria-label',c.name+', '+label[l]);b.addEventListener('click',()=>openDeck(list,c.id))}tl.appendChild(b)});
+ const rows=document.createElement('div');rows.className='rows';
+ ['red','yellow','green','purple','mixed'].forEach(l=>{const c=list.find(x=>x.light===l);if(!c)return;const r=document.createElement('button');r.type='button';r.className='crow';r.style.setProperty('--c',l==='mixed'?'var(--purple)':LIGHT[l]);
+  const ex=c.ex[0][0];r.innerHTML=`<span class="bulb" style="${l==='mixed'?'background:'+LIGHT.mixed:''}"></span><h3>${c.name}${known[c.id]?' ✓':''} <span style="font-family:var(--f-b);font-size:.82rem;font-weight:800;color:var(--muted)">${c.f}</span></h3><span class="pct">${c.pct}</span><p>${c.short}</p><span class="ex">${ex}</span>`;
+  r.addEventListener('click',()=>openDeck(list,c.id));rows.appendChild(r)});
+ w.append(tl,rows);return w}
+
+/* ======== DECK ======== */
+let deck=[],pos=0;
+function faceHTML(c){const col=colorOf(c);const catName=c.light?'Conditionals':CATS.find(k=>k.id===c.cat).name;
+ const bigTL=c.tl?TL(c.tl,col):c.light?`<svg viewBox="0 0 600 120" aria-hidden="true">${['red','yellow','green','purple'].map((l,i)=>`<circle cx="${120+i*120}" cy="60" r="${c.light===l||(c.light==='mixed'&&(l==='purple'||l==='red'))?44:30}" fill="${LIGHT[l]}" opacity="${c.light===l||(c.light==='mixed'&&(l==='purple'||l==='red'))?1:.22}"/>`).join('')}</svg>`:`<svg viewBox="0 0 600 90" aria-hidden="true"><text x="300" y="58" text-anchor="middle" font-family="Unbounded,sans-serif" font-weight="800" font-size="34" fill="${col}">${c.f.length<34?c.f:catName}</text></svg>`;
+ const front=`<div class="face front" style="--c:${col}"><div class="hd"><small>${catName}${c.light?' · '+c.pct:''}</small><h2>${c.name}</h2><span class="ua">${c.ua}</span></div><div class="tlbig">${bigTL}</div><div class="tap"><span>What's the rule? Think, then flip!</span><span>tap to flip ↻</span></div></div>`;
+ let bd='';
+ if(c.short)bd+=`<div class="blk"><p style="font-size:1.08rem;font-weight:800">${c.short}</p></div>`;
+ bd+=`<div class="blk"><h4>Formula</h4><p style="font-family:var(--f-d);font-size:1.05rem">${c.f}</p></div>`;
+ if(c.use)bd+=`<div class="blk"><h4>Коли вживаємо</h4><ul>${c.use.map(u=>`<li>${u}</li>`).join('')}</ul></div>`;
+ if(c.form)bd+=`<div class="blk"><h4>Form</h4><div class="form">${c.form.map(r=>`<span class="s">${r[0]}</span><div>${r[1]}${r[2]?`<em>${r[2]}</em>`:''}</div>`).join('')}</div></div>`;
+ if(c.table)bd+=`<div class="blk"><div class="tblwrap"><table class="t"><thead><tr>${c.table[0].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${c.table.slice(1).map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+ if(c.mk)bd+=`<div class="blk"><h4>Слова-маркери</h4><div class="mk">${c.mk.map(x=>`<span>${x}</span>`).join('')}</div></div>`;
+ if(c.ex)bd+=`<div class="blk"><h4>Examples</h4><div class="exs">${c.ex.map(e=>`<p>${e[0]}${e[1]?`<span>${e[1]}</span>`:''}</p>`).join('')}</div></div>`;
+ if(c.note)bd+=`<div class="note">💡 ${c.note}</div>`;
+ const back=`<div class="face back" style="--c:${col}"><div class="bh"><b>${c.name}</b><span>↻</span></div><div class="bd">${bd}</div></div>`;
+ return front+back}
+function openDeck(list,id){deck=list.slice();pos=Math.max(0,deck.findIndex(c=>c.id===id));$('ov').hidden=false;document.body.style.overflow='hidden';show(false);$('flip').focus({preventScroll:true})}
+function show(flipped){const c=deck[pos];const f=$('flip');f.classList.toggle('on',!!flipped);f.innerHTML=faceHTML(c);$('cnt').textContent=(pos+1)+' / '+deck.length;
+ $('know').setAttribute('aria-pressed',known[c.id]?'true':'false');$('know').textContent=known[c.id]?'✓ Known':'✓ I know it';$('ov').scrollTop=0}
+function turn(){$('flip').classList.toggle('on');$('ov').scrollTop=0}
+function go(d){pos=(pos+d+deck.length)%deck.length;show(false)}
+function closeDeck(){$('ov').hidden=true;document.body.style.overflow='';render()}
+$('flip').addEventListener('click',turn);$('turn').addEventListener('click',turn);
+$('prev').addEventListener('click',()=>go(-1));$('next').addEventListener('click',()=>go(1));$('close').addEventListener('click',closeDeck);
+$('shuf').addEventListener('click',()=>{for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}pos=0;show(false)});
+$('know').addEventListener('click',()=>{const c=deck[pos];if(known[c.id])delete known[c.id];else known[c.id]=1;save();show($('flip').classList.contains('on'))});
+$('studyAll').addEventListener('click',()=>{const v=visible();if(v.length)openDeck(v,v[0].id)});
+document.addEventListener('keydown',e=>{if($('ov').hidden)return;if(e.key==='Escape')closeDeck();else if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1);else if(e.key===' '||e.key==='Enter'){if(e.target.tagName!=='BUTTON'||e.target.id==='flip'){e.preventDefault();turn()}}});
+let sx=null,sy=null;$('flip').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+$('flip').addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){e.preventDefault();go(dx<0?1:-1)}sx=null});
+render();
+</script>
+
+</body>
+</html>
