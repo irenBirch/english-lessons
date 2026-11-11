@@ -99,12 +99,12 @@ section.grp{padding-block:40px 6px}
 .ovtop .cnt{font-weight:800;color:var(--muted)}
 .ib{border:0;background:var(--paper);box-shadow:0 0 0 1.5px var(--rule);border-radius:99px;padding:8px 16px;font-weight:800;cursor:pointer}
 .scene{perspective:1600px}
-.flip{display:grid;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;cursor:pointer}
+.flip{display:grid;align-items:start;transition:transform .55s cubic-bezier(.2,.7,.2,1),height .35s ease;transform-style:preserve-3d;cursor:pointer}
 .flip.on{transform:rotateY(180deg)}
-.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:28px;background:var(--paper);box-shadow:0 20px 50px rgba(0,0,0,.14),0 0 0 1px var(--rule);overflow:hidden;min-width:0}
+.face{grid-area:1/1;align-self:start;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:28px;background:var(--paper);box-shadow:0 20px 50px rgba(0,0,0,.14),0 0 0 1px var(--rule);overflow:hidden;min-width:0}
 .back{transform:rotateY(180deg)}
 .front{display:flex;flex-direction:column}
-.front .hd{background:var(--c);color:#fff;padding:30px 28px;display:flex;flex-direction:column;gap:8px;flex:1;justify-content:center}
+.front .hd{background:var(--c);color:#fff;padding:30px 28px;display:flex;flex-direction:column;gap:8px;justify-content:center;min-height:190px}
 .front .hd small{font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;opacity:.9}
 .front .hd h2{font-size:clamp(1.8rem,6vw,3rem)}
 .front .hd .ua{font-weight:800;opacity:.92;font-size:1.05rem}
@@ -132,7 +132,7 @@ table.t th{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:
 table.t td:first-child{font-weight:800}
 .tblwrap{overflow-x:auto}
 .note{background:color-mix(in srgb,var(--yellow) 22%,var(--paper));border-radius:14px;padding:10px 14px;font-weight:700;font-size:.94rem}
-.ovnav{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding-bottom:10px}
+.ovnav{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding-bottom:10px}.ovnav .mid{justify-content:center}
 .ovnav .mid{display:flex;gap:8px;flex-wrap:wrap}
 .ib.knowbtn[aria-pressed="true"]{background:var(--ok);color:#fff;box-shadow:none}
 .ib.pr{background:var(--ink);color:var(--bg);box-shadow:none}
@@ -143,7 +143,7 @@ footer{padding-block:50px 40px;color:var(--muted);font-size:.86rem}
 @media (max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.fan{height:170px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .lightbox{grid-template-columns:minmax(0,1fr)}.tlight{flex-direction:row;width:auto;align-self:center;margin:0 auto 10px;padding:12px;gap:10px;border-radius:30px}.tlight::after{display:none}.lamp{width:68px;height:68px;font-size:1rem}.lamp small{font-size:.55rem;margin-top:-2px}
  .search{flex:1 1 100%}}
-@media (max-width:420px){.grid{gap:10px}.card .top{padding:12px;min-height:88px}.card .top b{font-size:.92rem}.card .f{padding:6px 12px 12px;font-size:.82rem}.lamp{width:58px;height:58px}.back .bd,.back .bh{padding-left:16px;padding-right:16px}.front .hd{padding:24px 18px}}
+@media (max-width:420px){.ovnav .lb{display:none}.ovnav .ib{padding:8px 14px}.grid{gap:10px}.card .top{padding:12px;min-height:88px}.card .top b{font-size:.92rem}.card .f{padding:6px 12px 12px;font-size:.82rem}.lamp{width:58px;height:58px}.back .bd,.back .bh{padding-left:16px;padding-right:16px}.front .hd{padding:24px 18px}}
 </style>
 
 </head>
@@ -176,7 +176,7 @@ footer{padding-block:50px 40px;color:var(--muted);font-size:.86rem}
   <div class="ovin">
     <div class="ovtop"><span class="cnt" id="cnt"></span><div style="display:flex;gap:8px"><button class="ib" type="button" id="shuf">Shuffle</button><button class="ib" type="button" id="close">Close ✕</button></div></div>
     <div class="scene"><div class="flip" id="flip" tabindex="0" aria-live="polite"></div></div>
-    <div class="ovnav"><button class="ib" type="button" id="prev">← Back</button><div class="mid"><button class="ib pr" type="button" id="turn">Flip</button><button class="ib knowbtn" type="button" id="know" aria-pressed="false">✓ I know it</button></div><button class="ib" type="button" id="next">Next →</button></div>
+    <div class="ovnav"><button class="ib" type="button" id="prev" aria-label="Previous card">←<span class="lb"> Back</span></button><div class="mid"><button class="ib pr" type="button" id="turn">Flip</button><button class="ib knowbtn" type="button" id="know" aria-pressed="false">✓ I know it</button></div><button class="ib" type="button" id="next" aria-label="Next card"><span class="lb">Next </span>→</button></div>
   </div>
 </div>
 
@@ -409,8 +409,10 @@ function faceHTML(c){const col=colorOf(c);const catName=c.light?'Conditionals':C
  return front+back}
 function openDeck(list,id){deck=list.slice();pos=Math.max(0,deck.findIndex(c=>c.id===id));$('ov').hidden=false;document.body.style.overflow='hidden';show(false);$('flip').focus({preventScroll:true})}
 function show(flipped){const c=deck[pos];const f=$('flip');f.classList.toggle('on',!!flipped);f.innerHTML=faceHTML(c);$('cnt').textContent=(pos+1)+' / '+deck.length;
- $('know').setAttribute('aria-pressed',known[c.id]?'true':'false');$('know').textContent=known[c.id]?'✓ Known':'✓ I know it';$('ov').scrollTop=0}
-function turn(){$('flip').classList.toggle('on');$('ov').scrollTop=0}
+ $('know').setAttribute('aria-pressed',known[c.id]?'true':'false');$('know').textContent=known[c.id]?'✓ Known':'✓ I know it';$('ov').scrollTop=0;f.style.transition='none';fit();f.offsetHeight;f.style.transition=''}
+function fit(){const f=$('flip');const face=f.querySelector(f.classList.contains('on')?'.back':'.front');if(face)f.style.height=face.offsetHeight+'px'}
+function turn(){$('flip').classList.toggle('on');fit();$('ov').scrollTop=0}
+addEventListener('resize',()=>{if(!$('ov').hidden)fit()});
 function go(d){pos=(pos+d+deck.length)%deck.length;show(false)}
 function closeDeck(){$('ov').hidden=true;document.body.style.overflow='';render()}
 $('flip').addEventListener('click',turn);$('turn').addEventListener('click',turn);
