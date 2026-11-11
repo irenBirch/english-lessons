@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
-/* Concept: a road trip through Focus 2, Units 1–6. A winding road map is the navigation; each unit is a stop with its own colour, an illustrated banner and picture-led tasks. Stars on the map fill in as tasks are checked. */
+/* Concept: a road trip through Focus 2, Units 1–8. A winding road map is the navigation; each unit is a stop with its own colour, an illustrated banner and picture-led tasks. Stars on the map fill in as tasks are checked. */
 :root{
   --bg:#FFF6E9; --paper:#FFFFFF; --ink:#2A1F3D; --muted:#6B5E7E; --rule:rgba(42,31,61,.12); --soft:#F6EAD8;
   --road:#3B3150; --line:#FFD166;
-  --u1:#FF6B6B; --u2:#3D8BFD; --u3:#B15CFF; --u4:#22B07D; --u5:#FF9F1C; --u6:#14B8C4;
+  --u1:#FF6B6B; --u2:#3D8BFD; --u3:#B15CFF; --u4:#22B07D; --u5:#FF9F1C; --u6:#14B8C4; --u7:#EC4899; --u8:#475569;
   --ok:#1C9D63; --bad:#E0473B; --star:#FFB703;
   --skin1:#F7C9A3; --skin2:#D9A07A; --skin3:#A86B4C; --skin4:#7A4B32;
   --f-d:"Bricolage Grotesque","Arial Black",system-ui,sans-serif; --f-b:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -22,12 +22,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#17121F; --paper:#221B2E; --ink:#F4EDFB; --muted:#B5A9C6; --rule:rgba(244,237,251,.13); --soft:#2C2339;
   --road:#4A3F60; --line:#FFD166;
-  --u1:#FF8585; --u2:#6AA6FF; --u3:#C78BFF; --u4:#3DCB95; --u5:#FFB547; --u6:#3FD3DE;
+  --u1:#FF8585; --u2:#6AA6FF; --u3:#C78BFF; --u4:#3DCB95; --u5:#FFB547; --u6:#3FD3DE; --u7:#F472B6; --u8:#94A3B8;
   --ok:#3DD68C; --bad:#FF7468; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17121F; --paper:#221B2E; --ink:#F4EDFB; --muted:#B5A9C6; --rule:rgba(244,237,251,.13); --soft:#2C2339;
   --road:#4A3F60; --line:#FFD166;
-  --u1:#FF8585; --u2:#6AA6FF; --u3:#C78BFF; --u4:#3DCB95; --u5:#FFB547; --u6:#3FD3DE;
+  --u1:#FF8585; --u2:#6AA6FF; --u3:#C78BFF; --u4:#3DCB95; --u5:#FFB547; --u6:#3FD3DE; --u7:#F472B6; --u8:#94A3B8;
   --ok:#3DD68C; --bad:#FF7468; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -55,7 +55,7 @@ button,input,select{font:inherit;color:inherit}
 
 /* road map nav */
 .mapnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--rule)}
-.stops{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;position:relative}
+.stops{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;position:relative}
 .stops::before{content:"";position:absolute;left:4%;right:4%;top:24px;height:8px;border-radius:9px;background:var(--road);background-image:repeating-linear-gradient(90deg,var(--line) 0 14px,transparent 14px 28px);background-size:28px 2px;background-repeat:repeat-x;background-position:0 50%;z-index:0}
 .stop{position:relative;z-index:1;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;min-width:0}
 .stop .dot{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-d);font-size:1.2rem;color:#fff;background:var(--c);border:4px solid var(--bg);box-shadow:0 0 0 2px var(--c);transition:transform .2s}
@@ -167,7 +167,7 @@ footer{padding-block:40px 40px;color:var(--muted);font-size:.85rem}
   .hero{grid-template-columns:minmax(0,1fr)}.hero-art{max-width:420px}
   .tasks,.deck,.rule-box .in,.house{grid-template-columns:minmax(0,1fr)}
   .banner{grid-template-columns:minmax(0,1fr)}.banner .art{max-height:200px}
-  .stop .nm{display:none}.stops::before{top:20px}.stop .dot{width:40px;height:40px;font-size:1rem;border-width:3px}
+  .stop .nm{display:none}.stops::before{top:17px}.stop .dot{width:34px;height:34px;font-size:.92rem;border-width:2px}.stop .st{font-size:.56rem;letter-spacing:0}
 }
 @media (max-width:440px){.cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.sum{grid-template-columns:minmax(0,1fr)}.task{padding:16px}.pc{padding:9px}}
 </style>
@@ -176,23 +176,25 @@ footer{padding-block:40px 40px;color:var(--muted);font-size:.85rem}
 <body>
 <header class="wrap hero">
   <div>
-    <div class="kick">Focus 2 · Units 1–6 · Revision</div>
+    <div class="kick">Focus 2 · Units 1–8 · Revision</div>
     <h1>Revision <em>Road Trip</em></h1>
-    <p class="lede">Six stops, six units: personality, inventions, the arts, homes, school and jobs. Do the tasks, press <b>Check</b>, and collect stars on the map. Open <b>Grammar in a nutshell</b> at each stop if you need a reminder.</p>
+    <p class="lede">Eight stops, eight units: personality, inventions, the arts, homes, school, jobs, shopping and society. Do the tasks, press <b>Check</b>, and collect stars on the map. Open <b>Grammar in a nutshell</b> at each stop if you need a reminder.</p>
     <div class="prog"><div class="bar" aria-hidden="true"><i id="pbar"></i></div><b id="ptxt">0 / 0 ★</b><button class="reset" type="button" id="reset">Start again</button></div>
   </div>
-  <svg class="hero-art" viewBox="0 0 480 300" role="img" aria-label="An illustrated road winding past six stops: a family, a light bulb, a palette, a house, a school and a briefcase">
+  <svg class="hero-art" viewBox="0 0 480 300" role="img" aria-label="An illustrated road winding past eight numbered stops">
     <path d="M10 270 C 120 270 120 190 220 190 S 330 110 420 110 S 470 40 470 40" fill="none" stroke="var(--road)" stroke-width="30" stroke-linecap="round"/>
     <path d="M10 270 C 120 270 120 190 220 190 S 330 110 420 110 S 470 40 470 40" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="12 12"/>
     <g font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#fff" text-anchor="middle">
-      <circle cx="40" cy="230" r="26" fill="var(--u1)"/><text x="40" y="237">1</text>
-      <circle cx="130" cy="205" r="26" fill="var(--u2)"/><text x="130" y="212">2</text>
-      <circle cx="215" cy="150" r="26" fill="var(--u3)"/><text x="215" y="157">3</text>
-      <circle cx="300" cy="140" r="26" fill="var(--u4)"/><text x="300" y="147">4</text>
-      <circle cx="380" cy="70" r="26" fill="var(--u5)"/><text x="380" y="77">5</text>
-      <circle cx="450" cy="120" r="26" fill="var(--u6)"/><text x="450" y="127">6</text>
+      <circle cx="30" cy="262" r="21" fill="var(--u1)"/><text x="30" y="268" font-size="17">1</text>
+      <circle cx="95" cy="248" r="21" fill="var(--u2)"/><text x="95" y="254" font-size="17">2</text>
+      <circle cx="158" cy="214" r="21" fill="var(--u3)"/><text x="158" y="220" font-size="17">3</text>
+      <circle cx="222" cy="190" r="21" fill="var(--u4)"/><text x="222" y="196" font-size="17">4</text>
+      <circle cx="290" cy="166" r="21" fill="var(--u5)"/><text x="290" y="172" font-size="17">5</text>
+      <circle cx="352" cy="126" r="21" fill="var(--u6)"/><text x="352" y="132" font-size="17">6</text>
+      <circle cx="418" cy="106" r="21" fill="var(--u7)"/><text x="418" y="112" font-size="17">7</text>
+      <circle cx="462" cy="58" r="21" fill="var(--u8)"/><text x="462" y="64" font-size="17">8</text>
     </g>
-    <g transform="translate(330 205)"><rect x="-38" y="-8" width="76" height="34" rx="12" fill="var(--u2)"/><rect x="-26" y="-26" width="48" height="24" rx="8" fill="var(--u2)"/><rect x="-20" y="-21" width="16" height="14" rx="3" fill="#fff" opacity=".8"/><rect x="2" y="-21" width="14" height="14" rx="3" fill="#fff" opacity=".8"/><circle cx="-20" cy="28" r="10" fill="var(--ink)"/><circle cx="20" cy="28" r="10" fill="var(--ink)"/></g>
+    <g transform="translate(330 225) scale(.8)"><rect x="-38" y="-8" width="76" height="34" rx="12" fill="var(--u2)"/><rect x="-26" y="-26" width="48" height="24" rx="8" fill="var(--u2)"/><rect x="-20" y="-21" width="16" height="14" rx="3" fill="#fff" opacity=".8"/><rect x="2" y="-21" width="14" height="14" rx="3" fill="#fff" opacity=".8"/><circle cx="-20" cy="28" r="10" fill="var(--ink)"/><circle cx="20" cy="28" r="10" fill="var(--ink)"/></g>
     <circle cx="80" cy="60" r="30" fill="var(--star)" opacity=".9"/>
   </svg>
 </header>
@@ -202,7 +204,7 @@ footer{padding-block:40px 40px;color:var(--muted);font-size:.85rem}
 </nav>
 
 <main class="wrap" id="main"></main>
-<footer class="wrap">Revision of Focus 2, Units 1–6 (up to 6.2). All sentences and illustrations were made for this lesson.</footer>
+<footer class="wrap">Revision of Focus 2, Units 1–8. All sentences and illustrations were made for this lesson.</footer>
 
 <script>
 /* ================= ILLUSTRATIONS ================= */
@@ -246,6 +248,18 @@ const I={
  chef:`<svg viewBox="0 0 100 100"><g fill="var(--paper)" stroke="var(--muted)" stroke-width="3"><path d="M28 60 C 10 56 12 30 30 32 C 32 14 58 10 62 26 C 80 18 94 40 74 58z"/><rect x="28" y="58" width="46" height="24" rx="3"/></g><path d="M38 70 h26" stroke="var(--muted)" stroke-width="3"/></svg>`,
  pilot:`<svg viewBox="0 0 100 100"><path d="M10 54 L90 40 Q96 40 94 46 L18 64z" fill="var(--c)"/><path d="M44 48 L30 18 h10 l22 28z M48 56 L36 84 h10 l18 -30z" fill="color-mix(in srgb,var(--c) 70%,var(--ink))"/><path d="M14 56 l-6 -16 h8 l10 14z" fill="var(--c)"/></svg>`,
  vet:`<svg viewBox="0 0 100 100"><g fill="var(--c)"><ellipse cx="50" cy="66" rx="20" ry="16"/><ellipse cx="26" cy="44" rx="8" ry="11"/><ellipse cx="42" cy="30" rx="8" ry="11"/><ellipse cx="58" cy="30" rx="8" ry="11"/><ellipse cx="74" cy="44" rx="8" ry="11"/></g><path d="M44 66 h12 M50 60 v12" stroke="#fff" stroke-width="4"/></svg>`,
+ bread:`<svg viewBox="0 0 100 100"><path d="M14 62 Q10 34 50 30 Q90 34 86 62 Q86 74 72 74 H28 Q14 74 14 62z" fill="#D99A4E"/><path d="M34 42 l8 18 M50 38 l6 20 M66 42 l4 16" stroke="#A8692B" stroke-width="4" stroke-linecap="round"/></svg>`,
+ pills:`<svg viewBox="0 0 100 100"><rect x="30" y="26" width="40" height="62" rx="8" fill="var(--c)"/><rect x="26" y="12" width="48" height="16" rx="4" fill="var(--paper)" stroke="var(--muted)" stroke-width="3"/><rect x="36" y="42" width="28" height="26" rx="3" fill="#fff"/><path d="M50 47 v16 M42 55 h16" stroke="var(--bad)" stroke-width="4"/></svg>`,
+ flower:`<svg viewBox="0 0 100 100"><path d="M50 52 V92" stroke="var(--u4)" stroke-width="5"/><path d="M50 76 q-18 -2 -22 -16 q16 0 22 16z" fill="var(--u4)"/><g fill="var(--c)"><circle cx="50" cy="22" r="12"/><circle cx="66" cy="34" r="12"/><circle cx="60" cy="52" r="12"/><circle cx="40" cy="52" r="12"/><circle cx="34" cy="34" r="12"/></g><circle cx="50" cy="38" r="9" fill="var(--star)"/></svg>`,
+ newspaper:`<svg viewBox="0 0 100 100"><rect x="14" y="18" width="72" height="64" rx="4" fill="var(--paper)" stroke="var(--ink)" stroke-width="4"/><rect x="22" y="26" width="56" height="10" fill="var(--ink)"/><rect x="22" y="42" width="24" height="20" fill="var(--c)"/><path d="M52 44 h26 M52 52 h26 M52 60 h20 M22 70 h56" stroke="var(--muted)" stroke-width="3"/></svg>`,
+ fruit:`<svg viewBox="0 0 100 100"><circle cx="38" cy="58" r="24" fill="var(--bad)"/><path d="M38 34 q2 -12 10 -16" stroke="#7A4B32" stroke-width="4" fill="none"/><path d="M40 30 q12 -12 20 -4 q-10 8 -20 4z" fill="var(--u4)"/><path d="M66 40 L84 86 L54 50z" fill="var(--u5)"/><path d="M62 42 l-4 -12 M66 40 l4 -12 M64 40 l0 -14" stroke="var(--u4)" stroke-width="4" stroke-linecap="round"/></svg>`,
+ shoe:`<svg viewBox="0 0 100 100"><path d="M10 70 V46 q0 -8 8 -8 h18 q6 10 18 12 l26 6 q12 3 12 14z" fill="var(--c)"/><rect x="8" y="70" width="86" height="10" rx="4" fill="var(--ink)"/><path d="M40 48 l6 -6 M48 51 l6 -6 M56 53 l6 -6" stroke="#fff" stroke-width="3"/></svg>`,
+ mask:`<svg viewBox="0 0 100 100"><path d="M10 44 q40 -20 80 0 q0 18 -14 22 q-14 4 -26 -8 q-12 12 -26 8 q-14 -4 -14 -22z" fill="var(--ink)"/><ellipse cx="32" cy="48" rx="9" ry="6" fill="var(--paper)"/><ellipse cx="68" cy="48" rx="9" ry="6" fill="var(--paper)"/><path d="M70 74 q14 0 14 14 h-28 q0 -14 14 -14z" fill="var(--muted)"/><text x="70" y="88" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="12" fill="#fff">$</text></svg>`,
+ gavel:`<svg viewBox="0 0 100 100"><g transform="rotate(-35 50 40)"><rect x="30" y="24" width="40" height="22" rx="4" fill="#A8692B"/><rect x="46" y="46" width="8" height="40" rx="3" fill="#C98B4A"/></g><rect x="52" y="78" width="38" height="10" rx="3" fill="#A8692B"/></svg>`,
+ badge:`<svg viewBox="0 0 100 100"><path d="M50 8 L60 32 L86 34 L66 52 L72 78 L50 64 L28 78 L34 52 L14 34 L40 32z" fill="var(--star)" stroke="#B57F00" stroke-width="3"/><circle cx="50" cy="46" r="10" fill="var(--c)"/></svg>`,
+ eye:`<svg viewBox="0 0 100 100"><path d="M8 50 Q50 10 92 50 Q50 90 8 50z" fill="var(--paper)" stroke="var(--ink)" stroke-width="4"/><circle cx="50" cy="50" r="16" fill="var(--c)"/><circle cx="50" cy="50" r="7" fill="var(--ink)"/><circle cx="55" cy="45" r="3" fill="#fff"/></svg>`,
+ scales:`<svg viewBox="0 0 100 100"><path d="M50 14 V84 M30 88 h40 M18 28 h64" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/><path d="M18 28 l-10 26 h20z M82 28 l-10 26 h20z" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M6 54 q12 12 24 0z M70 54 q12 12 24 0z" fill="var(--c)"/><circle cx="50" cy="14" r="6" fill="var(--star)"/></svg>`,
+ bars:`<svg viewBox="0 0 100 100"><rect x="12" y="12" width="76" height="76" rx="6" fill="color-mix(in srgb,var(--c) 30%,var(--paper))"/><circle cx="50" cy="46" r="14" fill="var(--muted)"/><path d="M30 88 q20 -30 40 0z" fill="var(--muted)"/><path d="M24 12 V88 M42 12 V88 M58 12 V88 M76 12 V88" stroke="var(--ink)" stroke-width="5"/><rect x="12" y="12" width="76" height="76" rx="6" fill="none" stroke="var(--ink)" stroke-width="5"/></svg>`,
  mechanic:`<svg viewBox="0 0 100 100"><path d="M70 14 a16 16 0 0 0 -14 22 L18 74 a8 8 0 0 0 11 11 L67 47 a16 16 0 0 0 22 -14 l-10 6 l-8 -4 l-2 -9 z" fill="var(--muted)"/><circle cx="24" cy="80" r="3" fill="var(--paper)"/></svg>`
 };
 /* banner scenes */
@@ -258,6 +272,8 @@ const ART={
  4:`<svg viewBox="0 0 380 200"><path d="M70 110 L150 40 L230 110z" fill="#fff"/><rect x="85" y="108" width="130" height="80" fill="#ffffffdd"/><rect x="138" y="140" width="26" height="48" fill="var(--c)"/><rect x="100" y="125" width="26" height="24" fill="var(--star)"/><rect x="176" y="125" width="26" height="24" fill="var(--star)"/><rect x="190" y="50" width="16" height="36" fill="#fff"/><g fill="#ffffffaa"><circle cx="290" cy="130" r="34"/><rect x="284" y="150" width="12" height="40"/></g><text x="300" y="60" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="30" fill="#fff">since 2015</text></svg>`,
  5:`<svg viewBox="0 0 380 200"><rect x="40" y="30" width="200" height="130" rx="10" fill="#1F4D3A"/><rect x="30" y="156" width="220" height="10" rx="4" fill="#C98B4A"/><text x="140" y="85" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="22" fill="#fff">If I revise,</text><text x="140" y="118" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="22" fill="#FFD166">I'll pass!</text>${G(260,40,1.0,I.maths,'--c:#ffffffcc')}<path d="M258 170 h100" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`,
  6:`<svg viewBox="0 0 380 200"><rect x="110" y="70" width="160" height="110" rx="14" fill="#fff"/><path d="M160 70 v-18 a10 10 0 0 1 10 -10 h40 a10 10 0 0 1 10 10 v18" stroke="#fff" stroke-width="10" fill="none"/><rect x="110" y="112" width="160" height="10" fill="var(--c)" opacity=".5"/><rect x="178" y="104" width="24" height="26" rx="4" fill="var(--star)"/>${G(10,30,0.9,I.chef,'')}${G(285,20,0.9,I.firefighter,'')}<text x="190" y="30" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="#fff">If I were a pilot…</text></svg>`
+ ,7:`<svg viewBox="0 0 380 200"><path d="M70 70 h130 l-12 110 h-106z" fill="#fff"/><path d="M100 70 v-18 a35 35 0 0 1 70 0 v18" stroke="#fff" stroke-width="8" fill="none"/><text x="135" y="140" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="34" fill="var(--c)">SALE</text><g transform="rotate(14 290 80)"><path d="M240 50 h80 l20 30 l-20 30 h-80z" fill="var(--star)"/><circle cx="324" cy="80" r="6" fill="var(--c)"/><text x="282" y="92" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="30" fill="#2A1F3D">-50%</text></g><text x="290" y="175" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="15" fill="#fff">It was made in Italy.</text></svg>`,
+ 8:`<svg viewBox="0 0 380 200">${G(30,20,1.5,I.scales,'--c:#ffffffcc')}${G(220,60,1.1,I.gavel)}<rect x="190" y="20" width="170" height="40" rx="14" fill="#fff"/><path d="M220 60 l-8 14 l20 -14z" fill="#fff"/><text x="275" y="46" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="14" fill="#2A1F3D">He said he had seen it.</text></svg>`
 };
 const HOUSE=`<svg viewBox="0 0 420 330" role="img" aria-label="A cut-away picture of a two-storey house with numbered furniture">
  <path d="M30 120 L210 20 L390 120z" fill="var(--c)"/><rect x="40" y="118" width="340" height="200" fill="var(--paper)" stroke="var(--ink)" stroke-width="4"/>
@@ -409,9 +425,10 @@ const U=[
    ["The library is a place ___ you can study quietly.",["where","which","whose"]],["Is that the book ___ you need for the test?",["which","who","where"]],
    ["She's the girl ___ won the science prize.",["who","which","whose"]]]}
  ]},
-{n:6,name:"Working life",c:"var(--u6)",chips:["jobs","work + prepositions","job vs work","Second Conditional"],
+{n:6,name:"Working life",c:"var(--u6)",chips:["jobs","work + prepositions","compound nouns","phrasal verbs","Second Conditional","must / have to / can"],
  rules:`<div><h4>Second Conditional</h4><p>Уявна, малоймовірна ситуація в теперішньому чи майбутньому.</p><p><b>If + Past Simple, would + V</b></p><p><i>If I <b>had</b> a million, I'<b>d travel</b> the world.</i></p><p><i>If I <b>were</b> you, I'd apply.</i> (were для всіх осіб)</p></div>
- <div><h4>Work words</h4><ul><li>work <b>as</b> a nurse · <b>for</b> a company · <b>in</b> a hospital · <b>with</b> animals</li><li><b>job</b> (злічуване): <i>a job, two jobs</i>; <b>work</b> (незлічуване): <i>a lot of work</i></li><li>full-time / part-time · well-paid / badly-paid · work long hours</li></ul></div>`,
+ <div><h4>Work words</h4><ul><li>work <b>as</b> a nurse · <b>for</b> a company · <b>in</b> a hospital · <b>with</b> animals</li><li><b>job</b> (злічуване): <i>a job, two jobs</i>; <b>work</b> (незлічуване): <i>a lot of work</i></li><li>full-time / part-time · well-paid / badly-paid · work long hours</li></ul></div>
+ <div><h4>Obligation &amp; permission</h4><ul><li><b>must / have to</b>: треба. <i>You have to wear a uniform.</i></li><li><b>mustn't / can't</b>: не можна! <i>You mustn't use phones.</i></li><li><b>don't have to</b>: не обов'язково. <i>I don't have to get up early on Saturday.</i></li><li><b>can / be allowed to</b>: можна. <i>We're allowed to wear jeans on Fridays.</i></li><li>минуле: <b>had to</b>, <b>could</b>, <b>was allowed to</b></li></ul></div>`,
  tasks:[
   {t:"Who am I?",d:"Read the clue and choose the job.",type:"cards",items:[
    [I.firefighter,"I put out fires and rescue people.",["firefighter","police officer","builder"]],[I.nurse,"I look after patients in a hospital.",["nurse","vet","pilot"]],
@@ -429,10 +446,79 @@ const U=[
    ["If I ",["be","were|was"]," you, I ",["apply","would apply"]," for that job."],
    ["If my dad ",["not / have","didn't have"]," to work at weekends, we ",["go","would go"]," on more trips."]]},
   {t:"Dream job questions",d:"Put the words in order. Then ask a partner!",type:"order",items:[
-   "What would you do if you won a million?","If you could have any job, what would it be?","Would you work at weekends if you were a chef?"]}
+    "What would you do if you won a million?","If you could have any job, what would it be?","Would you work at weekends if you were a chef?"]},
+  {t:"Work words",d:"Phrasal verbs and compound nouns. Choose the correct word.",type:"mc",items:[
+   ["He gave ___ his job in the bank to travel the world.",["up","in","out"]],["We ran ___ of money at the end of the month.",["out","off","away"]],
+   ["My aunt set ___ her own business last year.",["up","on","off"]],["Can you look ___ my cat while I'm on holiday?",["after","for","at"]],
+   ["I've got a job ___ tomorrow. I'm so nervous!",["interview","meeting","talk"]],["Students do two weeks of work ___ in a real company.",["experience","practice","time"]],
+   ["My boss gave me a pay ___!",["rise","up","more"]]]},
+  {t:"Rules, rules, rules",d:"Choose the correct modal verb.",type:"mc",items:[
+   ["You ___ wear a uniform at our school. It's a rule.",["have to","don't have to","can"]],["You ___ use your phone during the exam!",["mustn't","don't have to","have to"]],
+   ["It's Saturday tomorrow, so I ___ get up early.",["don't have to","mustn't","can't"]],["___ I use your computer, please?",["Can","Must","Have"]],
+   ["We aren't ___ to eat in the classroom.",["allowed","can","must"]],["Pilots ___ have very good eyesight.",["must","mustn't","don't have to"]],
+   ["Last year I ___ work every Saturday in my uncle's café.",["had to","must","have to"]]]}
+ ]},
+{n:7,name:"Shopping",c:"var(--u7)",chips:["shops & services","partitives","shopping","the Passive","quantifiers"],
+ rules:`<div><h4>The Passive</h4><p>Важливо, <b>що</b> сталося, а не <b>хто</b> зробив. <b>be + V3</b>.</p><ul><li>Present: <b>am/is/are + V3</b>. <i>Phones <b>are made</b> in China.</i></li><li>Past: <b>was/were + V3</b>. <i>The mall <b>was built</b> in 2015.</i></li><li>Хто зробив: <b>by</b>. <i>It was painted <b>by</b> my sister.</i></li></ul></div>
+ <div><h4>Quantifiers</h4><ul><li><b>many / a few</b> + злічувані: <i>many shops, a few apples</i></li><li><b>much / a little</b> + незлічувані: <i>much money, a little sugar</i></li><li><b>a lot of</b>: з усіма</li><li><b>some</b> у ствердженнях, <b>any</b> у запереченнях і питаннях</li></ul></div>`,
+ tasks:[
+  {t:"Where can you buy it?",d:"Look at the picture and choose the shop.",type:"cards",items:[
+   [I.bread,"You buy bread and cakes here.",["baker's","butcher's","chemist's"]],[I.pills,"You buy medicine and shampoo here.",["chemist's","newsagent's","florist's"]],
+   [I.flower,"You buy flowers for someone's birthday here.",["florist's","greengrocer's","baker's"]],[I.newspaper,"You buy newspapers and magazines here.",["newsagent's","bookshop","chemist's"]],
+   [I.fruit,"You buy fruit and vegetables here.",["greengrocer's","butcher's","florist's"]],[I.shoe,"You buy trainers and boots here.",["shoe shop","clothes shop","sports centre"]]]},
+  {t:"A carton of what?",d:"Choose the correct partitive.",type:"mc",items:[
+   ["a ___ of milk",["carton","bar","loaf"]],["a ___ of chocolate",["bar","jar","slice"]],["a ___ of bread",["loaf","packet","can"]],
+   ["a ___ of crisps",["packet","loaf","bar"]],["a ___ of jam",["jar","bar","carton"]],["a ___ of water",["bottle","slice","loaf"]],["a ___ of tuna",["tin","slice","piece"]]]},
+  {t:"At the shops",d:"Choose the correct word.",type:"mc",items:[
+   ["Can I ___ it on? – Yes, the changing rooms are over there.",["try","put","wear"]],["This T-shirt is too small. Can I ___ it for a bigger one?",["exchange","spend","borrow"]],
+   ["The zip is broken. I'd like a ___, please.",["refund","receipt","discount"]],["Keep the ___ in case you want to bring it back.",["receipt","refund","sale"]],
+   ["Everything is 50% off. The ___ start today!",["sales","bargains","prices"]],["Can I pay ___ card?",["by","with","in"]],
+   ["These jeans were a real ___: only 200 hryvnias!",["bargain","sale","price"]]]},
+  {t:"Made where?",d:"Write the verbs in the Present Simple or Past Simple Passive.",type:"lines",items:[
+   ["Millions of smartphones ",["sell","are sold"]," every year."],["This shopping centre ",["build","was built"]," in 2015."],
+   ["Most of our clothes ",["make","are made"]," in Asia."],["My bike ",["steal","was stolen"]," outside the shop last week!"],
+   ["The first credit card ",["use","was used"]," in 1950."],["Online orders ",["deliver","are delivered"]," in two days."],
+   ["These photos ",["not / take","weren't taken"]," by a professional."],["Where ",["your jacket / make","was your jacket made"],"?"]]},
+  {t:"How much? How many?",d:"Choose the correct quantifier.",type:"mc",items:[
+   ["How ___ money have you got?",["much","many","a few"]],["There are only ___ shops in my village.",["a few","a little","much"]],
+   ["I need ___ sugar for the cake. Just one spoon.",["a little","a few","many"]],["Are there ___ good shops near here?",["any","some","much"]],
+   ["We've got ___ apples. Do you want one?",["some","any","much"]],["How ___ people were at the sale?",["many","much","a little"]],
+   ["There's a lot ___ choice in the big mall.",["of","with","for"]],["There isn't ___ milk left. Can you buy some?",["much","many","a few"]]]},
+  {t:"Shop talk",d:"Put the words in order.",type:"order",items:["Can I try this on, please?","Were these shoes made in Italy?","How much is this jacket?"]}
+ ]},
+{n:8,name:"Society",c:"var(--u8)",chips:["politics","crime & criminals","the justice system","Past Perfect","Reported Speech"],
+ rules:`<div><h4>Past Perfect</h4><p><b>had + V3</b>: дія, що сталася <b>раніше</b> за іншу дію в минулому.</p><p><i>When the police arrived, the thief <b>had</b> already <b>run</b> away.</i></p><p>Часто з <i>when, after, before, by the time, already, never</i>.</p></div>
+ <div><h4>Reported Speech</h4><ul><li>Present Simple → Past Simple: <i>"I'm tired." → She said she <b>was</b> tired.</i></li><li>Present Continuous → Past Continuous</li><li>will → <b>would</b>, can → <b>could</b></li><li>Past Simple / Present Perfect → <b>Past Perfect</b></li><li><b>said</b> (that)…, але <b>told</b> + кому: <i>He told <b>me</b>…</i></li><li>Займенники змінюються: <i>my → her, I → he</i></li></ul></div>`,
+ tasks:[
+  {t:"Who's who in court?",d:"Read the clue and choose the person.",type:"cards",items:[
+   [I.mask,"This person steals things.",["thief","judge","witness"]],[I.gavel,"This person decides the punishment in court.",["judge","lawyer","victim"]],
+   [I.eye,"This person saw the crime and tells the court about it.",["witness","suspect","prisoner"]],[I.badge,"This person catches criminals.",["police officer","lawyer","judge"]],
+   [I.scales,"This person gives legal advice and speaks for you in court.",["lawyer","witness","thief"]],[I.bars,"This person is in prison.",["prisoner","victim","police officer"]]]},
+  {t:"Crime and society",d:"Choose the correct word.",type:"mc",items:[
+   ["Someone ___ my wallet on the bus!",["stole","robbed","burgled"]],["Two men ___ a bank in the city centre yesterday.",["robbed","stole","took"]],
+   ["The police ___ the thief outside the shop.",["arrested","sentenced","voted"]],["He was sent to ___ for five years.",["prison","court","police"]],
+   ["The judge gave her a ___ of 200 euros.",["fine","crime","prison"]],["Painting graffiti on other people's walls is ___.",["vandalism","shoplifting","burglary"]],
+   ["Taking things from a shop without paying is ___.",["shoplifting","vandalism","robbery"]],["People ___ in elections every four or five years.",["vote","elect","choose"]],
+   ["The leader of the government in the UK is the Prime ___.",["Minister","President","King"]]]},
+  {t:"The stolen laptop",d:"Past Simple or Past Perfect? Write the verbs in the correct form.",type:"story",parts:[
+   "When Mrs Brown ",["come","came"]," home last night, she saw that someone ",["break","had broken"]," her kitchen window. The thief ",["take","had taken"]," her laptop and her jewellery. She ",["call","called"]," the police at once, but when they arrived, the thief ",["already / run","had already run"]," away. A neighbour told them she ",["see","had seen"]," a man in a red hoodie earlier that evening. The police found the man two hours later. Luckily, he ",["not / sell","hadn't sold"]," the laptop yet. He said he ",["never / steal","had never stolen"]," anything before."]},
+  {t:"Which happened first?",d:"Choose Past Simple or Past Perfect.",type:"mc",items:[
+   ["When we got to the cinema, the film ___. We missed the beginning.",["had started","started","has started"]],
+   ["I ___ my keys, so I couldn't get into the flat.",["had lost","lost","have lost"]],
+   ["She ___ home, made dinner and went to bed.",["got","had got","has got"]],
+   ["After he ___ his homework, he played computer games.",["had finished","has finished","finishes"]],
+   ["I didn't recognise him. I ___ him before.",["hadn't met","didn't meet","haven't met"]]]},
+  {t:"What did they say?",d:"Report what people said.",type:"lines",items:[
+   ["“I am tired.” → She said she ",["be","was"]," tired."],["“I live in London.” → He said he ",["live","lived"]," in London."],
+   ["“We are watching TV.” → They said they ",["watch","were watching"]," TV."],["“I will help you.” → She said she ",["help","would help"]," me."],
+   ["“I can't swim.” → Tom said he ",["can't","couldn't"]," swim."],["“I have lost my phone.” → Ann told me she ",["lose","had lost"]," her phone."],
+   ["“I saw the thief.” → The witness said she ",["see","had seen"]," the thief."],["“My mum works here.” → He told me his mum ",["work","worked"]," there."]]},
+  {t:"said or told?",d:"Choose the correct word.",type:"mc",items:[
+   ["He ___ me he was sorry.",["told","said"]],["She ___ that she was late.",["said","told"]],["They ___ us they had won.",["told","said"]],
+   ["I ___ I didn't know the answer.",["said","told"]],["“I like your dog,” Kate said to me. → Kate said she liked ___ dog.",["my","your","her"]]]}
  ]}
 ];
-const TALK=["Describe your best friend's personality. What is he or she good at?","What do you enjoy doing at the weekend? What do you hate doing?","Which invention couldn't you live without? Why?","What did you use to do when you were little that you don't do now?","What were you doing at 8 o'clock last night?","Have you read a good book or seen a good film lately? What was it like?","What's the best concert, film or show you've ever seen?","How long have you lived in your home? Describe your room.","What are you doing this weekend? What are you going to do this summer?","What will you do if you get a bad mark in your next test?","Describe a teacher who has helped you a lot.","If you could have any job in the world, what would it be?","If you had a million hryvnias, what would you do with it?","Would you rather work in an office or outdoors? Why?"];
+const TALK=["Describe your best friend's personality. What is he or she good at?","What do you enjoy doing at the weekend? What do you hate doing?","Which invention couldn't you live without? Why?","What did you use to do when you were little that you don't do now?","What were you doing at 8 o'clock last night?","Have you read a good book or seen a good film lately? What was it like?","What's the best concert, film or show you've ever seen?","How long have you lived in your home? Describe your room.","What are you doing this weekend? What are you going to do this summer?","What will you do if you get a bad mark in your next test?","Describe a teacher who has helped you a lot.","If you could have any job in the world, what would it be?","If you had a million hryvnias, what would you do with it?","Would you rather work in an office or outdoors? Why?","What rules do you have to follow at school? What aren't you allowed to do?","What's your favourite shop? What do you usually buy there?","Have you ever taken something back to a shop? What happened?","Where was your favourite piece of clothing made?","What would you do if you saw someone shoplifting?","What should the punishment be for vandalism?","Tell a story about a day when everything went wrong. What had happened?","What did your teacher tell you last lesson? Report it!"];
 
 /* ================= ENGINE ================= */
 const $=id=>document.getElementById(id);
@@ -448,7 +534,7 @@ function count(k){if(k.type==='lines')return k.items.reduce((s,l)=>s+l.filter(x=
 function unitScore(u){let o=0,n=0;U[u].tasks.forEach((k,i)=>{const r=st.s[u+'-'+i];n+=count(k);if(r)o+=r[0]});return [o,n]}
 const stars=([o,n])=>{const p=o/n;return p>=.9?3:p>=.7?2:p>=.35?1:0};
 function refresh(){let o=0;U.forEach((u,i)=>o+=unitScore(i)[0]);$('pbar').style.width=(o/total*100)+'%';$('ptxt').textContent=o+' / '+total+' ★';
-  document.querySelectorAll('.stop').forEach((b,i)=>{const s=b.querySelector('.st');if(s&&i>=1&&i<=6){const k=stars(unitScore(i-1));s.textContent='★'.repeat(k)+'☆'.repeat(3-k)}})}
+  document.querySelectorAll('.stop').forEach((b,i)=>{const s=b.querySelector('.st');if(s&&i>=1&&i<=U.length){const k=stars(unitScore(i-1));s.textContent='★'.repeat(k)+'☆'.repeat(3-k)}})}
 function record(key,o,n){const p=st.s[key];if(!p||o>=p[0])st.s[key]=[o,n];save();refresh()}
 function setMsg(el,o,n){el.className='msg '+(o===n?'ok':'no');el.textContent=o===n?'All correct! ★':o+' / '+n+' correct'}
 
@@ -456,17 +542,17 @@ function setMsg(el,o,n){el.className='msg '+(o===n?'ok':'no');el.textContent=o==
 const stopsEl=$('stops');
 const NAV=[{name:"Start",c:"var(--ink)",lbl:"★"},...U.map(u=>({name:u.name,c:u.c,lbl:u.n})),{name:"Finish",c:"var(--star)",lbl:"🏁"}];
 NAV.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.className='stop';b.style.setProperty('--c',s.c);
-  b.innerHTML=`<span class="dot">${s.lbl}</span><span class="nm">${s.name}</span><span class="st"></span>`;b.setAttribute('aria-label',i===0?'Start':i===7?'Finish':'Unit '+i+': '+s.name);
+  b.innerHTML=`<span class="dot">${s.lbl}</span><span class="nm">${s.name}</span><span class="st"></span>`;b.setAttribute('aria-label',i===0?'Start':i===U.length+1?'Finish':'Unit '+i+': '+s.name);
   b.addEventListener('click',()=>show(i,true));stopsEl.appendChild(b)});
 
 function show(i,scroll){st.cur=i;save();document.querySelectorAll('.stop').forEach((b,k)=>b.setAttribute('aria-current',k===i?'true':'false'));
-  const m=$('main');m.innerHTML='';if(i===0)renderStart(m);else if(i===7)renderFinish(m);else renderUnit(m,i-1);
+  const m=$('main');m.innerHTML='';if(i===0)renderStart(m);else if(i===U.length+1)renderFinish(m);else renderUnit(m,i-1);
   if(scroll)window.scrollTo({top:document.querySelector('.mapnav').offsetTop-4,behavior:'smooth'})}
 
 function renderStart(m){const s=document.createElement('section');s.className='station';s.style.setProperty('--c','var(--u1)');
   s.innerHTML=`<div class="tasks"><div class="task wide"><div class="th"><span class="n">0</span><div><h3>Warm-up: Find your way</h3><p>Answer as fast as you can. Every question is from a different unit!</p></div></div><ol class="mc" id="wu"></ol><div class="foot"><button class="btn" type="button" id="wuc">Check</button><span class="msg" id="wum"></span></div></div></div>`;
   m.appendChild(s);
-  const WU=[["My sister is very ___. She never shares anything.",["mean","generous","kind"]],["I ___ TV when you called me.",["was watching","watched","am watching"]],["Have you finished your project ___?",["yet","already","just"]],["I've lived here ___ I was born.",["since","for","from"]],["If it ___ tomorrow, we'll stay at home.",["rains","will rain","rained"]],["If I ___ a pilot, I'd fly to Japan.",["were","am","will be"]]];
+  const WU=[["My sister is very ___. She never shares anything.",["mean","generous","kind"]],["I ___ TV when you called me.",["was watching","watched","am watching"]],["Have you finished your project ___?",["yet","already","just"]],["I've lived here ___ I was born.",["since","for","from"]],["If it ___ tomorrow, we'll stay at home.",["rains","will rain","rained"]],["If I ___ a pilot, I'd fly to Japan.",["were","am","will be"]],["You ___ use your phone in the exam. It's not allowed!",["mustn't","don't have to","have to"]],["This bridge ___ in 1900.",["was built","built","is built"]],["She said she ___ tired.",["was","is","has been"]]];
   buildMC($('wu'),WU,'wu');$('wuc').addEventListener('click',()=>{const [o,n]=checkMC($('wu'));setMsg($('wum'),o,n)});
   const go=document.createElement('div');go.className='foot';go.style.marginTop='18px';go.innerHTML='<button class="btn" type="button" style="--c:var(--u1)">Go to Unit 1 →</button>';go.firstChild.addEventListener('click',()=>show(1,true));s.appendChild(go)}
 
@@ -485,7 +571,7 @@ function renderUnit(m,u){const D=U[u];const s=document.createElement('section');
     else if(k.type==='house'){check=buildHouse(body,k,key)}
     t.querySelector('.btn').addEventListener('click',()=>{const [o,n]=check();setMsg(msg,o,n);record(key,o,n)});box.appendChild(t)});
   const nav=document.createElement('div');nav.className='foot';nav.style.marginTop='20px';
-  nav.innerHTML=`<button class="btn ghost" type="button">← ${u?'Unit '+u:'Start'}</button><button class="btn" type="button">${u<5?'Next stop: Unit '+(u+2):'Finish line'} →</button>`;
+  nav.innerHTML=`<button class="btn ghost" type="button">← ${u?'Unit '+u:'Start'}</button><button class="btn" type="button">${u<U.length-1?'Next stop: Unit '+(u+2):'Finish line'} →</button>`;
   nav.children[0].addEventListener('click',()=>show(u,true));nav.children[1].addEventListener('click',()=>show(u+2,true));s.appendChild(nav);m.appendChild(s)}
 
 function buildMC(ol,items,key){items.forEach(([s,opts],qi)=>{const li=document.createElement('li');li.dataset.a=opts[0];const p=s.split('___');
@@ -536,7 +622,7 @@ function renderFinish(m){const s=document.createElement('section');s.className='
 /* reset */
 let armT;$('reset').addEventListener('click',e=>{const b=e.currentTarget;if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='Click again to clear everything';armT=setTimeout(()=>{b.classList.remove('arm');b.textContent='Start again'},3500);return}
   clearTimeout(armT);st={s:{},v:{},cur:0};save();b.classList.remove('arm');b.textContent='Start again';refresh();show(0,true)});
-show(Math.min(st.cur||0,7),false);refresh();
+show(Math.min(st.cur||0,U.length+1),false);refresh();
 </script>
 
 </body>
