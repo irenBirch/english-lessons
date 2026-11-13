@@ -185,6 +185,22 @@ section.blk{padding-block:64px 6px;scroll-margin-top:60px}
 .gen{display:flex;flex-direction:column;gap:6px;font-weight:700}
 .gen p{padding:8px 12px;border-radius:10px;background:var(--sky)}
 
+.vidbox{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+.screen{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:20px;overflow:hidden;background:#0C1A22}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.facade{position:absolute;inset:0;display:grid;place-items:center;border:0;padding:0;cursor:pointer;width:100%;color:#fff;background:linear-gradient(160deg,var(--c1),#0C1A22 80%)}
+.facade .pl{width:80px;height:80px;border-radius:50%;background:var(--sun);display:grid;place-items:center;box-shadow:0 0 0 12px rgba(255,194,60,.25);transition:transform .2s}
+.facade:hover .pl{transform:scale(1.08)}
+.facade .tt{position:absolute;left:18px;right:18px;bottom:16px;text-align:left;font-family:var(--f-d);font-size:clamp(1.1rem,3vw,1.6rem);line-height:1.05}
+.facade .src{position:absolute;left:18px;top:14px;font-family:var(--f-m);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.plist button{width:100%;border:1.5px solid var(--rule);background:var(--card);border-radius:14px;padding:10px 14px;cursor:pointer;text-align:left;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px}
+.plist button b{grid-row:span 2;font-family:var(--f-d);font-size:1.3rem;color:var(--coral);align-self:center}
+.plist button span{font-weight:800}
+.plist button small{color:var(--muted)}
+.plist button[aria-current="true"]{border-color:var(--coral);background:color-mix(in srgb,var(--coral) 10%,var(--card))}
+#vtasks ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+@media (max-width:760px){.vidbox{grid-template-columns:minmax(0,1fr)}}
 footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
 
 @media (max-width:980px){.vcards{grid-template-columns:repeat(2,minmax(0,1fr))}.fut{grid-template-columns:minmax(0,1fr)}.builder{grid-template-columns:minmax(0,1fr)}}
@@ -234,7 +250,7 @@ footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
 
 <nav class="nav" aria-label="Lesson blocks">
   <div class="wrap">
-    <a href="#b1"><b>01</b>Warm-up</a><a href="#b2"><b>02</b>Living spaces</a><a href="#b3"><b>03</b>Listening</a><a href="#b4"><b>04</b>Future forms</a><a href="#b5"><b>05</b>Practice</a><a href="#b6"><b>06</b>Build your city</a><a href="#b7"><b>07</b>Speaking &amp; homework</a>
+    <a href="#b1"><b>01</b>Warm-up</a><a href="#b2"><b>02</b>Living spaces</a><a href="#b3"><b>03</b>Listening</a><a href="#bv"><b>▶</b>Video</a><a href="#b4"><b>04</b>Future forms</a><a href="#b5"><b>05</b>Practice</a><a href="#b6"><b>06</b>Build your city</a><a href="#b7"><b>07</b>Speaking &amp; homework</a>
   </div>
 </nav>
 
@@ -311,6 +327,20 @@ footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
   </div>
 </section>
 
+<section class="blk" id="bv">
+  <div class="bh"><div class="pin" style="--c:var(--coral)">▶</div><div><h2>Watch: the city of tomorrow</h2><p>Three real videos about future homes and cities: a TED talk, a city designer answering questions, and a documentary. Choose one or watch them all.</p></div><span class="time">15 min</span></div>
+  <div class="vidbox">
+    <div class="stack">
+      <div class="screen" id="screen"></div>
+      <p class="ua" id="vlink"></p>
+    </div>
+    <div class="stack">
+      <ol class="plist" id="playlist"></ol>
+      <div class="card stack" id="vtasks"></div>
+    </div>
+  </div>
+</section>
+
 <section class="blk" id="b4">
   <div class="bh"><div class="pin" style="--c:var(--blue)">04</div><div><h2>Future forms</h2><p>Three ways to look at the future from a fixed point in time.</p></div><span class="time">15 min</span></div>
   <div class="fut">
@@ -384,7 +414,7 @@ footer{padding-block:60px 44px;color:var(--muted);font-size:.84rem}
   </div>
 </section>
 </main>
-<footer class="wrap">English B2 lesson for Focus 4, Unit 3 “Living spaces”. All texts, the podcast and the illustrations were made for this lesson. The podcast is read aloud by your browser's voices.</footer>
+<footer class="wrap">English B2 lesson for Focus 4, Unit 3 “Living spaces”. The texts, the podcast and the illustrations were made for this lesson; the videos belong to their YouTube channels. The podcast is read aloud by your browser's voices.</footer>
 
 <script>
 /* ============ ICONS (original illustrations) ============ */
@@ -400,6 +430,7 @@ const IC={
  park:`<svg viewBox="0 0 120 90"><rect x="6" y="20" width="108" height="64" rx="10" fill="var(--hill)"/><g fill="var(--green)"><circle cx="34" cy="46" r="14"/><circle cx="80" cy="40" r="16"/><circle cx="60" cy="66" r="10"/></g><path d="M8 74 Q60 50 112 74" stroke="var(--sun)" stroke-width="4" fill="none"/></svg>`,
  pedestrian:`<svg viewBox="0 0 120 90"><rect x="6" y="20" width="108" height="64" rx="8" fill="var(--tint)"/><g fill="var(--sun)"><circle cx="40" cy="38" r="6"/><circle cx="76" cy="44" r="6"/></g><path d="M40 44 v18 M40 50 l-8 6 M40 50 l8 6 M40 62 l-6 12 M40 62 l6 12 M76 50 v18 M76 56 l-8 6 M76 56 l8 6 M76 68 l-6 10 M76 68 l6 10" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="30" r="9" fill="none" stroke="var(--coral)" stroke-width="3"/><path d="M93 37 L107 23" stroke="var(--coral)" stroke-width="3"/></svg>`,
  school:`<svg viewBox="0 0 120 90"><path d="M14 84 v-40 l46 -26 l46 26 v40z" fill="var(--violet)"/><rect x="50" y="56" width="20" height="28" fill="var(--card)"/><g fill="var(--win)"><rect x="24" y="52" width="14" height="12"/><rect x="82" y="52" width="14" height="12"/></g><circle cx="60" cy="38" r="7" fill="var(--card)"/></svg>`,
+ icerink:`<svg viewBox="0 0 120 90"><ellipse cx="60" cy="58" rx="54" ry="26" fill="var(--blue)" opacity=".35"/><ellipse cx="60" cy="58" rx="44" ry="18" fill="var(--card)" stroke="var(--blue)" stroke-width="3"/><path d="M30 56 q14 -8 30 0 t30 0" stroke="var(--blue)" stroke-width="2" fill="none" opacity=".6"/><path d="M48 22 v18 h-10 q-4 0 -4 4 h22 v-22z" fill="var(--coral)"/><path d="M34 48 h24" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><path d="M80 18 l4 8 l8 1 l-6 6 l2 8 l-8 -4 l-8 4 l2 -8 l-6 -6 l8 -1z" fill="var(--card)" stroke="var(--blue)" stroke-width="2"/></svg>`,
  solar:`<svg viewBox="0 0 120 90"><circle cx="96" cy="18" r="10" fill="var(--sun)"/><g fill="var(--blue)" stroke="var(--ink)" stroke-width="2"><path d="M8 80 L24 52 H56 L40 80Z"/><path d="M56 80 L72 52 H104 L88 80Z"/></g><path d="M24 66 H50 M72 66 H98" stroke="var(--card)" stroke-width="2"/></svg>`
 };
 
@@ -484,7 +515,7 @@ const POLITE=[
  ["Are you moving to a residential area next year?","Will you be moving to a residential area next year?"],
  ["Do you think you'll leave your hometown before you're 25?","Will you be leaving your hometown before you're 25?"]
 ];
-const BUILD=[["tower","tower block"],["residential","houses"],["selfcontained","flats"],["park","park"],["pedestrian","pedestrian zone"],["carpark","car park"],["development","building site"],["school","school"],["solar","solar farm"]];
+const BUILD=[["tower","tower block"],["residential","houses"],["selfcontained","flats"],["park","park"],["pedestrian","pedestrian zone"],["carpark","car park"],["development","building site"],["school","school"],["solar","solar farm"],["icerink","ice rink"]];
 
 /* ============ HELPERS ============ */
 const $=id=>document.getElementById(id);
@@ -520,30 +551,34 @@ function say(text,who,onend){if(!synth)return;const u=new SpeechSynthesisUtteran
 $('vcards').innerHTML='';
 COLLO.forEach(([w,ic,d])=>{const c=document.createElement('article');c.className='vc';
   c.innerHTML=`<div class="art">${IC[ic]}</div><div class="body"><b>${w}</b><span>${d}</span><button class="say" type="button">Listen</button></div>`;
-  c.querySelector('.say').addEventListener('click',()=>{if(synth){synth.cancel();say(w,'A')}});$('vcards').appendChild(c)});
+  c.querySelector('.say').addEventListener('click',()=>{if(synth){if(typeof stop==='function'&&state!=='idle')stop();synth.cancel();say(w,'A')}});$('vcards').appendChild(c)});
 
 /* podcast */
 const wave=$('wave');for(let i=0;i<48;i++){const s=document.createElement('i');wave.appendChild(s)}
-let playing=false,line=0,wt=null;
+let state='idle',line=0,part=0,tok=0,wt=null;
+const PARTS=SCRIPT.map(([w,t])=>t.match(/[^.!?]+[.!?]+["”]?\s*|[^.!?]+$/g).map(x=>x.trim()).filter(Boolean));
 function animate(on){clearInterval(wt);const bars=wave.querySelectorAll('i');if(!on){bars.forEach(b=>b.style.height='20%');return}wt=setInterval(()=>bars.forEach(b=>b.style.height=(15+Math.random()*85)+'%'),140)}
-function playFrom(i){if(!synth)return;synth.cancel();playing=true;line=i;$('deck').classList.add('on');$('play').textContent='Pause';animate(true);next()}
-function next(){if(!playing)return;if(line>=SCRIPT.length){stop();$('now').textContent='The end. Now do Tasks 1 and 2.';return}
-  const [who,txt]=SCRIPT[line];$('now').textContent=(who==='L'?'Leo: ':'Amara: ')+'…';
-  document.querySelectorAll('#script p').forEach((p,k)=>p.classList.toggle('cur',k===line));
-  say(txt,who,()=>{line++;next()})}
-function stop(){playing=false;if(synth)synth.cancel();$('deck').classList.remove('on');$('play').textContent='Play';animate(false);document.querySelectorAll('#script p').forEach(p=>p.classList.remove('cur'))}
-$('play').addEventListener('click',()=>{if(!synth)return;
-  if(playing&&!synth.paused){synth.pause();$('play').textContent='Resume';animate(false);return}
-  if(playing&&synth.paused){synth.resume();$('play').textContent='Pause';animate(true);return}
-  playFrom(line>=SCRIPT.length?0:line)});
-$('stop').addEventListener('click',()=>{stop();line=0;$('now').textContent='Press Play to listen.'});
+function mark(k){document.querySelectorAll('#script p').forEach((p,n)=>p.classList.toggle('cur',n===k))}
+function ui(){$('play').textContent=state==='playing'?'Pause':state==='paused'?'Resume':'Play';$('deck').classList.toggle('on',state==='playing');animate(state==='playing')}
+function speakNext(single){if(state!=='playing')return;
+  if(line>=SCRIPT.length){state='idle';line=0;part=0;ui();mark(-1);$('now').textContent='The end. Now do Tasks 1 and 2.';return}
+  const who=SCRIPT[line][0];$('now').textContent=(who==='L'?'Leo: ':'Amara: ')+'…';mark(line);
+  const my=++tok;say(PARTS[line][part],who,()=>{if(my!==tok||state!=='playing')return;part++;
+    if(part>=PARTS[line].length){part=0;line++;if(single){state='idle';ui();mark(-1);$('now').textContent='Press Play to listen.';return}}speakNext(single)})}
+let single=false;
+function start(fromLine,one){if(!synth)return;tok++;synth.cancel();line=fromLine;part=0;single=!!one;state='playing';ui();setTimeout(()=>speakNext(single),60)}
+function pause(){tok++;state='paused';if(synth)synth.cancel();ui();$('now').textContent='Paused. Press Resume to continue.'}
+function resume(){if(!synth)return;tok++;synth.cancel();state='playing';ui();setTimeout(()=>speakNext(single),60)}
+function stop(){tok++;state='idle';if(synth)synth.cancel();line=0;part=0;ui();mark(-1);$('now').textContent='Press Play to listen.'}
+$('play').addEventListener('click',()=>{if(!synth)return;if(state==='playing')pause();else if(state==='paused')resume();else start(0)});
+$('stop').addEventListener('click',stop);
+$('rate').addEventListener('change',()=>{if(state==='playing'){tok++;synth.cancel();setTimeout(()=>speakNext(single),60)}});
 
 /* transcript */
 const FUT=/((?:will|won't|'ll)(?: (?:you|families))? (?:have been \w+ing|have (?:banned|turned)|be \w+ing))/g;
 const COL=/(self-contained flats?|tower blocks?|multi-storey car parks?|domestic chores|household appliances|residential areas|housing development|second home)/g;
 SCRIPT.forEach(([who,txt],i)=>{const p=document.createElement('p');p.innerHTML=`<b>${who==='L'?'Leo':'Amara'}:</b> `+txt.replace(COL,'<mark>$1</mark>').replace(FUT,'<u>$1</u>');
-  p.title='Click to hear this line';p.addEventListener('click',()=>{if(!synth)return;stop();line=i;playing=true;$('deck').classList.add('on');animate(true);
-    document.querySelectorAll('#script p').forEach((q,k)=>q.classList.toggle('cur',k===i));say(txt,who,()=>stop())});$('script').appendChild(p)});
+  p.title='Click to hear this line';p.addEventListener('click',()=>start(i,true));$('script').appendChild(p)});
 $('showScript').addEventListener('click',e=>{const s=$('script');s.hidden=!s.hidden;e.currentTarget.textContent=s.hidden?'Show the transcript':'Hide the transcript'});
 
 /* tasks */
@@ -595,11 +630,41 @@ function describe(){const c={};grid.forEach(v=>{if(v)c[v]=(c[v]||0)+1});
   if(n('park'))g.push(`Children will be playing in ${pl(n('park'),'green park','green parks')} every afternoon.`);
   if(n('development'))g.push(`By 2055, the builders will have been working on the new housing development for five years.`);
   if(n('school'))g.push(`This time next year, students will be studying in ${pl(n('school'),'new school','new schools')}.`);
+  if(n('icerink'))g.push(n('icerink')>1?`In winter, people will be skating at ${n('icerink')} ice rinks all over the city.`:`In winter, teenagers will be skating at the new ice rink every weekend.`);
   if(n('solar'))g.push(`By 2040, the city will have been using only solar energy for ten years.`);
   $('gen').innerHTML=g.length?g.map(s=>`<p>${s}</p>`).join(''):'<p>Place some buildings, and example sentences about your city will appear here.</p>';}
 $('clearMap').addEventListener('click',()=>{grid=Array(COLS*ROWS).fill(null);st.grid=grid;save();drawMap()});
 $('randMap').addEventListener('click',()=>{const keys=BUILD.map(b=>b[0]);grid=grid.map(()=>Math.random()<.55?keys[Math.floor(Math.random()*keys.length)]:null);st.grid=grid;save();drawMap()});
 drawMap();
+
+/* ============ VIDEO ============ */
+const VIDS=[
+ {id:'B8kyrIQCFXQ',t:'A vision of sustainable housing for all of humanity',s:'TED · Vishaan Chakrabarti · about 10 min',c:'#22A565',
+  tasks:['Before you watch: by 2100, how many people do you think will live on Earth? Guess, then check.','What problem is the architect trying to solve?','He talks about a “Goldilocks” type of building. What is it, and why is it “just right”? Is it a house, a tower block or something in between?','Which materials and transport does he think future neighbourhoods should use?','Would you like to live in the kind of neighbourhood he describes? Why or why not?','Grammar: make 3 predictions about housing in 2100 with will be + -ing, will have + V3 and will have been + -ing.']},
+ {id:'ldtUrIco_rk',t:'Urban designer answers city planning questions',s:'WIRED Tech Support · Alexandro Washburn · 11 min',c:'#2F7FE0',
+  tasks:['Who is Alexandro Washburn and what was his job?','Write down three questions people ask him. Which one is the funniest?','Choose one answer and explain it to your partner in your own words.','Which of his ideas would make your town a better place to live?','Write your own question for an urban designer about your city. Use a polite question: Will cities be…? Will people be…?']},
+ {id:'HBMlQZeXMiA',t:'Future cities: urban planners get creative',s:'DW Documentary · long: watch 10–15 minutes',c:'#7A5AF8',
+  tasks:['Why do some architects want to reuse old buildings instead of building new ones?','Which natural, local materials are mentioned?','What is Toyota\'s “Woven City” and where is it?','What is a “bio-city”? What will it produce for its own people?','Which idea from the film will most cities have tried by 2050, in your opinion? Use the Future Perfect.']}
+];
+const scr=$('screen');
+const CAN_EMBED=/github\.io$|^localhost$|^127\./.test(location.hostname)||location.protocol==='file:';
+function loadVid(i,autoplay){const v=VIDS[i];const yt=`https://www.youtube.com/watch?v=${v.id}`;
+  const face=`<span class="src">${v.s}</span><span class="pl"><svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l14 8-14 8z" fill="#1A1400"/></svg></span><span class="tt">${v.t}</span>`;
+  if(CAN_EMBED){
+    scr.innerHTML=`<button class="facade" type="button" style="--c1:${v.c}" aria-label="Play ${v.t}">${face}</button>`;
+    const play=()=>{const origin=encodeURIComponent(location.origin&&location.origin!=='null'?location.origin:'https://irenbirch.github.io');
+      scr.innerHTML=`<iframe src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="${v.t}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`};
+    scr.querySelector('.facade').addEventListener('click',play);if(autoplay)play();
+    $('vlink').innerHTML=`If it says “Video unavailable”, <a href="${yt}" target="_blank" rel="noopener">open it on YouTube</a>.`;
+  }else{
+    scr.innerHTML=`<a class="facade" href="${yt}" target="_blank" rel="noopener" style="--c1:${v.c};text-decoration:none">${face}</a>`;
+    $('vlink').innerHTML=`In this preview the video opens on YouTube. On the class website (irenbirch.github.io) it plays right here.`;
+  }
+  $('vtasks').innerHTML=`<span class="lbl">Tasks</span><ol>${v.tasks.map(t=>`<li>${t}</li>`).join('')}</ol>`;
+  document.querySelectorAll('#playlist button').forEach((b,k)=>b.setAttribute('aria-current',k===i?'true':'false'))}
+VIDS.forEach((v,i)=>{const li=document.createElement('li');li.innerHTML=`<button type="button"><b>${i+1}</b><span>${v.t}</span><small>${v.s}</small></button>`;
+  li.querySelector('button').addEventListener('click',()=>loadVid(i,true));$('playlist').appendChild(li)});
+loadVid(0,false);
 </script>
 
 </body>
